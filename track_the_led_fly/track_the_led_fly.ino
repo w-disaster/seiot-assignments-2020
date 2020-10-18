@@ -40,7 +40,7 @@ void setup() {
 void loop() {
   isOver = true;
   /* pulsante random tra il 2,3,4,5 */
-  int rnd = random(4);
+  int rnd = random(BUTTON_MAX - BUTTON_MIN + 1);
   /* disabilitiamo l'interrupt poichè se il bottone viene premuto è quello giusto */
   disableInterrupt(BUTTON_MIN + rnd);
   digitalWrite(PIN_MIN + rnd, HIGH);
