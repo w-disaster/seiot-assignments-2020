@@ -9,8 +9,6 @@
 #include <EnableInterrupt.h>
 #include "game_lib.h"
 
-int pin[LED_MAX - LED_MIN];
-
 int tMin;
 
 /* red led variables */
