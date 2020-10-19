@@ -1,15 +1,5 @@
 #include <EnableInterrupt.h>
-
-#define PIN_MIN 10
-#define PIN_MAX 13
-#define BUTTON_MIN 2
-#define BUTTON_MAX 5
-
-#define RED_LED 6
-#define FADE_STEP 5
-
-#define TMIN 250
-#define TMAX 1500
+#include "game_lib.h"
 
 int pin[PIN_MAX - PIN_MIN];
 
