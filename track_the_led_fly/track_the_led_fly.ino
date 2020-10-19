@@ -1,3 +1,9 @@
+/*
+ * PARTECIPANTI DEL GRUPPO
+ * - Luigi Olivieri
+ * - Luca Fabri
+ */
+
 #define EI_ARDUINO_INTERRUPTED_PIN
 
 #include <EnableInterrupt.h>
