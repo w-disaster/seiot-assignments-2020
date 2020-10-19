@@ -16,6 +16,8 @@ int tMin;
 int brightness;
 int verse;
 
+int flyPosition;
+
 int score;
 int isHigh;
 int offset;
@@ -51,15 +53,26 @@ void setup() {
   Serial.println("Track to Led Fly Game. Press Key T1 to Start \n");
 }
 
+void moveFly(){
+  noInterrupts();
+  int nextStep = random(0,1);
+  /* muovo la fly a destra o sinistra randoimicamente */
+  nextStep ? flyPosition++ : flyPosition--;
+
+  /* overflow control */
+  if(flyPosition > BUTTON_MAX-BUTTON_MIN) flyPosition = 0;
+  if(flyPosition < 0) flyPosition = BUTTON_MAX-BUTTON_MIN;
+
+ interrupts(); 
+}
+
 void loop() {
   if(isPlaying){
     
     isOver = true;
-    /* pulsante random tra il 2,3,4,5 */
-    int rnd = random(BUTTON_MAX - BUTTON_MIN + 1);
     /* disabilitiamo l'interrupt poichè se il bottone viene premuto è quello giusto */
-    disableInterrupt(BUTTON_MIN + rnd);
-    digitalWrite(PIN_MIN + rnd, HIGH);
+    disableInterrupt(BUTTON_MIN + flyPosition);
+    digitalWrite(PIN_MIN + flyPosition, HIGH);
 
     /* numero random che rappresenta il tempo disponibile per premere il pulsante */ 
     long rndTimer = random(tMin - offset, tMin*K);
@@ -67,7 +80,7 @@ void loop() {
     unsigned long tstart = millis();
     while(millis() - tstart < rndTimer){
       /* leggiamo lo stato del pulsante finchè la disuguaglianza è soddisfatta */
-      int buttonState = digitalRead(BUTTON_MIN + rnd);
+      int buttonState = digitalRead(BUTTON_MIN + flyPosition);
       /* se è ad HIGH e non è già stato premuto, l'ho premuto in tempo */
       if(buttonState == HIGH && isHigh == 0){
         isHigh = 1;
@@ -75,7 +88,7 @@ void loop() {
         isOver = false;
         offset = offset + 10;
         Serial.print("Tracking the fly: pos ");
-        Serial.println(rnd + 1);
+        Serial.println(flyPosition + 1);
         score++;
       } else if(buttonState == LOW){
         isHigh = 0;
@@ -88,10 +101,6 @@ void loop() {
     
     offset = 0;
     
-    /* spengo il led acceso appena perdo */
-    digitalWrite(PIN_MIN + rnd, LOW);
-
-    
     /* chiamo il game over */
     gameOver();
   
@@ -103,10 +112,11 @@ void loop() {
     isOver = true;
   }
   
-  digitalWrite(PIN_MIN + rnd, LOW);
+  digitalWrite(PIN_MIN + flyPosition, LOW);
   /* riabilitiamo l'interrupt del pulsante del led corrispondente appena spento */
-  enableInterrupt(BUTTON_MIN + rnd, gameOver, RISING);
+  enableInterrupt(BUTTON_MIN + flyPosition, gameOver, RISING);
 
+   moveFly();
   /* every round tMin decreases */
   tMin = tMin/REDUCING_FACTOR;
   delay(1000);
@@ -128,6 +138,11 @@ void loop() {
  */
 void gameOver(){
   if(isPlaying){
+
+
+    /* spengo il led acceso appena perdo */
+    digitalWrite(PIN_MIN + flyPosition, LOW);
+  
     
     Serial.println("GAME OVER!");
     
@@ -143,17 +158,24 @@ void gameOver(){
     
   }else if (arduinoInterruptedPin == BUTTON_MIN ){  
     /* this is a routine to do once the game starts */
-  
+
+
+    /* turn red led off */
     analogWrite(RED_LED, 0);
     Serial.print("Go!");
     isPlaying = true;
+
+    
+    /* pulsante random tra il 2,3,4,5 */
+    flyPosition = random(BUTTON_MAX - BUTTON_MIN + 1);
 
     /* 
      * maps the diffuclty level  
      * lvl 1 = 8 seconds
      * lvl 8 = 1 second
      */
-    tMin = (8 - map(analogRead(POT), 0, 1023, 0, 8)) * 1000;
+    tMin = (8 - map(analogRead(POT), 0, 1023, 1, 8)) * 1000;
+    Serial.print("difficulty: ");
     Serial.println(tMin);
   }
 }
