@@ -4,8 +4,8 @@
 /*
  * green led pins
  */
-#define PIN_MIN 10
-#define PIN_MAX 13
+#define LED_MIN 10
+#define LED_MAX 13
 
 /*
  * button pins
@@ -23,7 +23,27 @@
  */
 #define POT A0
 #define FADE_STEP 5
-#define REDUCING_FACTOR 2
+#define REDUCING_FACTOR 0.5
 #define K 1.5
+
+/*
+ * Extern global variables
+ */
+extern int flyPosition;
+
+/*
+ * makes the game start with variables set.
+ */
+void startGame();
+
+/*
+ * moves the fly left or right randomly.
+ */
+void moveFly();
+
+/*
+ * ends game and shows score.
+ */
+void gameOver();
 
 #endif

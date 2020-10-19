@@ -13,15 +13,17 @@ int pin[LED_MAX - LED_MIN];
 
 int tMin;
 
+/* red led variables */
 int brightness;
 int verse;
 
+/* the lit up led */
 int flyPosition;
 
 int score;
 int isHigh;
 
-bool isOver;
+bool timesUp;
 bool isPlaying;
 
 void setup() {
@@ -40,7 +42,7 @@ void setup() {
   
   for(int i = 0; i <= BUTTON_MAX - BUTTON_MIN; i++){
     pinMode(BUTTON_MIN + i, INPUT);
-    enableInterrupt(BUTTON_MIN + i, gameOver, RISING);
+    enableInterrupt(BUTTON_MIN + i, buttonPressed, RISING);
   } 
 
   /* inizializzo il generatore di numeri pseudocasuali su un pin disconnesso in modo tale 
@@ -53,24 +55,10 @@ void setup() {
   Serial.println("Track to Led Fly Game. Press Key T1 to Start \n");
 }
 
-void moveFly(){
-  noInterrupts();
-  
-  int nextStep = random(0,1);
-  /* muovo la fly a destra o sinistra randoimicamente */
-  nextStep ? flyPosition++ : flyPosition--;
-
-  /* overflow control */
-  if(flyPosition > BUTTON_MAX-BUTTON_MIN) flyPosition = 0;
-  if(flyPosition < 0) flyPosition = BUTTON_MAX-BUTTON_MIN;
-
- interrupts(); 
-}
-
 void loop() {
   if(isPlaying){
     
-    isOver = true;
+    timesUp = true;
     /* disabilitiamo l'interrupt poichè se il bottone viene premuto è quello giusto */
     disableInterrupt(BUTTON_MIN + flyPosition);
     digitalWrite(LED_MIN + flyPosition, HIGH);
@@ -86,7 +74,7 @@ void loop() {
       if(buttonState == HIGH && isHigh == 0){
         isHigh = 1;
         /* la partita non è finita e quindi aumentiamo l'offset di TMIN */
-        isOver = false;
+        timesUp = false;
         Serial.print("Tracking the fly: pos ");
         Serial.println(flyPosition + 1);
         score++;
@@ -97,18 +85,18 @@ void loop() {
    
 
   /* se è ancora a true il pulsante non è stato premuto */
-  if(isOver){
+  if(timesUp){
     /* chiamo il game over */
     gameOver();   
   } else {
-    isOver = true;
+    timesUp = true;
   }
   
   digitalWrite(LED_MIN + flyPosition, LOW);
   /* riabilitiamo l'interrupt del pulsante del led corrispondente appena spento */
   enableInterrupt(BUTTON_MIN + flyPosition, gameOver, RISING);
 
-   moveFly();
+  moveFly();
   /* every round tMin decreases */
   tMin = tMin*REDUCING_FACTOR;
   delay(1000);
@@ -128,7 +116,7 @@ void loop() {
 /* se un pulsante tra quelli che non autorizzati vengono premuti o il pulsante corrente non è 
  *  stato premuto in tempo.
  */
-void gameOver(){
+void buttonPressed(){
   if(isPlaying){
 
 
@@ -150,7 +138,7 @@ void gameOver(){
 
     analogWrite(RED_LED, brightness);
     delay(2000);
-  }else if (arduinoInterruptedPin == BUTTON_MIN ){  
+  }else if (arduinoInterruptedPin == BUTTON_MIN){  
     /* this is a routine to do once the game starts */
 
 
