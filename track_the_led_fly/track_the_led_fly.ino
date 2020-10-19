@@ -22,11 +22,10 @@ bool isOver;
 bool isPlaying;
 
 void setup() {
+  
   isPlaying = false;
-
   brightness = 255;
   verse = -1;
-  
   pinMode(RED_LED, OUTPUT);
   
   isHigh = 0;
@@ -109,5 +108,16 @@ void loop() {
  *  stato premuto in tempo.
  */
 void gameOver(){
-  Serial.println("GAME OVER!");
+  if(isPlaying){
+    
+    Serial.println("GAME OVER!");
+    brightness = 255;
+    verse = -1;
+    isPlaying = false;
+  
+  }else{
+    Serial.print("GO!");
+    analogWrite(RED_LED, 0);
+    isPlaying = true;
+  }
 }
