@@ -69,7 +69,7 @@ void loop() {
         isOver = false;
         offset = offset + 10;
         Serial.print("Tracking the fly: pos ");
-        Serial.println(rnd);
+        Serial.println(rnd + 1);
         score++;
       } else if(buttonState == LOW){
         isHigh = 0;
@@ -147,7 +147,7 @@ void gameOver(){
      * lvl 1 = 8 seconds
      * lvl 8 = 1 second
      */
-    tMin = (9 - map(analogRead(POT), 0, 1023, 1, 8)) * 1000;
+    tMin = (8 - map(analogRead(POT), 0, 1023, 0, 8)) * 1000;
     Serial.println(tMin);
   }
 }
