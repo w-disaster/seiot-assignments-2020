@@ -19,7 +19,7 @@ void startGame(){
      * lvl 1 = 8 seconds
      * lvl 8 = 1 second
      */
-    tMin = (8 - map(analogRead(POT), 0, 1023, 1, 8)) * MILLIS_TO_SECONDS;
+    tMin = (8 - map(analogRead(POT), 0, 1023, 0, 7)) * MILLIS_TO_SECONDS;
 }
 
 void moveFly(){
