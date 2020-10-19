@@ -29,6 +29,7 @@ void setup() {
   isPlaying = false;
   brightness = 255;
   verse = -1;
+  
   pinMode(RED_LED, OUTPUT);
   
   isHigh = 0;
@@ -96,12 +97,9 @@ void loop() {
    
 
   /* se è ancora a true il pulsante non è stato premuto */
-  if(isOver == true){
-   
+  if(isOver){
     /* chiamo il game over */
-    gameOver();
- 
-    
+    gameOver();   
   } else {
     isOver = true;
   }
