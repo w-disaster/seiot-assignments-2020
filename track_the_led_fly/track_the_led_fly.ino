@@ -11,13 +11,14 @@ int tMax;
 int brightness;
 int verse;
 
+int score;
 int isHigh;
 int offset;
 bool isOver;
 bool isPlaying;
 
 void setup() {
-  
+  score = 0;
   isPlaying = false;
   brightness = 255;
   verse = -1;
@@ -42,7 +43,7 @@ void setup() {
   
   Serial.begin(9600);
   /* da documentazione solo con il pulsante T1 si può iniziare a giocare */
-  Serial.println("Track to Led Fly Game. Press Key T1 to Start");
+  Serial.println("Track to Led Fly Game. Press Key T1 to Start \n");
 }
 
 void loop() {
@@ -68,7 +69,9 @@ void loop() {
         /* la partita non è finita e quindi aumentiamo l'offset di TMIN */
         isOver = false;
         offset = offset + 10;
-        Serial.println("bravo!");
+        Serial.print("Tracking the fly: pos ");
+        Serial.println(rnd);
+        score++;
       } else if(buttonState == LOW){
         isHigh = 0;
       }
@@ -77,8 +80,20 @@ void loop() {
 
   /* se è ancora a true il pulsante non è stato premuto */
   if(isOver == true){
+    
     offset = 0;
+    
+    /* spengo il led acceso appena perdo */
+    digitalWrite(PIN_MIN + rnd, LOW);
+
+    
+    /* chiamo il game over */
     gameOver();
+  
+    /* tengo acceso il led rosso per 2 sec*/
+    analogWrite(RED_LED, brightness);
+    delay(2000);
+    
   } else {
     isOver = true;
   }
@@ -105,12 +120,16 @@ void loop() {
  */
 void gameOver(){
   if(isPlaying){
-
+    
     Serial.println("GAME OVER!");
     brightness = 255;
     verse = -1;
     isPlaying = false;
-  
+    
+    Serial.print("Final score: ");
+    Serial.println(score);
+    score = 0;
+    
   }else if (arduinoInterruptedPin == BUTTON_MIN ){
     
     analogWrite(RED_LED, 0);

@@ -22,7 +22,7 @@
  * utilities
  */
 #define FADE_STEP 5
-#define TMIN 250
+#define TMIN 1000 
 #define TMAX 1500
 #define K //yet to define
 
