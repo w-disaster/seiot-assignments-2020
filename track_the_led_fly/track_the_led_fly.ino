@@ -1,7 +1,12 @@
+#define EI_ARDUINO_INTERRUPTED_PIN
+
 #include <EnableInterrupt.h>
 #include "game_lib.h"
 
 int pin[PIN_MAX - PIN_MIN];
+
+int tMin;
+int tMax;
 
 int brightness;
 int verse;
@@ -36,7 +41,8 @@ void setup() {
   randomSeed(analogRead(A1));
   
   Serial.begin(9600);
-  Serial.println("PRESS A BUTTON TO START!");
+  /* da documentazione solo con il pulsante T1 si può iniziare a giocare */
+  Serial.println("Track to Led Fly Game. Press Key T1 to Start");
 }
 
 void loop() {
@@ -99,15 +105,17 @@ void loop() {
  */
 void gameOver(){
   if(isPlaying){
-    
+
     Serial.println("GAME OVER!");
     brightness = 255;
     verse = -1;
     isPlaying = false;
   
-  }else{
-    Serial.print("GO!");
+  }else if (arduinoInterruptedPin == BUTTON_MIN ){
+    
     analogWrite(RED_LED, 0);
+    Serial.print("Go!");
     isPlaying = true;
+  
   }
 }
