@@ -27,6 +27,12 @@
 #define K 1.5
 
 /*
+ * time conversion 
+ */
+#define MICROS_TO_SECONDS 1000000
+#define MILLIS_TO_SECONDS 1000
+
+/*
  * Extern global variables
  */
 extern int flyPosition;

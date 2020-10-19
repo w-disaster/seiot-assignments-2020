@@ -99,7 +99,7 @@ void loop() {
   moveFly();
   /* every round tMin decreases */
   tMin = tMin*REDUCING_FACTOR;
-  delay(1000);
+  delay(MILLIS_TO_SECONDS);
 
 } else {
       analogWrite(RED_LED, brightness);
@@ -118,12 +118,8 @@ void loop() {
  */
 void buttonPressed(){
   if(isPlaying){
-
     gameOver();
-    
   }else if (arduinoInterruptedPin == BUTTON_MIN){  
-    
     startGame();
-
   }
 }

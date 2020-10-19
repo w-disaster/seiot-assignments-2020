@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <TimerOne.h>
+
 #include "game_lib.h"
 
 void startGame(){
@@ -17,9 +19,7 @@ void startGame(){
      * lvl 1 = 8 seconds
      * lvl 8 = 1 second
      */
-    tMin = (8 - map(analogRead(POT), 0, 1023, 1, 8)) * 1000;
-    Serial.print("difficulty: ");
-    Serial.println(tMin);
+    tMin = (8 - map(analogRead(POT), 0, 1023, 1, 8)) * MILLIS_TO_SECONDS;
 }
 
 void moveFly(){
@@ -39,7 +39,6 @@ void moveFly(){
 void gameOver(){
   /* spengo il led acceso appena perdo */
     digitalWrite(LED_MIN + flyPosition, LOW);
-  
     
     Serial.println("GAME OVER!");
     
@@ -54,5 +53,5 @@ void gameOver(){
     score = 0;
 
     analogWrite(RED_LED, brightness);
-    delay(2000);
+    delay(2*MILLIS_TO_SECONDS);
 }
