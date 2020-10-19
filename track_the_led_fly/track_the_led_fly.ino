@@ -6,7 +6,6 @@
 int pin[PIN_MAX - PIN_MIN];
 
 int tMin;
-int tMax;
 
 int brightness;
 int verse;
@@ -57,7 +56,7 @@ void loop() {
     digitalWrite(PIN_MIN + rnd, HIGH);
 
     /* numero random che rappresenta il tempo disponibile per premere il pulsante */ 
-    long rndTimer = random(TMIN - offset, TMAX);
+    long rndTimer = random(tMin - offset, tMin*K);
     Serial.println(rndTimer);
     unsigned long tstart = millis();
     while(millis() - tstart < rndTimer){
@@ -101,6 +100,9 @@ void loop() {
   digitalWrite(PIN_MIN + rnd, LOW);
   /* riabilitiamo l'interrupt del pulsante del led corrispondente appena spento */
   enableInterrupt(BUTTON_MIN + rnd, gameOver, RISING);
+
+  /* every round tMin decreases */
+  tMin = tMin/REDUCING_FACTOR;
   delay(1000);
 
 } else {
@@ -122,19 +124,30 @@ void gameOver(){
   if(isPlaying){
     
     Serial.println("GAME OVER!");
+    
+    /* reset default values */
     brightness = 255;
     verse = -1;
     isPlaying = false;
-    
+
+    /* prints the score then resets it */
     Serial.print("Final score: ");
     Serial.println(score);
     score = 0;
     
-  }else if (arduinoInterruptedPin == BUTTON_MIN ){
-    
+  }else if (arduinoInterruptedPin == BUTTON_MIN ){  
+    /* this is a routine to do once the game starts */
+  
     analogWrite(RED_LED, 0);
     Serial.print("Go!");
     isPlaying = true;
-  
+
+    /* 
+     * maps the diffuclty level  
+     * lvl 1 = 8 seconds
+     * lvl 8 = 1 second
+     */
+    tMin = (9 - map(analogRead(POT), 0, 1023, 1, 8)) * 1000;
+    Serial.println(tMin);
   }
 }

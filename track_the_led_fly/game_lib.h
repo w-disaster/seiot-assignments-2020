@@ -21,9 +21,9 @@
 /*
  * utilities
  */
+#define POT A0
 #define FADE_STEP 5
-#define TMIN 1000 
-#define TMAX 1500
-#define K //yet to define
+#define REDUCING_FACTOR 2
+#define K 1.5
 
 #endif
