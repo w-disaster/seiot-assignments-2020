@@ -30,6 +30,12 @@
  * Extern global variables
  */
 extern int flyPosition;
+extern int brightness;
+extern int verse;
+extern int score;
+extern int tMin;
+
+extern bool isPlaying;
 
 /*
  * makes the game start with variables set.

@@ -119,45 +119,11 @@ void loop() {
 void buttonPressed(){
   if(isPlaying){
 
-
-    /* spengo il led acceso appena perdo */
-    digitalWrite(LED_MIN + flyPosition, LOW);
-  
+    gameOver();
     
-    Serial.println("GAME OVER!");
-    
-    /* reset default values */
-    brightness = 255;
-    verse = -1;
-    isPlaying = false;
-
-    /* prints the score then resets it */
-    Serial.print("Final score: ");
-    Serial.println(score);
-    score = 0;
-
-    analogWrite(RED_LED, brightness);
-    delay(2000);
   }else if (arduinoInterruptedPin == BUTTON_MIN){  
-    /* this is a routine to do once the game starts */
-
-
-    /* turn red led off */
-    analogWrite(RED_LED, 0);
-    Serial.print("Go!");
-    isPlaying = true;
-
     
-    /* pulsante random tra il 2,3,4,5 */
-    flyPosition = random(BUTTON_MAX - BUTTON_MIN + 1);
+    startGame();
 
-    /* 
-     * maps the diffuclty level  
-     * lvl 1 = 8 seconds
-     * lvl 8 = 1 second
-     */
-    tMin = (8 - map(analogRead(POT), 0, 1023, 1, 8)) * 1000;
-    Serial.print("difficulty: ");
-    Serial.println(tMin);
   }
 }
