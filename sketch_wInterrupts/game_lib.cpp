@@ -1,49 +1,61 @@
 #include <Arduino.h>
 #include "game_lib.h"
 
+/*
+ * This function will be called when T1 is pressed
+ */
 void startGame(){
   if(canStart){
-    /* turn red led off */
+    // We turn red led off
     analogWrite(RED_LED, 0);
-    //Serial.println("Go!");
+    Serial.println("Go!");
     isPlaying = true;
-
-    /* pulsante random tra il 2,3,4,5 */
-    pinOffset = random(BUTTON_MAX - BUTTON_MIN + 1);
-
-    /* 
-     * maps the diffuclty level  
-     * lvl 1 = 8 seconds
-     * lvl 8 = 1 second
-     */
-    tMin = (8 - map(analogRead(POT), 0, 1023, 0, 7));
-    tMin = tMin * MICROS_TO_SECONDS;
-    Serial.println(String("tmin : ") + tMin);
-
-    long rndTimer = random(tMin, tMin * K);
-    Serial.println(String("timer: ") + rndTimer);
-    MiniTimer1.setPeriod(rndTimer);
+    alreadyOver = false;
     
-    MiniTimer1.attachInterrupt(gameOver);
-    digitalWrite(LED_MIN + pinOffset, HIGH);
+    // We generate a random offset for the first led
+    pinOffset = random(BUTTON_PIN_MAX - BUTTON_PIN_MIN + 1);
+
+    /*
+     * The maximum period time provided by MiniTimerOne is 4.194304s, therefore,
+     * since the random() upper bound range is multiplied by K, we must divide it by K,
+     * in order to give the change to not exceed the maximum value.
+     * We subctract 1 from this value because at the beginning the timer must stand for
+     * minimum 1 second.
+     * 
+     */
+    int potValue = analogRead(POT);
+    tMin = (4.194304/K - map(potValue, 0, 1023, 0, 4.194304/K - 1));
+    tMin = tMin * MICROS_TO_SECONDS;
+    
+    long rndTimer = random(tMin, tMin * K);
+    Serial.println(String("pot value : ") + potValue + String(" timer: ") + rndTimer);
+    // We set the random period
+    MiniTimer1.setPeriod(rndTimer);
+    // We turn on the first led
+    digitalWrite(LED_PIN_MIN + pinOffset, HIGH);
+    // The timer starting
     MiniTimer1.start();
   }
 }
 
-
+/*
+ * This function is called by MiniTimerOne when a period of time is done 
+ * (the player didn't press the button in time) or, when a wrong one is pressed
+ */
 void gameOver(){
+  if(!alreadyOver){
+    // We stop the timer and we reset it to the beginning
     MiniTimer1.stop();
-    /* spengo il led acceso appena perdo */
-    digitalWrite(LED_MIN + pinOffset, LOW);
-        
-    /* reset default values */
-    brightness = 255;
-    verse = -1;
-    isPlaying = false;
-    pinOffset = 0;
-    missedLed = true;
-    
-    /* prints the score then resets it */
+    MiniTimer1.reset();
+
+    // We turn off the current led on
+    digitalWrite(LED_PIN_MIN + pinOffset, LOW);
+
+    // We print the score
     Serial.println(String("Game Over! Final score: ") + score);
-    score = 0;
+
+    // We reset the default global variables values 
+    setGlobalVariables(false, 255, -1, 0, 0, true, false, 0, true);
+    
+  }
 }

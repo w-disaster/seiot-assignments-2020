@@ -7,14 +7,14 @@
 /*
  * green led pins
  */
-#define LED_MIN 10
-#define LED_MAX 13
+#define LED_PIN_MIN 10
+#define LED_PIN_MAX 13
 
 /*
  * button pins
  */
-#define BUTTON_MIN 2
-#define BUTTON_MAX 5
+#define BUTTON_PIN_MIN 2
+#define BUTTON_PIN_MAX 5
 
 /*
  * red led pin
@@ -26,7 +26,7 @@
  */
 #define POT A0
 #define FADE_STEP 5
-#define REDUCING_FACTOR 0.5
+#define REDUCING_FACTOR 7/8
 #define K 1.5
 
 /*
@@ -42,11 +42,13 @@ extern int pinOffset;
 extern int brightness;
 extern int verse;
 extern int score;
-extern long tMin; 
+extern double tMin; 
 extern bool isPlaying;
 extern bool missedLed;
 extern bool canStart;
+extern bool alreadyOver;
 
+extern volatile unsigned long lastMicros;
 /*
  * makes the game start with variables set.
  */
@@ -63,5 +65,8 @@ void nextPinOffset();
 void gameOver();
 
 void buttonPressed();
+
+void setGlobalVariables(bool pIsPlaying, int pBrightness, int pVerse, int pPinOffset, int pScore, \
+  bool pMissedLed, bool pCanStart, unsigned long pLastMicros, bool pAlreadyOver);
 
 #endif
