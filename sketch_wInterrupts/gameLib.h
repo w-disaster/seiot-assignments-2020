@@ -1,7 +1,6 @@
 #ifndef _GAME_LIB_H
 #define _GAME_LIB_H
 
-
 #include "MiniTimerOne.h"
 
 /*
@@ -47,25 +46,33 @@ extern bool isPlaying;
 extern bool missedLed;
 extern bool canStart;
 extern bool alreadyOver;
-
 extern volatile unsigned long lastMicros;
+
 /*
- * makes the game start with variables set.
+ * This function will be called when T1 is pressed
  */
 void startGame();
 
 /*
- * moves the fly left or right randomly.
+ * This function calculates the next offset of the Led that must turn on and
+ * the button that should be pressed
  */
 void nextPinOffset();
 
 /*
- * ends game and shows score.
+ * This function is called by MiniTimerOne when a period of time is done 
+ * (the player didn't press the button in time) or, when a wrong one is pressed
  */
 void gameOver();
 
+/*
+ * Led fading function
+ */
 void buttonPressed();
 
+/*
+ * This function is useful to minimize repetitions
+ */
 void setGlobalVariables(bool pIsPlaying, int pBrightness, int pVerse, int pPinOffset, int pScore, \
   bool pMissedLed, bool pCanStart, unsigned long pLastMicros, bool pAlreadyOver);
 

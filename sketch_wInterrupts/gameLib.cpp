@@ -1,9 +1,6 @@
 #include <Arduino.h>
-#include "game_lib.h"
+#include "gameLib.h"
 
-/*
- * This function will be called when T1 is pressed
- */
 void startGame(){
   if(canStart){
     // We turn red led off
@@ -38,10 +35,6 @@ void startGame(){
   }
 }
 
-/*
- * This function is called by MiniTimerOne when a period of time is done 
- * (the player didn't press the button in time) or, when a wrong one is pressed
- */
 void gameOver(){
   if(!alreadyOver){
     // We stop the timer and we reset it to the beginning

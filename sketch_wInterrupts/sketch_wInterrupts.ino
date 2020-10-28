@@ -5,7 +5,7 @@
  */
  
 #define EI_ARDUINO_INTERRUPTED_PIN
-#include "game_lib.h"
+#include "gameLib.h"
 #include <EnableInterrupt.h>
 
 // Variable for random time
@@ -97,7 +97,7 @@ void loop() {
  */
 void buttonPressed(){
   // debouncing
-  if(micros() - last_micros > 200000) {    
+  if(micros() - lastMicros > 200000) {    
     Serial.println(String("pressed") + arduinoInterruptedPin);
 
     // The game didn't started and T1 is pressed
@@ -130,13 +130,10 @@ void buttonPressed(){
     else if(isPlaying) {
       gameOver();
     }
-    last_micros = micros();
+    lastMicros = micros();
   }
 }
 
-/*
- * Led fading function
- */
 void fadeRedLed(){
     analogWrite(RED_LED, brightness);
  
@@ -146,11 +143,6 @@ void fadeRedLed(){
     }
 }
 
-
-/*
- * This function calculates the next offset of the Led that must turn on and
- * the button that should be pressed
- */
 void nextPinOffset(){
   // direction
   int dir = random(0,2);
@@ -166,9 +158,6 @@ void nextPinOffset(){
   pinOffset = next;
 }
 
-/*
- * This function is useful to minimize repetitions
- */
 void setGlobalVariables(bool pIsPlaying, int pBrightness, int pVerse, int pPinOffset, int pScore, \
   bool pMissedLed, bool pCanStart, unsigned long pLastMicros, bool pAlreadyOver) {
   score = pScore;
