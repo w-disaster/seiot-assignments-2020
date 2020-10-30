@@ -21,7 +21,7 @@ void startGame(){
      * 
      */
     int potValue = analogRead(POT);
-    tMin = (4.194304/K - map(potValue, 0, 1023, 0, 3));
+    tMin = (4.194304/K - (map(potValue, 0, 1023, 0, 7) / 2));
     tMin = tMin * MICROS_TO_SECONDS;
     
     long rndTimer = random(tMin, tMin * K);

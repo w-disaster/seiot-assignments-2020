@@ -26,7 +26,7 @@
 #define POT A0
 #define FADE_STEP 5
 #define REDUCING_FACTOR 7/8
-#define K 1.5
+#define K 1.1
 
 /*
  * time conversion 
