@@ -98,7 +98,7 @@ void loop() {
 void buttonPressed(){
   // debouncing
   if(micros() - lastMicros > 200000) {    
-    Serial.println(String("pressed") + arduinoInterruptedPin);
+    Serial.println(String("pressed: ") + arduinoInterruptedPin);
 
     // The game didn't started and T1 is pressed
     if(!isPlaying){
@@ -144,12 +144,10 @@ void fadeRedLed(){
 }
 
 void nextPinOffset(){
-  // direction
-  int dir = random(0,2);
   int next;
   
   // We move the fly in an adjacent position and then we manage the overflow state
-  next = dir ? pinOffset + 1  : pinOffset - 1;
+  next = random(0,2) ? pinOffset + 1  : pinOffset - 1;
   /* if the next offsed exeeds the maximum range then it's set at minimum (0) */
   if(next > BUTTON_PIN_MAX - BUTTON_PIN_MIN) next = 0;
   /* if the offsed is negative, the maximum must be set */
