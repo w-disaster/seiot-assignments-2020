@@ -1,5 +1,17 @@
-#include <Arduino.h>
 #include "gameLib.h"
+#include <Arduino.h>
+
+long tMin; 
+int brightness;
+int verse;
+int pinOffset;
+int score;
+bool isPlaying;
+bool missedLed;
+bool canStart;
+bool alreadyOver;
+volatile unsigned long lastMicros;
+bool pressed;
 
 void startGame(){
   if(canStart){

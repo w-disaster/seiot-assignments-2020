@@ -3,121 +3,118 @@
  * - Luigi Olivieri
  * - Luca Fabri
  */
-
+ 
 #define EI_ARDUINO_INTERRUPTED_PIN
-
+#include "gameLib.h"
 #include <EnableInterrupt.h>
-#include "game_lib.h"
-
-int tMin;
-
-/* red led variables */
-int brightness;
-int verse;
-
-/* the lit up led */
-int flyPosition;
-
-int score;
-int isHigh;
-
-bool timesUp;
-bool isPlaying;
 
 void setup() {
-  score = 0;
-  isPlaying = false;
-  brightness = 255;
-  verse = -1;
-  
-  pinMode(RED_LED, OUTPUT);
-  
-  isHigh = 0;
+  /* Global variables set */
+  setGlobalVariables(false, 255, -1, 0, 0, false, true, 0, false, false);
 
-  for(int i = 0; i <= LED_MAX - LED_MIN; i++){
-    pinMode(LED_MIN + i, OUTPUT);
+  /* Led and buttons setup */
+  pinMode(RED_LED_PIN, OUTPUT);
+  for(int i = 0; i <= LED_PIN_MAX - LED_PIN_MIN; i++){
+    pinMode(LED_PIN_MIN + i, OUTPUT);
+    pinMode(BUTTON_PIN_MIN + i, INPUT);
+    enableInterrupt(BUTTON_PIN_MIN + i, buttonPressed, RISING);
   }
-  
-  for(int i = 0; i <= BUTTON_MAX - BUTTON_MIN; i++){
-    pinMode(BUTTON_MIN + i, INPUT);
-    enableInterrupt(BUTTON_MIN + i, buttonPressed, RISING);
-  } 
 
-  /* inizializzo il generatore di numeri pseudocasuali su un pin disconnesso in modo tale 
-  *  che dal momento che ArduinoUNO si connette la sequenza è sempre diversa.
-  */
+  /* Pseudo number generator init in unused pin */
   randomSeed(analogRead(A1));
-  
-  Serial.begin(9600);
-  /* da documentazione solo con il pulsante T1 si può iniziare a giocare */
-  Serial.println("Track to Led Fly Game. Press Key T1 to Start \n");
+
+  Serial.begin(115200);
+  Serial.println("Welcome to the Track to Led Fly Game. Press Key T1 to Start");
+
+  /*
+   * timer setup: at times up timesUp will be called. We don't start it
+   * because the player didn't press T1 yet.
+   */
+  MiniTimer1.init();
+  MiniTimer1.attachInterrupt(timesUp);
 }
 
 void loop() {
-  if(isPlaying){
-    
-    timesUp = true;
-    /* disabilitiamo l'interrupt poichè se il bottone viene premuto è quello giusto */
-    disableInterrupt(BUTTON_MIN + flyPosition);
-    digitalWrite(LED_MIN + flyPosition, HIGH);
-
-    /* numero random che rappresenta il tempo disponibile per premere il pulsante */ 
-    long rndTimer = random(tMin, tMin*K);
-    Serial.println(rndTimer);
-    unsigned long tstart = millis();
-    while(millis() - tstart < rndTimer){
-      /* leggiamo lo stato del pulsante finchè la disuguaglianza è soddisfatta */
-      int buttonState = digitalRead(BUTTON_MIN + flyPosition);
-      /* se è ad HIGH e non è già stato premuto, l'ho premuto in tempo */
-      if(buttonState == HIGH && isHigh == 0){
-        isHigh = 1;
-        /* la partita non è finita e quindi aumentiamo l'offset di TMIN */
-        timesUp = false;
-        Serial.print("Tracking the fly: pos ");
-        Serial.println(flyPosition + 1);
-        score++;
-      } else if(buttonState == LOW){
-        isHigh = 0;
-      }
-    }
-   
-
-  /* se è ancora a true il pulsante non è stato premuto */
-  if(timesUp){
-    /* chiamo il game over */
-    gameOver();   
-  } else {
-    timesUp = true;
+  /* If the player is not playing and timesUp was not called */
+  if(!isPlaying && !missedLed){
+    noInterrupts();
+    fadeRedLed();
+    interrupts();
+  } else if(missedLed){ /* timesUp() sets true this global variable at game over */
+    /* When the red led go HIGH for two seconds, the game cannot start at T1 pressing */
+    noInterrupts();
+    canStart = false;
+    interrupts();
+    /* Set at HIGH for 2 seconds the red led */
+    analogWrite(RED_LED_PIN, brightness);
+    delay(2 * MILLIS_TO_SECONDS);
+    missedLed = false;
+    /* Now the player can replay the game */
+    noInterrupts();
+    canStart = true;
+    interrupts();
   }
-  
-  digitalWrite(LED_MIN + flyPosition, LOW);
-  /* riabilitiamo l'interrupt del pulsante del led corrispondente appena spento */
-  enableInterrupt(BUTTON_MIN + flyPosition, gameOver, RISING);
-
-  moveFly();
-  /* every round tMin decreases */
-  tMin = tMin*REDUCING_FACTOR;
-  delay(MILLIS_TO_SECONDS);
-
-} else {
-      analogWrite(RED_LED, brightness);
-      delay(10);
-      
-      brightness = brightness + verse*FADE_STEP;
-     
-      if(brightness == 255 || brightness == 0){
-        verse = -(verse);
-      }
-   }
+  delay(10);
 }
 
-/* se un pulsante tra quelli che non autorizzati vengono premuti o il pulsante corrente non è 
- *  stato premuto in tempo.
- */
 void buttonPressed(){
-  if(isPlaying){
-    gameOver();
-  }else if (arduinoInterruptedPin == BUTTON_MIN){  
-    startGame();
+  /* Debouncing: 200'000micros = 200ms between two interrupts */
+  if(micros() - lastMicros > 200000) {    
+    /* The game didn't started and T1 is pressed then game must start */
+    if(!isPlaying){
+      if(arduinoInterruptedPin == BUTTON_PIN_MIN){
+        startGame();
+      }
+    }
+    /* 
+     * Right button pressed:
+     * when the time is up, setting pressed = true, the game will not be over
+     */
+    else if(isPlaying && arduinoInterruptedPin == BUTTON_PIN_MIN + pinOffset){
+      if(!pressed){
+        Serial.println(String("Tracking the fly: pos ") + (BUTTON_PIN_MIN + pinOffset));
+        pressed = true;
+      }
+    }
+    /* In all the other cases the player pressed a wrong button, then timesUp will be called */
+    else if(isPlaying) {
+      timesUp();
+    }
+    lastMicros = micros();
   }
+}
+
+void fadeRedLed(){
+    analogWrite(RED_LED_PIN, brightness);
+    brightness = brightness + verse * FADE_STEP;
+    /* Change direction when lower/upper bound reached */
+    if(brightness == 255 || brightness == 0){
+      verse = -(verse);
+    }
+}
+
+void nextPinOffset(){
+  int next;
+  /* We move the fly in an adjacent position and then we manage the overflow state */
+  next = random(0,2) ? pinOffset + 1  : pinOffset - 1;
+  /* If the next offsed exeeds the maximum range then it's set at minimum (0) */
+  if(next > BUTTON_PIN_MAX - BUTTON_PIN_MIN) next = 0;
+  /* If the offsed is negative, the maximum must be set */
+  if(next < 0) next = BUTTON_PIN_MAX - BUTTON_PIN_MIN;
+  
+  pinOffset = next;
+}
+
+void setGlobalVariables(bool pIsPlaying, int pBrightness, int pVerse, int pPinOffset, int pScore, \
+  bool pMissedLed, bool pCanStart, unsigned long pLastMicros, bool pAlreadyOver, bool pPressed) {
+  score = pScore;
+  isPlaying = pIsPlaying;
+  brightness = pBrightness;
+  verse = pVerse;
+  pinOffset = pPinOffset;
+  missedLed = pMissedLed;
+  canStart = pCanStart;
+  lastMicros = pLastMicros;
+  alreadyOver = pAlreadyOver;
+  pressed = pPressed;
 }

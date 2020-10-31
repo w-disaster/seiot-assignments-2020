@@ -1,7 +1,7 @@
 #ifndef _GAME_LIB_H
 #define _GAME_LIB_H
 
-#include "MiniTimerOne.h"
+#include <MiniTimerOne.h>
 
 /*
  * Green led pins
@@ -38,16 +38,28 @@
 /*
  * Extern global variables
  */
-extern int pinOffset;
+extern long tMin; 
+/* Fading variables */
 extern int brightness;
 extern int verse;
+/* Current pin offset */
+extern int pinOffset;
+/* Current score  */
 extern int score;
-extern long tMin; 
+/* State of the game */
 extern bool isPlaying;
+/*
+ * We set true this variable when the time is up or the player pressed a wrong
+ * button: the red led must go HIGH for 2 seconds
+ */
 extern bool missedLed;
+/* Show if the player can start or not */
 extern bool canStart;
+/* Variable to avoid chain of interrupts */
 extern bool alreadyOver;
+/* Time in micros for button ISR debounce */
 extern volatile unsigned long lastMicros;
+/* True if right button is pressed */
 extern bool pressed;
 
 /*
