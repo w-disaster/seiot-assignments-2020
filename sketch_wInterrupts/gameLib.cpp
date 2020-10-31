@@ -22,6 +22,8 @@ void startGame(){
         
     /* We set the random period */
     MiniTimer1.setPeriod(random(tMin, tMin * K));
+    /* Message printing */
+    Serial.println("Go!");
     /* We turn on the first led */
     digitalWrite(LED_PIN_MIN + pinOffset, HIGH);
     /* The timer startGameing */
@@ -36,7 +38,6 @@ void timesUp(){
   if(pressed){ /* The current button was pressed in time */
       /* We turn off the current led */
       digitalWrite(LED_PIN_MIN + pinOffset, LOW);
-      Serial.println(String("Tracking the fly: pos ") + (BUTTON_PIN_MIN + pinOffset));
       /* Next offset calculation */
       nextPinOffset();
       /* Turning on the next led */
@@ -50,7 +51,6 @@ void timesUp(){
       tMin = tMin * REDUCING_FACTOR;
       /* We set the new period of the timer and we start it from the beginning */
       MiniTimer1.setPeriod(random(tMin, tMin * K));
-      MiniTimer1.reset();
       MiniTimer1.start();
   }
   /* 

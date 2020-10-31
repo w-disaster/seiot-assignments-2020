@@ -48,7 +48,7 @@ void setup() {
   /* Pseudo number generator init in unused pin */
   randomSeed(analogRead(A1));
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Welcome to the Track to Led Fly Game. Press Key T1 to Start");
 
   /*
@@ -83,8 +83,8 @@ void loop() {
 }
 
 void buttonPressed(){
-  /* Debouncing: 200ms between two interrupts */
-  if(micros() - lastMicros > 0.002 * MICROS_TO_SECONDS) {    
+  /* Debouncing: 200'000micros = 200ms between two interrupts */
+  if(micros() - lastMicros > 200000) {    
     /* The game didn't started and T1 is pressed then game must start */
     if(!isPlaying){
       if(arduinoInterruptedPin == BUTTON_PIN_MIN){
@@ -97,6 +97,7 @@ void buttonPressed(){
      */
     else if(isPlaying && arduinoInterruptedPin == BUTTON_PIN_MIN + pinOffset){
       if(!pressed){
+        Serial.println(String("Tracking the fly: pos ") + (BUTTON_PIN_MIN + pinOffset));
         pressed = true;
       }
     }
