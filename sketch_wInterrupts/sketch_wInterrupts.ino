@@ -13,11 +13,7 @@ long tMin;
 /* Fading variables */
 int brightness;
 int verse;
-
-/* offset from: 
- *  - LED_PIN_MIN => offset + LED_PIN_MIN = current led at HIGH
- *  - BUTTON_PIN_MIN => offset + BUTTON_PIN_MIN = current button to press
- */
+/* Current pin offset */
 int pinOffset;
 /* Current score  */
 int score;
@@ -32,15 +28,16 @@ bool missedLed;
 bool canStart;
 /* Variable to avoid chain of interrupts */
 bool alreadyOver;
-/* time in micros for button isr debounce */
+/* Time in micros for button ISR debounce */
 volatile unsigned long lastMicros;
-/* true if right button is pressed */
+/* True if right button is pressed */
 bool pressed;
 
 void setup() {
+  /* Global variables set */
   setGlobalVariables(false, 255, -1, 0, 0, false, true, 0, false, false);
 
-  /* led and buttons setup */
+  /* Led and buttons setup */
   pinMode(RED_LED_PIN, OUTPUT);
   for(int i = 0; i <= LED_PIN_MAX - LED_PIN_MIN; i++){
     pinMode(LED_PIN_MIN + i, OUTPUT);
@@ -48,9 +45,7 @@ void setup() {
     enableInterrupt(BUTTON_PIN_MIN + i, buttonPressed, RISING);
   }
 
-  /*
-   * Pseudo number generator init in unused pin
-   */
+  /* Pseudo number generator init in unused pin */
   randomSeed(analogRead(A1));
 
   Serial.begin(9600);
@@ -87,12 +82,6 @@ void loop() {
   delay(10);
 }
 
-/*
- * ISR's button interrupt. It manage all possible ways at button pressing: 
- * - start, at T1 pressing
- * - continue, at the right button
- * - game over, at the wrong one
- */
 void buttonPressed(){
   /* Debouncing: 200ms between two interrupts */
   if(micros() - lastMicros > 0.002 * MICROS_TO_SECONDS) {    
@@ -106,8 +95,10 @@ void buttonPressed(){
      * Right button pressed:
      * when the time is up, setting pressed = true, the game will not be over
      */
-    else if(isPlaying && arduinoInterruptedPin == BUTTON_PIN_MIN + pinOffset && !pressed){
-      pressed = true;
+    else if(isPlaying && arduinoInterruptedPin == BUTTON_PIN_MIN + pinOffset){
+      if(!pressed){
+        pressed = true;
+      }
     }
     /* In all the other cases the player pressed a wrong button, then timesUp will be called */
     else if(isPlaying) {
@@ -119,7 +110,6 @@ void buttonPressed(){
 
 void fadeRedLed(){
     analogWrite(RED_LED_PIN, brightness);
- 
     brightness = brightness + verse * FADE_STEP;
     if(brightness == 255 || brightness == 0){
       verse = -(verse);
@@ -128,7 +118,6 @@ void fadeRedLed(){
 
 void nextPinOffset(){
   int next;
-  
   /* We move the fly in an adjacent position and then we manage the overflow state */
   next = random(0,2) ? pinOffset + 1  : pinOffset - 1;
   /* If the next offsed exeeds the maximum range then it's set at minimum (0) */

@@ -20,9 +20,8 @@ void startGame(){
     int level = map(potValue, 0, 1023, 1, 8);
     tMin = (MTO_MAX_PERIOD - map(level, 1, 8, 0, MTO_MAX_PERIOD - MICROS_TO_SECONDS)) / K;
         
-    long rndTimer = random(tMin, tMin * K);
     /* We set the random period */
-    MiniTimer1.setPeriod(rndTimer);
+    MiniTimer1.setPeriod(random(tMin, tMin * K));
     /* We turn on the first led */
     digitalWrite(LED_PIN_MIN + pinOffset, HIGH);
     /* The timer startGameing */
@@ -31,34 +30,35 @@ void startGame(){
 }
 
 void timesUp(){
-  if(pressed){
-      /* We stop the timer, the button was pressed in time */
-      MiniTimer1.stop();
-      // We turn off the current led and we turn on the next one
+  /* We stop the timer and we reset it to the beginning */
+  MiniTimer1.stop();
+  MiniTimer1.reset();
+  if(pressed){ /* The current button was pressed in time */
+      /* We turn off the current led */
       digitalWrite(LED_PIN_MIN + pinOffset, LOW);
-      /* Score increment */
-      score++; 
-      pressed = false;
       Serial.println(String("Tracking the fly: pos ") + (BUTTON_PIN_MIN + pinOffset));
       /* Next offset calculation */
       nextPinOffset();
+      /* Turning on the next led */
       digitalWrite(LED_PIN_MIN + pinOffset, HIGH);
+
+      /* Score increment, reset pressed variable */
+      score++; 
+      pressed = false;
+      
       /* We reduce tMin in order to reduce the range whom the next expiring time will be calculated */
       tMin = tMin * REDUCING_FACTOR;
-      /* We set the new period of the timer and we startGame it from the beginning */
+      /* We set the new period of the timer and we start it from the beginning */
       MiniTimer1.setPeriod(random(tMin, tMin * K));
       MiniTimer1.reset();
       MiniTimer1.start();
   }
   /* 
-   * checking this variable means be sure that this function is called only by 
+   * Else, game over: current button not pressed in time / wrong button pressed
+   * Checking this variable means be sure that this function is called only by 
    * buttonPressed() or by MiniTimerOne, avoiding a chain of interrupts   
    */
   else if(!alreadyOver){
-    /* We stop the timer and we reset it to the beginning */
-    MiniTimer1.stop();
-    MiniTimer1.reset();
-
     /* We turn off the current led on */
     digitalWrite(LED_PIN_MIN + pinOffset, LOW);
 
