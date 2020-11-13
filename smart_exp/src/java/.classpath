@@ -6,15 +6,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/gigio/OneDrive/Documenti/Arduino/sketches/seiot-assignments-2020/smart_exp/src/java/external jars/jfreechart-1.0.19/lib/jcommon-1.0.23.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/gigio/OneDrive/Documenti/Arduino/sketches/seiot-assignments-2020/smart_exp/src/java/external jars/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/gigio/OneDrive/Documenti/Arduino/sketches/seiot-assignments-2020/smart_exp/src/java/external jars/jfreechart-1.0.19/lib/jcommon-1.0.23.jar"/>
+	<classpathentry kind="lib" path="C:/Users/gigio/OneDrive/Documenti/Arduino/sketches/seiot-assignments-2020/smart_exp/src/java/external jars/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
