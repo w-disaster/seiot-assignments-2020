@@ -10,6 +10,7 @@
 #include "ButtonStart.h"
 #include "ButtonStop.h"
 #include "LedImpl.h"
+#include "SchedulerImpl.h"
 
 /**
  * pins.
