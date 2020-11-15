@@ -1,8 +1,6 @@
 #ifndef __LED_H__
 #define __LED_H__
 
-#define BLINKING_STEP 200
-
 class Led
 {
 public:
@@ -18,9 +16,10 @@ public:
   virtual void turnOff()= 0;
 
   /**
-   * Makes the led turn on and off for a period of time specified by 
-   * the param seconds.
+   * Makes the led turn on and off for the specified period of milliseconds.
+   * The led switches between On and Off state every blinkStep milliseconds.
+   * After the specified milliseconds have passed the led will turn Off.
    */
-  virtual void blinkLed(int seconds) = 0;
+  virtual void blinkLed(int milliseconds, int blinkStep) = 0;
 };
 #endif

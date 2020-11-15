@@ -10,7 +10,7 @@ public:
   LedImpl(int pin);
   void turnOn();
   void turnOff();
-  void blinkLed(int seconds);
+  void blinkLed(int milliseconds, int blinkStep);
   
 private:
   int pin;

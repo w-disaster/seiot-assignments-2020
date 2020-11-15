@@ -1,8 +1,6 @@
 #include "LedImpl.h"
 #include "Arduino.h"
 
-#define BLINK_DELAY
-
 LedImpl::LedImpl(int pin) {
   this->pin = pin;
   pinMode(pin, OUTPUT);
@@ -17,6 +15,25 @@ void LedImpl::turnOff() {
   digitalWrite(this->pin, LOW);
 }
 
-void LedImpl::blinkLed(int seconds) {
+void LedImpl::blinkLed(int milliseconds, int blinkStep) {
+  /* fìrst the led turns ON */
+  bool ledIsOn = false;
   
+  while(blinkStep < milliseconds){
+    
+    if(ledIsOn){
+      turnOff(); 
+    }else{
+      turnOn(); 
+    }
+    
+    delay(blinkStep);
+    milliseconds =- blinkStep;
+  }
+
+  /* if some milliseconds have remained */
+  if(milliseconds) delay(milliseconds);
+
+  /* at the end we turn OFF the led*/
+  turnOff();
 }
