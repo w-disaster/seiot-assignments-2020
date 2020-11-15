@@ -11,8 +11,9 @@ class SchedulerImpl: public Scheduler
 public:
   SchedulerImpl();
   void addTask(Task* task);
-  void removeTask(Task* task);
+  void schedule();
 private:
+  int nTask;
   Task* tasks[N_TASKS];
 };
 

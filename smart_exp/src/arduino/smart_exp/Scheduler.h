@@ -11,10 +11,10 @@ public:
    * Adds a Task to the list of tasks to schedule.
    */
   virtual void addTask(Task* task) = 0;
-  
+
   /**
-   * Removes a Task from the list of tasks to schedule.
+   * Goes to the next Task.
    */
-  virtual void removeTask(Task* task) = 0;
+  virtual void schedule() = 0;
 };
 #endif
