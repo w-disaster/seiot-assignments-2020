@@ -21,12 +21,8 @@ void LedImpl::blinkLed(int milliseconds, int blinkStep) {
   
   while(blinkStep < milliseconds){
     
-    if(ledIsOn){
-      turnOff(); 
-    }else{
-      turnOn(); 
-    }
-    
+    ledIsOn ? turnOff() : turnOn(); 
+
     delay(blinkStep);
     milliseconds =- blinkStep;
   }
