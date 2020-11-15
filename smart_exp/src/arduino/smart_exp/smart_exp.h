@@ -19,6 +19,11 @@
 #define GREEN_LED_PIN 13
 #define RED_LED_PIN 12
 #define POT_PIN A0
+#define PIR_PIN 4
+#define THERMO_PIN 5
+#define SERVO_MOTOR_PIN 6
+#define SONAR_TRIG_PIN 8
+#define SONAR_ECHO_PIN 7
 
 /**
  * utility.
