@@ -24,7 +24,7 @@ void LedImpl::blinkLed(int milliseconds, int blinkStep) {
     ledIsOn ? turnOff() : turnOn(); 
 
     delay(blinkStep);
-    milliseconds =- blinkStep;
+    milliseconds -= blinkStep;
   }
 
   /* if some milliseconds have remained */
