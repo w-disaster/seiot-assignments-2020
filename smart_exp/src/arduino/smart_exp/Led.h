@@ -4,7 +4,6 @@
 class Led
 {
 public:
-  
   /**
    * Turns the led on.
    */
@@ -13,7 +12,7 @@ public:
   /**
    * Turns the led off.
    */
-  virtual void turnOff()= 0;
+  virtual void turnOff() = 0;
 
   /**
    * Makes the led turn on and off for the specified period of milliseconds.

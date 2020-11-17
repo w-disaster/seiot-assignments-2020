@@ -3,7 +3,7 @@
 
 #include "Led.h"
 
-class LedImpl: public Led
+class LedImpl : public Led
 {
 
 public:
@@ -11,7 +11,7 @@ public:
   void turnOn();
   void turnOff();
   void blinkLed(int milliseconds, int blinkStep);
-  
+
 private:
   int pin;
 };

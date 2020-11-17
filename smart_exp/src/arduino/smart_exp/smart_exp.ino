@@ -1,11 +1,12 @@
 #include "smart_exp.h"
 
-Button* buttonStart;
-Button* buttonStop;
+Button *buttonStart;
+Button *buttonStop;
 
-Scheduler* scheduler;
+Scheduler *scheduler;
 
-void setup(){
+void setup()
+{
 
   buttonStart = new ButtonStart(BUTTON_START_PIN);
   buttonStop = new ButtonStop(BUTTON_STOP_PIN);
@@ -14,6 +15,6 @@ void setup(){
   Serial.begin(9600);
 }
 
-void loop(){
-  
+void loop()
+{
 }

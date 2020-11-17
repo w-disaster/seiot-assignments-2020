@@ -1,8 +1,8 @@
 #ifndef __TASK_H__
 #define __TASK_H__
 
-class Task{
-  
+class Task
+{
 };
 
 #endif

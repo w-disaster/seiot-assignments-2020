@@ -10,7 +10,7 @@ public:
   /**
    * Adds a Task to the list of tasks to schedule.
    */
-  virtual void addTask(Task* task) = 0;
+  virtual void addTask(Task *task) = 0;
 
   /**
    * Goes to the next Task.

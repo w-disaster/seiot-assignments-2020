@@ -30,11 +30,11 @@
  * utility.
  */
 #define MILLIS_TO_SEC 1000
-#define SLEEP_TIME 5 
-#define MAX_TIME 20 
-#define ERROR_TIME 2 
-#define MIN_FREQ 1 
-#define MAX_FREQ 50 
+#define SLEEP_TIME 5
+#define MAX_TIME 20
+#define ERROR_TIME 2
+#define MIN_FREQ 1
+#define MAX_FREQ 50
 //#define MAXVEL tbd
 
 #endif

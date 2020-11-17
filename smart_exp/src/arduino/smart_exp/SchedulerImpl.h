@@ -6,15 +6,16 @@
 //TODO: Update value
 #define N_TASKS 10
 
-class SchedulerImpl: public Scheduler
+class SchedulerImpl : public Scheduler
 {
 public:
   SchedulerImpl();
-  void addTask(Task* task);
+  void addTask(Task *task);
   void schedule();
+
 private:
   int nTask;
-  Task* tasks[N_TASKS];
+  Task *tasks[N_TASKS];
 };
 
 #endif
