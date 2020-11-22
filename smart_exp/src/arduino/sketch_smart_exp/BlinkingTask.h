@@ -2,13 +2,14 @@
 #define __BLINKING_TASK_H__
 
 #include "Task.h"
+#include "Led.h"
 
 class BlinkingTask : public Task{
-    int pin;
+    Led* led;
     int ledState;
 
     public:
-        BlinkingTask(int pin);
+        BlinkingTask(Led* led);
         void init(int period);
         void tick();
 };

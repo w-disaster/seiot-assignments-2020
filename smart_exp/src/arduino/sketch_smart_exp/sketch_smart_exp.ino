@@ -3,11 +3,11 @@
 Scheduler* scheduler;
 
 void setup() {
-  scheduler = new SchedulerImpl();
   Serial.begin(115200);
+  scheduler = new SchedulerImpl();
+  scheduler->init(50);
 }
 
 void loop() {
   scheduler -> schedule();
-  delay(1000);
 }

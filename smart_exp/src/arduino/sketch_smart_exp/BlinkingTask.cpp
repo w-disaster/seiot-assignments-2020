@@ -1,8 +1,8 @@
 #include "BlinkingTask.h"
 #include "Arduino.h"
 
-BlinkingTask::BlinkingTask(int pin){
-   this->pin = pin;
+BlinkingTask::BlinkingTask(Led* led){
+   this->led = led;
 }
 
 void BlinkingTask::init(int period){
@@ -10,6 +10,11 @@ void BlinkingTask::init(int period){
 }
 
 void BlinkingTask::tick(){
-    this->ledState = this->ledState == HIGH ? LOW : HIGH;
-    digitalWrite(this->pin, this->ledState);    
+    if(this->ledState == HIGH){
+        this->ledState = LOW;
+        this->led->switchOff();
+    } else {
+        this->ledState = HIGH;
+        this->led->switchOn();
+    }
 }
