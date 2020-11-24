@@ -2,14 +2,13 @@ package application;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 
 import jssc.SerialPortList;
 
 import model.GraphFactory;
-
-import java.util.List;
 
 import controller.SerialController;
 import view.Graph;
@@ -24,8 +23,6 @@ public final class Main extends Application {
 
     private SerialController serialController;
 
-    private String[] ports;
-
     private Graph g1;
     private Graph g2;
     private Graph g3;
@@ -33,21 +30,24 @@ public final class Main extends Application {
     @Override
     public void start(final Stage stage) throws Exception {
 
-        FlowPane root = new FlowPane();
+        final FlowPane root = new FlowPane();
 
         this.g1 = GraphFactory.createPositionGraph();
         this.g2 = GraphFactory.createSpeedGraph();
         this.g3 = GraphFactory.createAccelerationGraph();
 
-        root.getChildren().addAll(g1.getChart(), g2.getChart(), g3.getChart());
+        final Label status = new Label();
+        root.getChildren().addAll(g1.getChart(), g2.getChart(), g3.getChart(), status);
 
         final Scene scene = new Scene(root, SCENE_WIDTH, SCENE_HEIGHT);
 
         try {
-            ports = SerialPortList.getPortNames();
-            serialController = new SerialController(ports[0], g1, g2, g3);
+            final String[] ports = SerialPortList.getPortNames();
+            serialController = new SerialController(ports[0], g1, g2, g3, status);
+            status.setText("READY");
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("No Serial Port connected\nRE-LAUNCH THE APPLICATION ONCE THE PORT IS CONNECTED");
+            status.setText("NOT CONNECTED");
         }
 
         stage.setScene(scene);
