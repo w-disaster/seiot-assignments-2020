@@ -9,22 +9,19 @@ public class GraphImpl implements Graph {
 
     private final LineChart<Number, Number> chart;
 
-    private final NumberAxis xAxis;
-    private final NumberAxis yAxis;
-
     private final Series<Number, Number> coordinates;
 
     public GraphImpl(final String xName, final String unitOfMeasure) {
-        this.xAxis = new NumberAxis();
-        this.yAxis = new NumberAxis();
+        final NumberAxis xAxis = new NumberAxis();
+        final NumberAxis yAxis = new NumberAxis();
 
-        this.xAxis.setLabel(unitOfMeasure);
-        this.yAxis.setLabel("s");
+        xAxis.setLabel(unitOfMeasure);
+        yAxis.setLabel("s");
 
-        this.coordinates = new Series<Number, Number>();
+        this.coordinates = new Series<>();
         this.coordinates.setName(xName);
 
-        this.chart = new LineChart<Number, Number>(xAxis, yAxis);
+        this.chart = new LineChart<>(xAxis, yAxis);
         this.chart.setTitle(xName);
         this.chart.getData().add(coordinates);
 

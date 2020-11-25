@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Range;
-
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Label;
 import jssc.*;
@@ -69,9 +67,9 @@ public class SerialController implements SerialPortEventListener {
     private Map<String, Data<Number, Number>> getCoordinates(final String data) {
         final Map<String, Data<Number, Number>> coordinates = new HashMap<>();
         int i = 0;
-        Number time = Integer.parseInt(data.split(SEPARATOR)[i]);
+        final Number time = Integer.parseInt(data.split(SEPARATOR)[i]);
 
-        for (String key : List.of("position", "speed", "acceleration")) {
+        for (final String key : List.of("position", "speed", "acceleration")) {
             i++;
             coordinates.put(key, new Data<Number, Number>(time, Integer.parseInt(data.split(SEPARATOR)[i])));
         }
