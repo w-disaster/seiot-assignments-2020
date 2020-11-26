@@ -1,15 +1,16 @@
 package application;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
-
+import javafx.stage.WindowEvent;
 import jssc.SerialPortList;
 
 import model.GraphFactory;
-
+import model.State;
 import controller.SerialController;
 import view.Graph;
 
@@ -18,8 +19,8 @@ import view.Graph;
  */
 public final class Main extends Application {
 
-    private static final int SCENE_WIDTH = 1080;
-    private static final int SCENE_HEIGHT = 720;
+    private static final int SCENE_WIDTH = 1500;
+    private static final int SCENE_HEIGHT = 500;
 
     private SerialController serialController;
 
@@ -36,22 +37,35 @@ public final class Main extends Application {
         this.g2 = GraphFactory.createSpeedGraph();
         this.g3 = GraphFactory.createAccelerationGraph();
 
-        final Label status = new Label();
-        root.getChildren().addAll(g1.getChart(), g2.getChart(), g3.getChart(), status);
+        final Label stateLabel = new Label();
+        stateLabel.setStyle("-fx-font-size: 25pt;"
+                + "-fx-font-weight:bold;");
+        root.getChildren().addAll(g1.getChart(), g2.getChart(), g3.getChart(), stateLabel);
 
         final Scene scene = new Scene(root, SCENE_WIDTH, SCENE_HEIGHT);
 
         try {
             final String[] ports = SerialPortList.getPortNames();
-            serialController = new SerialController(ports[0], g1, g2, g3, status);
-            status.setText("READY");
+            serialController = new SerialController(ports[0], g1, g2, g3, stateLabel);
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("No Serial Port connected\nRE-LAUNCH THE APPLICATION ONCE THE PORT IS CONNECTED");
-            status.setText("NOT CONNECTED");
+            stateLabel.setText(State.NOT_CONNECTED.getLabelText());
         }
 
         stage.setScene(scene);
         stage.show();
+
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(final WindowEvent event) {
+                try {
+                    if (serialController.isPortOpen()) {
+                        serialController.close();
+                    }
+                } catch (NullPointerException e) {
+                    System.out.println("Application closed without connecting any board");
+                }
+            }
+        });
     }
 
     /**
