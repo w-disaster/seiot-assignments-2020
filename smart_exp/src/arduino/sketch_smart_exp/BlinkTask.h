@@ -4,12 +4,12 @@
 #include "Task.h"
 #include "Led.h"
 
-class BlinkingTask : public Task{
+class BlinkTask : public Task{
     Led* led;
     int ledState;
 
     public:
-        BlinkingTask(Led* led);
+        BlinkTask(Led* led);
         void init(int period);
         void tick();
 };

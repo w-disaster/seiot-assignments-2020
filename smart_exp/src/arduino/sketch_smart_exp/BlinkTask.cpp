@@ -1,15 +1,15 @@
-#include "BlinkingTask.h"
+#include "BlinkTask.h"
 #include "Arduino.h"
 
-BlinkingTask::BlinkingTask(Led* led){
+BlinkTask::BlinkTask(Led* led){
    this->led = led;
 }
 
-void BlinkingTask::init(int period){
+void BlinkTask::init(int period){
     Task::init(period);
 }
 
-void BlinkingTask::tick(){
+void BlinkTask::tick(){
     if(this->ledState == HIGH){
         this->ledState = LOW;
         this->led->switchOff();

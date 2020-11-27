@@ -2,7 +2,6 @@
 #define __READY_AGENT_H__
 
 #include "Agent.h"
-//#include "BlinkingTask.h"
 #include "Button.h"
 #define CALIBRATION_TIME 10
 

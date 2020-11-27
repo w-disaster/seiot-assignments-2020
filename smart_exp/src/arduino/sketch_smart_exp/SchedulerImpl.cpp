@@ -1,10 +1,12 @@
 #include "SchedulerImpl.h"
 #include "ReadyAgent.h"
-#include "BlinkingTask.h"
+#include "BlinkTask.h"
 #include "Arduino.h"
 
 #define L1PIN 12
 #define L2PIN 13
+#define ERROR_TIME 5
+#define MILLIS_TO_SEC 1000
 
 SchedulerImpl::SchedulerImpl(){
     this->state = State::STATE::READY;
@@ -16,14 +18,14 @@ SchedulerImpl::SchedulerImpl(){
     this->agents[0]->setLeds(L1, L2);
 
     // creiamo il task che fa blinking sul secondo led
-    Task* blinkTask = new BlinkingTask(L2);
+    Task* blinkTask = new BlinkTask(L2);
     // settiamo il suo periodo
     blinkTask->init(200);
 
     // aggiungiamo il task all'agent
     this->agents[0]->setTask(blinkTask);
     // settiamo il periodo dell'agent
-    this->agents[0]->init(200000);
+    this->agents[0]->init(ERROR_TIME * MILLIS_TO_SEC);
 
     // settiamo l'agent corrente
     setCurrentAgent(this->state);
@@ -51,6 +53,8 @@ void SchedulerImpl::setCurrentAgent(State::STATE state){
     switch (state){
         case State::STATE::READY:
             this->current = this->agents[0];
+            this->current->init(ERROR_TIME * MILLIS_TO_SEC);
+            this->current->getTask()->init(200);
             break;
         case State::STATE::SUSPENDED:
         case State::STATE::ERROR:
