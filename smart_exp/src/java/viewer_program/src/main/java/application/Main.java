@@ -54,9 +54,7 @@ public final class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(final WindowEvent event) {
+        stage.setOnCloseRequest((event) -> {
                 try {
                     if (serialController.isPortOpen()) {
                         serialController.close();
@@ -64,8 +62,7 @@ public final class Main extends Application {
                 } catch (NullPointerException e) {
                     System.out.println("Application closed without connecting any board");
                 }
-            }
-        });
+            });
     }
 
     /**

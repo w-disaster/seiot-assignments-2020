@@ -20,7 +20,7 @@ public final class GraphFactory {
     }
 
     private static Graph createGraph(final Measures measure) {
-        return new GraphImpl(measure.getName(), measure.getUnitOfMeasure());
+        return new GraphImpl(measure.getName(), measure.getUnitOfMeasure(), measure.getGraphLineColor());
     }
 
 }

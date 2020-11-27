@@ -1,5 +1,6 @@
 package view;
 
+import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -11,25 +12,36 @@ public class GraphImpl implements Graph {
 
     private final Series<Number, Number> coordinates;
 
-    public GraphImpl(final String xName, final String unitOfMeasure) {
+    private final String lineColor;
+
+    public GraphImpl(final String yName, final String unitOfMeasure, final String color) {
         final NumberAxis xAxis = new NumberAxis();
         final NumberAxis yAxis = new NumberAxis();
 
-        xAxis.setLabel(unitOfMeasure);
-        yAxis.setLabel("s");
+        yAxis.setLabel(unitOfMeasure);
+        xAxis.setLabel("s");
 
         this.coordinates = new Series<>();
-        this.coordinates.setName(xName);
+        this.coordinates.setName(yName);
 
         this.chart = new LineChart<>(xAxis, yAxis);
-        this.chart.setTitle(xName);
+        this.chart.setTitle(yName);
         this.chart.getData().add(coordinates);
 
+        this.lineColor = color;
     }
 
     @Override
     public final void updatePlot(final XYChart.Data<Number, Number> newCoordinates) {
         this.coordinates.getData().add(newCoordinates);
+        for (Node node : this.chart.lookupAll(".series" + 0)) {
+            node.setStyle(" -fx-stroke: " + this.lineColor + ";\n"
+                    + "     -fx-background-color: " + this.lineColor + ", white;\n"
+                    + "     -fx-background-insets: 0, 2;\n"
+                    + "     -fx-background-radius: 5px;\n"
+                    + "     -fx-padding: 5px;");
+        }
+
     }
 
     @Override

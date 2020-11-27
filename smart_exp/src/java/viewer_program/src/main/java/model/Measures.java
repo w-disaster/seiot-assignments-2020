@@ -1,16 +1,18 @@
 package model;
 
 enum Measures {
-    POSITION("Posizione", "m"),
-    SPEED("Velocità", "m/s"),
-    ACCELERATION("Accelerazione", "m/s^2");
+    POSITION("Posizione", "m", "#0028c9"),
+    SPEED("Velocità", "m/s", "#e68e00"),
+    ACCELERATION("Accelerazione", "m/s^2", "#31d48a");
 
     private final String name;
     private final String unitOfMeasure;
+    private final String lineColor;
 
-    Measures(final String name, final String unitOfMeasure) {
+    Measures(final String name, final String unitOfMeasure, final String lineColor) {
         this.name = name;
         this.unitOfMeasure = unitOfMeasure;
+        this.lineColor = lineColor;
     }
 
     public String getName() {
@@ -19,5 +21,9 @@ enum Measures {
 
     public String getUnitOfMeasure() {
         return this.unitOfMeasure;
+    }
+
+    public String getGraphLineColor() {
+        return this.lineColor;
     }
 }

@@ -12,7 +12,8 @@ import view.Graph;
 public class SerialController implements SerialPortEventListener {
 
     private static final String SEPARATOR = ":";
-    private static final String END_MSG = "f";
+    private static final String STATE_CHAR = "S";
+    private static final String END_MSG = ";";
 
     private final SerialPort port;
 
@@ -27,7 +28,7 @@ public class SerialController implements SerialPortEventListener {
     public SerialController(final String portName, final Graph positionGraph, final Graph speedGraph,
             final Graph accelerationGraph, final Label stateLabel) {
 
-        msg = new String("");
+        msg = "";
 
         /* set up the serial port */
         port = new SerialPort(portName);
@@ -81,7 +82,7 @@ public class SerialController implements SerialPortEventListener {
 
                     /* data usage */
                     processData();
-                    
+
                 } else if (recivedData.contains(END_MSG)) { 
                     final String oldData = recivedData.split(END_MSG)[0];
                     final String newData = recivedData.split(END_MSG)[1];
@@ -133,14 +134,13 @@ public class SerialController implements SerialPortEventListener {
      */
     private void processData() {
         if (isState(msg)) {
-            getState(msg);
+            updateState(msg);
             updateStateLabel();
         } else {
             updatePlots(msg);
-            /* ready next msg */
-            msg = "";
         }
-
+        /* ready next msg */
+        msg = "";
     }
 
     /**
@@ -150,12 +150,7 @@ public class SerialController implements SerialPortEventListener {
      * True if it is a State updating message, False otherwise.
      */
     private boolean isState(final String string) {
-        for (int i = 0; i < 10; i++) {
-            if (string.contains(SEPARATOR)) {
-                return false;
-            }
-        }
-        return true;
+        return string.endsWith(STATE_CHAR);
     }
 
     /**
@@ -193,15 +188,13 @@ public class SerialController implements SerialPortEventListener {
         try {
             final Map<String, Data<Number, Number>> coordinates = getCoordinates(data);
 
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
+            Platform.runLater(() -> {
                     positionGraph.updatePlot(coordinates.get("position"));
                     speedGraph.updatePlot(coordinates.get("speed"));
                     accelerationGraph.updatePlot(coordinates.get("acceleration"));
-                }
-            });
+                });
         } catch (IllegalArgumentException e) {
+            System.out.println(msg);
             System.out.println("Clean up input before starting");
         }
     }
@@ -224,13 +217,29 @@ public class SerialController implements SerialPortEventListener {
      * @param recivedData
      * The message containing the State code.
      */
-    private void getState(final String recivedData) {
+    private void updateState(final String recivedData) {
         switch (recivedData) {
-        case "r":
+        case "readyS":
             state = State.READY;
             break;
-        case "s":
+        case "suspendedS":
             state = State.SUSPENDED;
+            break;
+        case "experimentS":
+            Platform.runLater(() -> {
+                    /* clear any old graph before the experiment starts */
+                    positionGraph.reset();
+                    speedGraph.reset();
+                    accelerationGraph.reset();
+                });
+
+            state = State.EXPERIMENTING;
+            break;
+        case "overS":
+            state = State.EXPERIMENT_CONLUDED;
+            break;
+        case "errorS":
+            state = State.ERROR;
             break;
         default:
             state = State.ERROR;
