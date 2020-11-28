@@ -9,24 +9,30 @@
 #define TRIG_PIN 10
 #define ECHO_PIN 11
 
-Scheduler* scheduler;
+Scheduler *scheduler;
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   scheduler = new Scheduler();
   scheduler->init(100);
 
-  Experimentation* experimentation = new ExperimentationImpl(Experimentation::State::READY);
+  Experimentation *experimentation = new ExperimentationImpl(Experimentation::State::READY);
 
-  Task* expStepTask = new ExperimentationStepTask(experimentation, BSTART_PIN, BSTOP_PIN, PIR_PIN);
+  Task *expStepTask = new ExperimentationStepTask(experimentation, BSTART_PIN, BSTOP_PIN, PIR_PIN);
   expStepTask->init(SLEEP_TIME * MILLIS_TO_SEC);
+
+  ViewerComunication *viewerComunicator = new ViewerComunicationTask(experimentation);
+  viewerComunicator->init(SLEEP_TIME * MILLIS_TO_SEC);
+
+  Task *kinematicsTask = new KinematicsTask(experimentation, TRIG_PIN, ECHO_PIN);
+
   scheduler->addTask(expStepTask);
-
-  Task* kinematicsTask = new KinematicsTask(experimentation, TRIG_PIN, ECHO_PIN);
   scheduler->addTask(kinematicsTask);
-
+  scheduler->addTask(viewerComunicator);
 }
 
-void loop() {
-  scheduler -> schedule();
+void loop()
+{
+  scheduler->schedule();
 }
