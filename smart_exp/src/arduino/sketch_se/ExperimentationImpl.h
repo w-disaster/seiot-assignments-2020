@@ -5,4 +5,10 @@ class ExperimentationImpl : public Experimentation{
         ExperimentationImpl(State initialState);
         void setExperimentationState(State expState);
         State getExperimentationState();
+        void setDistance(float x);
+        float getDistance();
+        void setSpeed(float v);
+        float getSpeed();
+        void setAcceleration(float a);
+        float getAcceleration();
 };

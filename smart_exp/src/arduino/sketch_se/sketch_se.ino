@@ -6,7 +6,7 @@
 #define BSTART_PIN 3
 #define BSTOP_PIN 8
 #define PIR_PIN 2
-#define TRIG_PIN 10
+#define TRIG_PIN 6
 #define ECHO_PIN 11
 
 Scheduler* scheduler;
@@ -14,7 +14,7 @@ Scheduler* scheduler;
 void setup() {
   Serial.begin(115200);
   scheduler = new Scheduler();
-  scheduler->init(100);
+  scheduler->init(20);
 
   Experimentation* experimentation = new ExperimentationImpl(Experimentation::State::READY);
 
@@ -24,9 +24,8 @@ void setup() {
 
   Task* kinematicsTask = new KinematicsTask(experimentation, TRIG_PIN, ECHO_PIN);
   scheduler->addTask(kinematicsTask);
-
 }
 
 void loop() {
-  scheduler -> schedule();
+  scheduler->schedule();
 }

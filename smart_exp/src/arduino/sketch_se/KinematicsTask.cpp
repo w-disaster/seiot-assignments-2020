@@ -1,9 +1,10 @@
 #include "Arduino.h"
+#include "SonarImpl.h"
 #include "KinematicsTask.h"
 
 KinematicsTask::KinematicsTask(Experimentation* experimentation, int trigPin, int echoPin){
     this->experimentation = experimentation;
-    this->sonar = new Sonar();
+    this->sonar = new SonarImpl();
     this->sonar->init(trigPin, echoPin);
     this->state = K0;
 
@@ -11,33 +12,48 @@ KinematicsTask::KinematicsTask(Experimentation* experimentation, int trigPin, in
 }
 
 bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod){
+    State nextState = state;
+    bool result;
     switch(state){
         case K0:
             if(this->experimentation->getExperimentationState() == Experimentation::State::EXPERIMENTATION){
                 /* sampling rate */
-                int potValue = digitalRead(POT_PIN);
+                int potValue = analogRead(POT_PIN);
 
-                int period = roundToNearestMultiple(1050 - map(potValue, 0, 1023, 50, 1000), 50);
+                int period = roundToNearestMultiple(1020 - map(potValue, 0, 1023, 20, 1000), 20);
                 init(period);
-                Serial.println(String("periodo task cinematica: ") + period + "pot value: " + potValue);
+                Serial.println(String("periodo task cinematica: ") + period + " pot value: " + potValue);
 
-                state = K1;
+                /* sound speed update */
+                this->sonar->updateSoundSpeed();
+
+                /* start calculating speed from point x0 = 0 and acceleration from v0 = 0*/
+                precDistance = 0;
+                precSpeed = 0;
+                
+                nextState = K1;
             }
-            return true;
+            result = true;
+            break;
         case K1:
-            if(Task::updateAndCheckTime(basePeriod)){
+            if(updateAndCheckTime(basePeriod)){
                 if(this->experimentation->getExperimentationState() == Experimentation::State::EXPERIMENTATION){
-                    return true;
+                    result = true;
+                    break;
                 } else {
-                    state = K0;
-                    return false;
+                    nextState = K0;
+                    result = false;
+                    break;
                 }
             }
             if(this->experimentation->getExperimentationState() != Experimentation::State::EXPERIMENTATION){
-                state = K0;
+                nextState = K0;
             }
-            return false;
+            result = false;
+            break;
     }
+    state = nextState;
+    return result;
 }
 
 void KinematicsTask::tick(){
@@ -45,13 +61,34 @@ void KinematicsTask::tick(){
         case K0:
             break;
         case K1:
-            Serial.println(String("distanza: ") + this->sonar->getDistance());
+            float distance = this->sonar->getDistance() * 1000;
+            float speed = (distance - precDistance) / getPeriod();
+            float acceleration = (speed - precSpeed) / getPeriod();
+            
+            Serial.println(distance + String(" : ") + speed + String(" : ") + acceleration);
+
+            /* write to communicator */
+            this->experimentation->setDistance(distance);
+            this->experimentation->setSpeed(speed);
+            this->experimentation->setAcceleration(acceleration);
+
+            /* prec values update */
+            precDistance = distance;
+            precSpeed = speed;
             break;
     }
 }
 
 void KinematicsTask::init(int period){
     Task::init(period);
+}
+
+bool KinematicsTask::updateAndCheckTime(int basePeriod){
+    return Task::updateAndCheckTime(basePeriod);
+}
+
+int KinematicsTask::getPeriod(){
+    return Task::getPeriod();
 }
 
 int KinematicsTask::roundToNearestMultiple(int numToRound, int multiple){

@@ -25,6 +25,10 @@ class Task{
       }
       return false;
     }
+
+    int getPeriod(){
+      return myPeriod;
+    }
 };
 
 #endif
