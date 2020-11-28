@@ -2,6 +2,7 @@
 #include "ExperimentationStepTask.h"
 #include "KinematicsTask.h"
 #include "ExperimentationImpl.h"
+#include "ViewerComunicationTask.h"
 
 #define BSTART_PIN 3
 #define BSTOP_PIN 8
