@@ -1,17 +1,14 @@
 #ifndef __VIEWER_COM_TASK__
 #define __VIEWER_COM_TASK__
 
-#include "ViewerComunication.h"
+#include "Task.h"
+#include "Arduino.h"
 
 #define DATA_SEPARATOR ":"
 #define MSG_END ";"
 #define STATE_END "!"
-#define T 0
-#define P 1
-#define V 2
-#define A 3
 
-class ViewerComunicationTask : public ViewerComunication
+class ViewerComunicationTask : public Task
 {
 
     enum State
@@ -24,6 +21,7 @@ class ViewerComunicationTask : public ViewerComunication
     } state;
     Experimentation *experimentation;
     bool stateMsgAlreadySent;
+    long expRelativeTime;
 
 private:
     void init(int period);
@@ -31,7 +29,6 @@ private:
 
 public:
     ViewerComunicationTask(Experimentation *experimentation);
-    void getData(double[] data);
     bool updateTimeAndCheckEvent(int basePeriod);
     void tick();
     ~ViewerComunicationTask();

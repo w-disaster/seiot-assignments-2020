@@ -5,12 +5,6 @@ ViewerComunicationTask::ViewerComunicationTask(; Experimentation * experimentati
     this->experimentation = experimentation;
     this->stateMsgAlreadySent = false;
     this->state = VC0;
-    this->data = ""
-}
-
-void ViewerComunicationTask::getData(double[] data)
-{
-    this->data = format(data);
 }
 
 void ViewerComunicationTask::sendData(String msg, bool isState)
@@ -112,7 +106,10 @@ void ViewerComunicationTask::tick()
     case VC3:
         /* exp */
         sendStateMsgOnce("exp");
-        sendExperimentData(this->data);
+        sendExperimentData(format(micros() - this->expRelativeTime,
+                                  this->experimentation->getDistance(),
+                                  this->experimentation->getSpeed(),
+                                  this->experimentation->getAcceleration()));
         break;
     case VC4:
         /* exp over */
@@ -123,29 +120,30 @@ void ViewerComunicationTask::tick()
     }
 }
 
-void sendStateMsgOnce(String state)
+void sendStateMsgOnce(String stateKey)
 {
     if (!stateMsgAlreadySent)
     {
         /* sends the State to serial */
-        sendData(state, true);
+        sendData(stateKey, true);
+        if (this->state == VC3)
+        {
+            /* start the relative clock if we are experimenting */
+            this->expRelativeTime = micros();
+        }
         this->stateMsgAlreadySent = true;
     }
 }
 
 void sendExperimentData(String data)
 {
-    if (data != "")
-    {
-        /* sends msg ad experiment data */
-        sendData(data, false);
-        this->data = ""
-    }
+    /* sends msg ad experiment data */
+    sendData(data, false);
 }
 
-String format(double[] arrayData)
+String format(long t, float p, float v, float a)
 {
-    String formattedString = String(arrayData[T]) + DATA_SEPARATOR + String(arrayData[P]) + DATA_SEPARATOR + String(arrayData[V]) + DATA_SEPARATOR + String(arrayData[A]);
+    String formattedString = String(t) + DATA_SEPARATOR + String(p) + DATA_SEPARATOR + String(v) + DATA_SEPARATOR + String(a);
     return formattedString;
 }
 
