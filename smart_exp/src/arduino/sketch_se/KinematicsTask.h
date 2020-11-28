@@ -9,10 +9,13 @@
 class KinematicsTask : public Task{
     Experimentation* experimentation;
     Sonar* sonar;
-    enum {K0, K1} state, prec;
+    enum State{K0, K1};
+    State state;
+    float precDistance, precSpeed;
 
     private:
         bool updateAndCheckTime(int basePeriod);
+        int getPeriod();
         void init(int period);
         int roundToNearestMultiple(int numToRound, int multiple);
 
