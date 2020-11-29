@@ -18,14 +18,21 @@ class ViewerComunicationTask : public Task
         VC2,
         VC3,
         VC4
-    } state;
+    };
+
+    /* fields */
+    State state;
     Experimentation *experimentation;
     bool stateMsgAlreadySent;
     long expRelativeTime;
 
 private:
+    /* functions */
     void init(int period);
     void sendData(String msg, bool isState);
+    void sendStateMsgOnce(String stateKey);
+    void sendExperimentData(String data);
+    String format(long t, float p, float v, float a);
 
 public:
     ViewerComunicationTask(Experimentation *experimentation);

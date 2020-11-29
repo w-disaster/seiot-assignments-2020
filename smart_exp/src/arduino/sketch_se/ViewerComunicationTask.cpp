@@ -1,6 +1,6 @@
 #include "ViewerComunicationTask.h"
 
-ViewerComunicationTask::ViewerComunicationTask(; Experimentation * experimentation)
+ViewerComunicationTask::ViewerComunicationTask(Experimentation *experimentation)
 {
     this->experimentation = experimentation;
     this->stateMsgAlreadySent = false;
@@ -10,6 +10,34 @@ ViewerComunicationTask::ViewerComunicationTask(; Experimentation * experimentati
 void ViewerComunicationTask::sendData(String msg, bool isState)
 {
     isState ? Serial.print(msg + STATE_END + MSG_END) : Serial.print(msg + MSG_END);
+}
+
+void ViewerComunicationTask::sendStateMsgOnce(String stateKey)
+{
+    if (!stateMsgAlreadySent)
+    {
+        /* sends the State to serial */
+        sendData(stateKey, true);
+
+        if (state == VC3)
+        {
+            /* start the relative clock if we are experimenting */
+            expRelativeTime = micros();
+        }
+        stateMsgAlreadySent = true;
+    }
+}
+
+void ViewerComunicationTask::sendExperimentData(String data)
+{
+    /* sends msg ad experiment data */
+    sendData(data, false);
+}
+
+String ViewerComunicationTask::format(long t, float p, float v, float a)
+{
+    String formattedString = String(t) + DATA_SEPARATOR + String(p) + DATA_SEPARATOR + String(v) + DATA_SEPARATOR + String(a);
+    return formattedString;
 }
 
 void ViewerComunicationTask::init(int period)
@@ -24,67 +52,74 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
     {
     case VC0:
         /* ready */
-        if (this->experimentation->getExperimentationState == Experimentation::State::SUSPENDED)
+        if (this->experimentation->getExperimentationState() == Experimentation::State::SUSPENDED)
         {
             /* goes to suspended */
             this->state = VC1;
-            setStateMsgAlreadySent(&result);
+            this->stateMsgAlreadySent = false;
+            result = true;
         }
-        else if (this->experimentation->getExperimentationState == Experimentation::State::ERROR)
+        else if (this->experimentation->getExperimentationState() == Experimentation::State::ERROR)
         {
             /* goes to error */
             this->state = VC2;
-            setStateMsgAlreadySent(&result);
+            this->stateMsgAlreadySent = false;
+            result = true;
         }
-        else if (this->experimentation->getExperimentationState == Experimentation::State::EXPERIMENTATION)
+        else if (this->experimentation->getExperimentationState() == Experimentation::State::EXPERIMENTATION)
         {
             /* goes to exp */
             this->state = VC3;
-            setStateMsgAlreadySent(&result);
+            this->stateMsgAlreadySent = false;
+            result = true;
         }
 
         break;
     case VC1:
         /* suspended */
-        if (this->experimentation->getExperimentationState == Experimentation::State::READY)
+        if (this->experimentation->getExperimentationState() == Experimentation::State::READY)
         {
             /* goes to ready */
             this->state = VC0;
-            setStateMsgAlreadySent(&result);
+            this->stateMsgAlreadySent = false;
+            result = true;
         }
         break;
     case VC2:
         /* error */
-        if (this->experimentation->getExperimentationState == Experimentation::State::READY)
+        if (this->experimentation->getExperimentationState() == Experimentation::State::READY)
         {
             /* goes to ready */
             this->state = VC0;
-            setStateMsgAlreadySent(&result);
+            this->stateMsgAlreadySent = false;
+            result = true;
         }
         break;
     case VC3:
         /* exp */
-        if (this->experimentation->getExperimentationState == Experimentation::State::EXPERIMENTATION_CONCLUDED)
+        if (this->experimentation->getExperimentationState() == Experimentation::State::EXPERIMENTATION_CONCLUDED)
         {
             /* goes to exp over */
             this->state = VC4;
-            setStateMsgAlreadySent(&result);
+            this->stateMsgAlreadySent = false;
+            result = true;
         }
         break;
     case VC4:
         /* exp over */
-        if (this->experimentation->getExperimentationState == Experimentation::State::READY)
+        if (this->experimentation->getExperimentationState() == Experimentation::State::READY)
         {
             /* goes to ready */
             this->state = VC0;
-            setStateMsgAlreadySent(&result);
+            this->stateMsgAlreadySent = false;
+            result = true;
         }
         break;
     default:
         break;
     }
 
-    return reuslt;
+    return result;
 }
 
 void ViewerComunicationTask::tick()
@@ -118,39 +153,6 @@ void ViewerComunicationTask::tick()
     default:
         break;
     }
-}
-
-void sendStateMsgOnce(String stateKey)
-{
-    if (!stateMsgAlreadySent)
-    {
-        /* sends the State to serial */
-        sendData(stateKey, true);
-        if (this->state == VC3)
-        {
-            /* start the relative clock if we are experimenting */
-            this->expRelativeTime = micros();
-        }
-        this->stateMsgAlreadySent = true;
-    }
-}
-
-void sendExperimentData(String data)
-{
-    /* sends msg ad experiment data */
-    sendData(data, false);
-}
-
-String format(long t, float p, float v, float a)
-{
-    String formattedString = String(t) + DATA_SEPARATOR + String(p) + DATA_SEPARATOR + String(v) + DATA_SEPARATOR + String(a);
-    return formattedString;
-}
-
-void setStateMsgAlreadySent(bool *result)
-{
-    this->stateMsgAlreadySent = false;
-    result = true;
 }
 
 ViewerComunicationTask::~ViewerComunicationTask()
