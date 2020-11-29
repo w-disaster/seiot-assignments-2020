@@ -8,10 +8,8 @@ class PirImpl : public Pir{
     public:
         PirImpl(int pin);
         bool isHigh();
-        void enableInterrupt();
-        void disableInterrupt();
-    private:
-        void motionDetected();
+        void interrupt();
+        void noInterrupt();
 };
 
 #endif

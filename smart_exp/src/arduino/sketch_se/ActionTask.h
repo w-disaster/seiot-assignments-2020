@@ -6,7 +6,7 @@
 #include "Pir.h"
 
 class ActionTask : public Task{
-    Experimentation* experimentation:
+    Experimentation* experimentation;
     Led* L1;
     Led* L2;
     Pir* pir;
@@ -18,8 +18,7 @@ class ActionTask : public Task{
         void init(int period);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();
-}
-
+};
 
 #endif
 

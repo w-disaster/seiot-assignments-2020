@@ -2,8 +2,6 @@
 #include "StepTask.h"
 #include "ButtonImpl.h"
 
-#define CALIBRATION_TIME 10
-
 StepTask::StepTask(Experimentation *experimentation, Pir* pir, int bStartPin, int bStopPin)
 {
     this->experimentation = experimentation;
@@ -80,7 +78,7 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod)
 
     case State::ES4:
         // bOK
-        if (this->bStart->isPressed() && this->bStop->isPressed())
+        if (/*this->bStart->isPressed() && */this->bStop->isPressed())
         {
             nextState = State::ES0;
             init(SLEEP_TIME * MILLIS_TO_SEC);

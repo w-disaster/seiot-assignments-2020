@@ -61,9 +61,10 @@ void KinematicsTask::tick(){
         case K0:
             break;
         case K1:
-            float distance = this->sonar->getDistance() * 1000;
-            float speed = (distance - precDistance) / getPeriod();
-            float acceleration = (speed - precSpeed) / getPeriod();
+            float distance = this->sonar->getDistance();
+            float deltat = getPeriod() * 0.001;
+            float speed = (distance - precDistance) / deltat;
+            float acceleration = (speed - precSpeed) / deltat;
             
             Serial.println(distance + String(" : ") + speed + String(" : ") + acceleration);
 

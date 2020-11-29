@@ -3,6 +3,7 @@
 
 #include "Task.h"
 #include "Button.h"
+#include "Pir.h"
 
 #define SLEEP_TIME 5
 #define MAX_TIME 20

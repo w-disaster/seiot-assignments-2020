@@ -66,7 +66,7 @@ void ActionTask::tick(){
         case A1:
             this->L1->switchOff();
             /* enabling interrupt to wake up arduino */
-            this->pir->enableInterrupt();
+            this->pir->interrupt();
 
             set_sleep_mode(SLEEP_MODE_PWR_DOWN);  
             sleep_enable();
@@ -77,7 +77,7 @@ void ActionTask::tick(){
             sleep_disable();
 
             /* we disable the interrupt */
-            this->pir->disableInterrupt();
+            this->pir->noInterrupt();
         case A2:
             this->L1->switchOff();
             break;

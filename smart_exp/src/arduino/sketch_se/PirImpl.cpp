@@ -1,6 +1,8 @@
 #include "PirImpl.h"
 #include "Arduino.h"
-#include <EnableInterrupt.h>
+#include "EnableInterrupt.h"
+
+#define CALIBRATION_TIME 10
 
 PirImpl::PirImpl(int pin){
     this->pin = pin;
@@ -19,12 +21,11 @@ bool PirImpl::isHigh(){
     return digitalRead(this->pin);
 }
 
-void PirImpl::enableInterrupt(){
-    enableInterrupt(this->pin, motionDetected, RISING);
+void PirImpl::interrupt(){
+    enableInterrupt(this->pin, Pir::motionDetected, RISING);
 }
 
-void PirImpl::disableInterrupt(){
+void PirImpl::noInterrupt(){
     disableInterrupt(this->pin);
 }
 
-void PirImpl::motionDetected(){}
