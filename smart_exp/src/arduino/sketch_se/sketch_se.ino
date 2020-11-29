@@ -23,7 +23,7 @@ void setup()
   Task *stepTask = new StepTask(experimentation, BSTART_PIN, BSTOP_PIN, PIR_PIN);
   stepTask->init(SLEEP_TIME * MILLIS_TO_SEC);
 
-  ViewerComunication *viewerComunicator = new ViewerComunicationTask(experimentation);
+  Task *viewerComunicator = new ViewerComunicationTask(experimentation);
   viewerComunicator->init(SLEEP_TIME * MILLIS_TO_SEC);
 
   Task *kinematicsTask = new KinematicsTask(experimentation, TRIG_PIN, ECHO_PIN);
