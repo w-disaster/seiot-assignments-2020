@@ -18,7 +18,8 @@
                 "path": [
                     "${workspaceFolder}/**",
                     "${HOME}/Arduino/libraries/**",
-                    "${HOME}/Downloads/arduino-1.8.13/hardware/arduino/avr/cores/arduino/**"
+                    "${HOME}/Downloads/arduino-1.8.13/hardware/arduino/avr/cores/arduino/**",
+                    "~/Downloads/arduino-1.8.13/hardware/tools/avr/avr/include/avr/**"
                 ]
             },
             "compilerPath": "/usr/bin/gcc",

@@ -1,5 +1,5 @@
-#ifndef __EXPERIMENTATION_STEP_TASK__
-#define __EXPERIMENTATION_STEP_TASK__
+#ifndef __STEP_TASK__
+#define __STEP_TASK__
 
 #include "Task.h"
 #include "Button.h"
@@ -9,11 +9,11 @@
 #define ERROR_TIME 2
 #define MILLIS_TO_SEC 1000
 
-class ExperimentationStepTask : public Task{
+class StepTask : public Task{
     Experimentation* experimentation;
+    Pir* pir;
     Button* bStart;
     Button* bStop;
-    int pirPin;
     
     enum State{ES0, ES1, ES2, ES3, ES4};
     State state;
@@ -22,7 +22,7 @@ class ExperimentationStepTask : public Task{
         bool updateAndCheckTime(int basePeriod);
 
     public:
-        ExperimentationStepTask(Experimentation* experimentation, int bStartPin, int bStopPin, int pir);
+        StepTask(Experimentation* experimentation, Pir* pir, int bStartPin, int bStopPin);
         void init(int period);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();  

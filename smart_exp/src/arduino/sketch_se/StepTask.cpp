@@ -1,36 +1,25 @@
 #include "Arduino.h"
-#include "ExperimentationStepTask.h"
+#include "StepTask.h"
 #include "ButtonImpl.h"
 
 #define CALIBRATION_TIME 10
 
-ExperimentationStepTask::ExperimentationStepTask(Experimentation *experimentation,
-                                                 int bStartPin, int bStopPin, int pir)
+StepTask::StepTask(Experimentation *experimentation, Pir* pir, int bStartPin, int bStopPin)
 {
     this->experimentation = experimentation;
+    this->pir = pir;
     this->bStart = new ButtonImpl(bStartPin);
     this->bStop = new ButtonImpl(bStopPin);
-    pirPin = pir;
-
-    pinMode(pirPin, INPUT);
-
-    Serial.print("Calibrating PIR ");
-    for (int i = 0; i < CALIBRATION_TIME; i++)
-    {
-        Serial.print(".");
-        delay(1000);
-    }
-    Serial.println("");
 }
 
-void ExperimentationStepTask::init(int period)
+void StepTask::init(int period)
 {
     state = State::ES0;
     this->experimentation->setExperimentationState(Experimentation::State::READY);
     Task::init(period);
 }
 
-bool ExperimentationStepTask::updateTimeAndCheckEvent(int basePeriod)
+bool StepTask::updateTimeAndCheckEvent(int basePeriod)
 {
     State nextState = state;
     bool result;
@@ -39,14 +28,13 @@ bool ExperimentationStepTask::updateTimeAndCheckEvent(int basePeriod)
     case State::ES0:
         if (Task::updateAndCheckTime(basePeriod))
         {
-
             nextState = State::ES1;
             result = true;
             break;
         }
         if (this->bStart->isPressed())
         {
-            if (digitalRead(pirPin))
+            if (this->pir->isHigh())
             {
                 nextState = State::ES3;
                 init(MAX_TIME * MILLIS_TO_SEC);
@@ -63,8 +51,12 @@ bool ExperimentationStepTask::updateTimeAndCheckEvent(int basePeriod)
         break;
 
     case State::ES1:
-        result = false;
+        /* At this point Arduino woke up from sleep mode */
+        nextState = State::ES0;
+        init(SLEEP_TIME * MILLIS_TO_SEC);
+        result = true;
         break;
+
     case State::ES2:
         if (Task::updateAndCheckTime(basePeriod))
         {
@@ -75,6 +67,7 @@ bool ExperimentationStepTask::updateTimeAndCheckEvent(int basePeriod)
         }
         result = false;
         break;
+
     case State::ES3:
         if (Task::updateAndCheckTime(basePeriod) || this->bStop->isPressed())
         {
@@ -84,6 +77,7 @@ bool ExperimentationStepTask::updateTimeAndCheckEvent(int basePeriod)
         }
         result = false;
         break;
+
     case State::ES4:
         // bOK
         if (this->bStart->isPressed() && this->bStop->isPressed())
@@ -100,7 +94,7 @@ bool ExperimentationStepTask::updateTimeAndCheckEvent(int basePeriod)
     return result;
 }
 
-void ExperimentationStepTask::tick()
+void StepTask::tick()
 {
     switch (state)
     {

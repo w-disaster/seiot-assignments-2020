@@ -1,5 +1,5 @@
 #include "Scheduler.h"
-#include "ExperimentationStepTask.h"
+#include "StepTask.h"
 #include "KinematicsTask.h"
 #include "ExperimentationImpl.h"
 #include "ViewerComunicationTask.h"
@@ -20,15 +20,15 @@ void setup()
 
   Experimentation *experimentation = new ExperimentationImpl(Experimentation::State::READY);
 
-  Task *expStepTask = new ExperimentationStepTask(experimentation, BSTART_PIN, BSTOP_PIN, PIR_PIN);
-  expStepTask->init(SLEEP_TIME * MILLIS_TO_SEC);
+  Task *stepTask = new StepTask(experimentation, BSTART_PIN, BSTOP_PIN, PIR_PIN);
+  stepTask->init(SLEEP_TIME * MILLIS_TO_SEC);
 
   ViewerComunication *viewerComunicator = new ViewerComunicationTask(experimentation);
   viewerComunicator->init(SLEEP_TIME * MILLIS_TO_SEC);
 
   Task *kinematicsTask = new KinematicsTask(experimentation, TRIG_PIN, ECHO_PIN);
 
-  scheduler->addTask(expStepTask);
+  scheduler->addTask(stepTask);
   scheduler->addTask(kinematicsTask);
   scheduler->addTask(viewerComunicator);
 }
