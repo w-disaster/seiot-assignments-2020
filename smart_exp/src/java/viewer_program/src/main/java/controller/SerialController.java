@@ -12,7 +12,7 @@ import view.Graph;
 public class SerialController implements SerialPortEventListener {
 
     private static final String SEPARATOR = ":";
-    private static final String STATE_CHAR = "S";
+    private static final String STATE_CHAR = "!";
     private static final String END_MSG = ";";
 
     private final SerialPort port;
@@ -38,7 +38,7 @@ public class SerialController implements SerialPortEventListener {
                 port.openPort();
             }
 
-            port.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            port.setParams(SerialPort.BAUDRATE_115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 
             port.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
 
