@@ -14,7 +14,7 @@ PirImpl::PirImpl(int pin){
         Serial.print(".");
         delay(1000);
     }
-    Serial.println("");
+    Serial.println("rotto i coglioniiii");
 }
 
 bool PirImpl::isHigh(){

@@ -1,3 +1,6 @@
+#ifndef __EXPERIMENTATION_IMPL__
+#define __EXPERIMENTATION_IMPL__
+
 #include "Experimentation.h"
 
 class ExperimentationImpl : public Experimentation{
@@ -12,3 +15,5 @@ class ExperimentationImpl : public Experimentation{
         void setAcceleration(float a);
         float getAcceleration();
 };
+
+#endif

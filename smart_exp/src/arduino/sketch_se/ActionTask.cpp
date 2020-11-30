@@ -82,6 +82,7 @@ void ActionTask::tick(){
             this->L1->switchOff();
             break;
         case A3:
+            Serial.println("spengo L1 e accendo L2");
             this->L1->switchOff();
             this->L2->switchOn();
             break;

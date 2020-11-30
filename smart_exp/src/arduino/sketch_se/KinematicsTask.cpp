@@ -1,11 +1,14 @@
 #include "Arduino.h"
 #include "SonarImpl.h"
+#include "ServoMotorImpl.h"
 #include "KinematicsTask.h"
 
-KinematicsTask::KinematicsTask(Experimentation* experimentation, int trigPin, int echoPin){
+KinematicsTask::KinematicsTask(Experimentation* experimentation, int trigPin, int echoPin, int servoMotorPin){
     this->experimentation = experimentation;
     this->sonar = new SonarImpl();
     this->sonar->init(trigPin, echoPin);
+    this->servoMotor = new ServoMotorImpl(servoMotorPin);
+    
     this->state = K0;
 
     pinMode(POT_PIN, INPUT);
@@ -26,11 +29,13 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod){
 
                 /* sound speed update */
                 this->sonar->updateSoundSpeed();
-
+                /* servo motor on */
+                this->servoMotor->on();
                 /* start calculating speed from point x0 = 0 and acceleration from v0 = 0*/
                 precDistance = 0;
                 precSpeed = 0;
                 
+                //i = 0;
                 nextState = K1;
             }
             result = true;
@@ -42,12 +47,29 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod){
                     break;
                 } else {
                     nextState = K0;
+                    this->servoMotor->off();
                     result = false;
+                    /*int s = 0;
+                    for(int k = 0; k < 1000; k++){
+                        s += avg_vel[k];
+                    }
+                    s = s/1000;
+                    Serial.println(String("s:") + s);
+                    i = 0;*/
                     break;
                 }
             }
             if(this->experimentation->getExperimentationState() != Experimentation::State::EXPERIMENTATION){
                 nextState = K0;
+                this->servoMotor->off();
+                /*int s = 0;
+                for(int k = 0; k < 1000; k++){
+                    s += avg_vel[k];
+                }
+                s = s/1000;
+                Serial.println(String("s:") + s);
+                i = 0;*/
+
             }
             result = false;
             break;
@@ -66,7 +88,13 @@ void KinematicsTask::tick(){
             float speed = (distance - precDistance) / deltat;
             float acceleration = (speed - precSpeed) / deltat;
             
-            Serial.println(distance + String(" : ") + speed + String(" : ") + acceleration);
+            /*avg_vel[i] = speed;
+            i++;*/
+
+            int value = map(abs(speed) * 10, 0, 100, 0, 180);
+            Serial.println(distance + String(" : ") + speed + String(" : ") + acceleration + String("->") + value);
+            
+            this->servoMotor->setPosition(50);
 
             /* write to communicator */
             this->experimentation->setDistance(distance);
