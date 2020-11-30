@@ -5,6 +5,9 @@
 #include <Arduino.h>
 #include "ServoTimer2.h"
 
+#define MAX_SERVO 2250
+#define MIN_SERVO 750
+
 class ServoMotorImpl: public ServoMotor {
 
 public:
