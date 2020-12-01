@@ -3,8 +3,11 @@ package controller;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.chart.XYChart.Data;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.text.Text;
 import jssc.*;
 import model.State;
 import view.Graph;
@@ -14,10 +17,14 @@ public class SerialController implements SerialPortEventListener {
     private static final String SEPARATOR = ":";
     private static final String STATE_CHAR = "!";
     private static final String END_MSG = ";";
+    private static final String END_EXP_OK = ">";
 
     private final SerialPort port;
 
     private final Label stateLabel;
+    private final Button okButton;
+    private final Text okButtonDescription;
+
     private final Graph positionGraph;
     private final Graph speedGraph;
     private final Graph accelerationGraph;
@@ -26,8 +33,8 @@ public class SerialController implements SerialPortEventListener {
     private State state;
 
     public SerialController(final String portName, final Graph positionGraph, final Graph speedGraph,
-            final Graph accelerationGraph, final Label stateLabel) {
-
+            final Graph accelerationGraph, final Label stateLabel, final Button okButton, final Text okButtonDescription) {
+        /* msg set up */
         msg = "";
 
         /* set up the serial port */
@@ -57,6 +64,20 @@ public class SerialController implements SerialPortEventListener {
         this.positionGraph = positionGraph;
         this.speedGraph = speedGraph;
         this.accelerationGraph = accelerationGraph;
+
+        /* set up okButton utility */
+        this.okButton = okButton;
+        this.okButtonDescription = okButtonDescription;
+
+        this.okButton.setOnMouseClicked(event -> {
+                if (port.isOpened()) {
+                    sendMessage(END_EXP_OK);
+                }
+
+                this.okButtonDescription.setVisible(false);
+                this.okButton.setDisable(true);
+                this.okButton.setVisible(false);
+            });
     }
 
     /**
@@ -219,13 +240,13 @@ public class SerialController implements SerialPortEventListener {
      */
     private void updateState(final String recivedData) {
         switch (recivedData) {
-        case "readyS":
+        case "ready!":
             state = State.READY;
             break;
-        case "suspendedS":
+        case "suspended!":
             state = State.SUSPENDED;
             break;
-        case "experimentS":
+        case "experiment!":
             Platform.runLater(() -> {
                     /* clear any old graph before the experiment starts */
                     positionGraph.reset();
@@ -235,15 +256,41 @@ public class SerialController implements SerialPortEventListener {
 
             state = State.EXPERIMENTING;
             break;
-        case "overS":
+        case "over!":
             state = State.EXPERIMENT_CONLUDED;
+
+            /* open the ok menù */
+            Platform.runLater(() -> {
+                okButtonDescription.setVisible(true);
+                okButton.setVisible(true);
+                okButton.setDisable(false);
+            });
+
             break;
-        case "errorS":
+        case "error!":
             state = State.ERROR;
+            Platform.runLater(() -> {
+                okButtonDescription.setVisible(false);
+                okButton.setVisible(false);
+                okButton.setDisable(true);
+            });
             break;
         default:
             state = State.ERROR;
+            Platform.runLater(() -> {
+                okButtonDescription.setVisible(false);
+                okButton.setVisible(false);
+                okButton.setDisable(true);
+            });
             break;
+        }
+    }
+
+    private void sendMessage(final String msg) {
+        try {
+            port.writeString(msg);
+        } catch (SerialPortException e) {
+            e.printStackTrace();
         }
     }
 

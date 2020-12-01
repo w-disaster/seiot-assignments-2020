@@ -1,12 +1,13 @@
 package application;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import jssc.SerialPortList;
 
 import model.GraphFactory;
@@ -19,8 +20,9 @@ import view.Graph;
  */
 public final class Main extends Application {
 
+    private static final String EXP_OVER_TXT = "Esperimento concluso.\nPremere OK per continuare.";
     private static final int SCENE_WIDTH = 1500;
-    private static final int SCENE_HEIGHT = 500;
+    private static final int SCENE_HEIGHT = 600;
 
     private SerialController serialController;
 
@@ -31,7 +33,7 @@ public final class Main extends Application {
     @Override
     public void start(final Stage stage) throws Exception {
 
-        final FlowPane root = new FlowPane();
+        final GridPane root = new GridPane();
 
         this.g1 = GraphFactory.createPositionGraph();
         this.g2 = GraphFactory.createSpeedGraph();
@@ -40,13 +42,44 @@ public final class Main extends Application {
         final Label stateLabel = new Label();
         stateLabel.setStyle("-fx-font-size: 25pt;"
                 + "-fx-font-weight:bold;");
-        root.getChildren().addAll(g1.getChart(), g2.getChart(), g3.getChart(), stateLabel);
+
+        final Button okButton = new Button("OK");
+        okButton.setDisable(true);
+        okButton.setVisible(false);
+        okButton.setStyle("-fx-font-size: 15pt;"
+                + "-fx-font-weight:bold;"
+                + "-fx-padding: 10pt 25pt;" 
+                + "-fx-border-insets: 10pt;" 
+                + "-fx-background-insets: 5pt;");
+
+        final Text okButtonDescription = new Text(EXP_OVER_TXT);
+        okButtonDescription.setVisible(false);
+        okButtonDescription.setStyle("-fx-font-size: 10pt;"
+                + "-fx-font-weight:bold;"
+                + "-fx-padding: 10pt;" 
+                + "-fx-border-insets: 10pt;" 
+                + "-fx-background-insets: 5pt;");
+
+        /* add the graphs */
+        root.add(g1.getChart(), 0, 0);
+        root.add(g2.getChart(), 1, 0);
+        root.add(g3.getChart(), 2, 0);
+
+        /* add the state label */
+        root.add(stateLabel, 1, 1);
+        GridPane.setHalignment(stateLabel, HPos.CENTER);
+
+        /* add the ok for later */
+        root.add(okButtonDescription, 1, 2);
+        GridPane.setHalignment(okButton, HPos.CENTER);
+        root.add(okButton, 1, 3);
+        GridPane.setHalignment(okButtonDescription, HPos.CENTER);
 
         final Scene scene = new Scene(root, SCENE_WIDTH, SCENE_HEIGHT);
 
         try {
             final String[] ports = SerialPortList.getPortNames();
-            serialController = new SerialController(ports[0], g1, g2, g3, stateLabel);
+            serialController = new SerialController(ports[0], g1, g2, g3, stateLabel, okButton, okButtonDescription);
         } catch (ArrayIndexOutOfBoundsException e) {
             stateLabel.setText(State.NOT_CONNECTED.getLabelText());
         }
