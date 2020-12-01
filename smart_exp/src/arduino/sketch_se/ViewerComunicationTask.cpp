@@ -84,6 +84,13 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
             this->stateMsgAlreadySent = false;
             result = true;
         }
+        else if (this->experimentation->getExperimentationState() == Experimentation::State::ERROR)
+        {
+            /* goes to error */
+            this->state = VC2;
+            this->stateMsgAlreadySent = false;
+            result = true;
+        }
         break;
     case VC2:
         /* error */
@@ -104,6 +111,13 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
             this->stateMsgAlreadySent = false;
             result = true;
         }
+        else if (this->experimentation->getExperimentationState() == Experimentation::State::ERROR)
+        {
+            /* goes to error */
+            this->state = VC2;
+            this->stateMsgAlreadySent = false;
+            result = true;
+        }
         break;
     case VC4:
         /* exp over */
@@ -111,6 +125,13 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
         {
             /* goes to ready */
             this->state = VC0;
+            this->stateMsgAlreadySent = false;
+            result = true;
+        }
+        else if (this->experimentation->getExperimentationState() == Experimentation::State::ERROR)
+        {
+            /* goes to error */
+            this->state = VC2;
             this->stateMsgAlreadySent = false;
             result = true;
         }
@@ -149,6 +170,13 @@ void ViewerComunicationTask::tick()
     case VC4:
         /* exp over */
         sendStateMsgOnce("over");
+
+        /* every tick checks if the user pressed ok */
+        if ((char)Serial.read() == EXP_OVER)
+        {
+            /* tells experimentation to change State */
+            this->experimentation->setExperimentationState(Experimentation::State::READY);
+        }
         break;
     default:
         break;

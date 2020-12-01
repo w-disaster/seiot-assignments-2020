@@ -7,6 +7,7 @@
 #define DATA_SEPARATOR ":"
 #define MSG_END ";"
 #define STATE_END "!"
+#define EXP_OVER ">"
 
 class ViewerComunicationTask : public Task
 {
