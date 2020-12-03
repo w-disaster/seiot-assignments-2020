@@ -3,7 +3,7 @@
 
 #include "Task.h"
 #include "Button.h"
-#include "Pir.h"
+#include "Sonar.h"
 
 #define SLEEP_TIME 5
 #define MAX_TIME 20
@@ -12,7 +12,7 @@
 
 class StepTask : public Task{
     Experimentation* experimentation;
-    Pir* pir;
+    Sonar* sonar;
     Button* bStart;
     Button* bStop;
     
@@ -23,7 +23,7 @@ class StepTask : public Task{
         bool updateAndCheckTime(int basePeriod);
 
     public:
-        StepTask(Experimentation* experimentation, Pir* pir, int bStartPin, int bStopPin);
+        StepTask(Experimentation* experimentation, Sonar* sonar, int bStartPin, int bStopPin);
         void init(int period);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();  

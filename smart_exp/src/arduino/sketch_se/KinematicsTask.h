@@ -5,6 +5,10 @@
 #include "Sonar.h"
 #include "ServoMotor.h"
 
+#define MIN_FREQ 1
+#define MAX_FREQ 25
+#define MAX_VEL 15
+
 #define POT_PIN A0 
 
 class KinematicsTask : public Task{
@@ -14,17 +18,17 @@ class KinematicsTask : public Task{
     enum State{K0, K1};
     State state;
     float precDistance, precSpeed;
-    /*int i;
-    float avg_vel[1000];*/
+    float maxSpeed;
 
     private:
         bool updateAndCheckTime(int basePeriod);
         int getPeriod();
         void init(int period);
         int roundToNearestMultiple(int numToRound, int multiple);
+        float mapfloat(float value, float inMin, float inMax, float outMin, float outMax);
 
     public:
-        KinematicsTask(Experimentation* experimentation, int trigPin, int echoPinf, int servoMotorPin);
+        KinematicsTask(Experimentation* experimentation, Sonar* sonar, int servoMotorPin);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();  
 };

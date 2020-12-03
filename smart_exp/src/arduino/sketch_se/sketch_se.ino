@@ -5,7 +5,8 @@
 #include "KinematicsTask.h"
 #include "ExperimentationImpl.h"
 #include "ViewerComunicationTask.h"
-#include "PirImpl.h"
+#include "SonarImpl.h"
+ #include "PirImpl.h"
 
 #define BSTART_PIN 9
 #define BSTOP_PIN 10
@@ -15,7 +16,7 @@
 #define L1_PIN 12
 #define L2_PIN 13
 #define SERVO_MOTOR_PIN 7
-#define SCHED_PERIOD 20
+#define SCHED_PERIOD 50
 
 Scheduler *scheduler;
 
@@ -27,15 +28,17 @@ void setup()
 
   Experimentation *experimentation = new ExperimentationImpl(Experimentation::State::READY);
   
-  Pir *pir = new PirImpl(PIR_PIN);
+  Sonar* sonar = new SonarImpl();
+  sonar->init(TRIG_PIN, ECHO_PIN);
+
   Led *L1 = new Led(L1_PIN);
   Led *L2 = new Led(L2_PIN);
 
-  Task *stepTask = new StepTask(experimentation, pir, BSTART_PIN, BSTOP_PIN);
+  Task *stepTask = new StepTask(experimentation, sonar, BSTART_PIN, BSTOP_PIN);
   stepTask->init(SLEEP_TIME * MILLIS_TO_SEC);
   scheduler->addTask(stepTask);
 
-  Task *actionTask = new ActionTask(experimentation, L1, L2, pir);
+  Task *actionTask = new ActionTask(experimentation, PIR_PIN, L1, L2);
   actionTask->init(SCHED_PERIOD);
   scheduler->addTask(actionTask);
 
@@ -47,7 +50,7 @@ void setup()
   viewerComunicator->init(SLEEP_TIME * MILLIS_TO_SEC);
   scheduler->addTask(viewerComunicator);
 */
-  Task *kinematicsTask = new KinematicsTask(experimentation, TRIG_PIN, ECHO_PIN, SERVO_MOTOR_PIN);
+  Task *kinematicsTask = new KinematicsTask(experimentation, sonar, SERVO_MOTOR_PIN);
   scheduler->addTask(kinematicsTask);
 }
 

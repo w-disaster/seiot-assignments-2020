@@ -2,9 +2,9 @@
 #include "StepTask.h"
 #include "ButtonImpl.h"
 
-StepTask::StepTask(Experimentation *experimentation, Pir* pir, int bStartPin, int bStopPin){
+StepTask::StepTask(Experimentation *experimentation, Sonar* sonar, int bStartPin, int bStopPin){
     this->experimentation = experimentation;
-    this->pir = pir;
+    this->sonar = sonar;
     this->bStart = new ButtonImpl(bStartPin);
     this->bStop = new ButtonImpl(bStopPin);
 }
@@ -26,7 +26,7 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
             break;
         }
         if (this->bStart->isPressed()){
-            if (this->pir->isHigh()){
+            if (this->sonar->getDistance() < 1.0){
                 nextState = State::ES3;
                 init(MAX_TIME * MILLIS_TO_SEC);
             }

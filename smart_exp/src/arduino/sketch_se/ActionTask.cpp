@@ -1,12 +1,13 @@
 #include "ActionTask.h"
+#include "PirImpl.h"
 #include <Arduino.h>
 #include <avr/sleep.h>
 
-ActionTask::ActionTask(Experimentation* experimentation, Led* L1, Led* L2, Pir* pir){
+ActionTask::ActionTask(Experimentation* experimentation, int pirPin, Led* L1, Led* L2){
     this->experimentation = experimentation;
+    this->pir = new PirImpl(pirPin);
     this->L1 = L1;
     this->L2 = L2;
-    this->pir = pir;
 }
 
 void ActionTask::init(int period){

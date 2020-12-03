@@ -2,8 +2,6 @@
 #include "Arduino.h"
 #include "EnableInterrupt.h"
 
-#define CALIBRATION_TIME 10
-
 PirImpl::PirImpl(int pin){
     this->pin = pin;
     pinMode(this->pin, INPUT);
@@ -14,7 +12,6 @@ PirImpl::PirImpl(int pin){
         Serial.print(".");
         delay(1000);
     }
-    Serial.println("rotto i coglioniiii");
 }
 
 bool PirImpl::isHigh(){

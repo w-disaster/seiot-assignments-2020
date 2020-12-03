@@ -61,8 +61,6 @@ void BlinkLedTask::tick(){
     switch(state){
         case BL0:
         case BL2:
-             Serial.println("spengo  L2");
-
             this->led->switchOff();
             break;
         case BL1:
