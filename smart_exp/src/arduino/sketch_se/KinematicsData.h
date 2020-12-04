@@ -2,7 +2,6 @@
 #define __KINEMATICS_DATA__
 
 class KinematicsData{
-
     float distance;
     float speed;
     float acceleration;
@@ -40,7 +39,6 @@ class KinematicsData{
         virtual bool isDataReady(){
             return dataReady;
         }
-
 };
 
 

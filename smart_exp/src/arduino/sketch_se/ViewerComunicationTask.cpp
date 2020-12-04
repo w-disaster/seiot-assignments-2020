@@ -1,4 +1,5 @@
 #include "ViewerComunicationTask.h"
+#include "Arduino.h"
 
 ViewerComunicationTask::ViewerComunicationTask(Experimentation *experimentation, KinematicsData *kinematicsData)
 {
@@ -125,9 +126,6 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
         /* keep ticking */
         result = true;
         break;
-
-    default:
-        break;
     }
     state = nextState;
     return result;
@@ -166,7 +164,6 @@ void ViewerComunicationTask::tick()
     case VC4:
         /* exp over */
         sendStateMsgOnce("over");
-
         /* every tick checks if the user pressed ok */
         if ((char)Serial.read() == EXP_OVER)
         {

@@ -49,8 +49,8 @@ bool ActionTask::updateTimeAndCheckEvent(int basePeriod){
                     result = true;
                     break;
                 }
-                break;
             }
+            break;
         case A3:
             if(updateAndCheckTime(basePeriod)){
                 if(expState == Experimentation::State::EXPERIMENTATION_CONCLUDED){
