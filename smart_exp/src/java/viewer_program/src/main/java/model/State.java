@@ -6,6 +6,7 @@ import javafx.scene.paint.Paint;
 public enum State {
     
     NOT_CONNECTED("NO DEVICE CONNECTED", "000000"),
+    CALIBRATING("CALIBRATING PIR...", "#808080"),
     READY("READY", "00FF00"),
     EXPERIMENTING("EXPERIMENTING", "#00bbff"),
     EXPERIMENT_CONLUDED("EXPERIMENT ENDED", "#ffc400"),

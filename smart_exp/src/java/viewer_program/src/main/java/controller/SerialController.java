@@ -56,7 +56,7 @@ public class SerialController implements SerialPortEventListener {
         }
 
         /* set up state */
-        this.state = State.READY;
+        this.state = State.CALIBRATING;
         this.stateLabel = stateLabel;
         updateStateLabel();
 
@@ -186,10 +186,10 @@ public class SerialController implements SerialPortEventListener {
         final String[] dataArray = data.split(SEPARATOR);
 
         if (dataArray.length == 4) {
-            final int t = Integer.parseInt(dataArray[0]);
-            final int s = Integer.parseInt(dataArray[1]);
-            final int v = Integer.parseInt(dataArray[2]);
-            final int a = Integer.parseInt(dataArray[3]);
+            final double t = Double.parseDouble(dataArray[0]);
+            final double s = Double.parseDouble(dataArray[1]);
+            final double v = Double.parseDouble(dataArray[2]);
+            final double a = Double.parseDouble(dataArray[3]);
             coordinates.put("position", new Data<Number, Number>(t, s));
             coordinates.put("speed", new Data<Number, Number>(t, v));
             coordinates.put("acceleration", new Data<Number, Number>(t, a));
@@ -246,7 +246,7 @@ public class SerialController implements SerialPortEventListener {
         case "suspended!":
             state = State.SUSPENDED;
             break;
-        case "experiment!":
+        case "exp!":
             Platform.runLater(() -> {
                     /* clear any old graph before the experiment starts */
                     positionGraph.reset();
@@ -276,7 +276,7 @@ public class SerialController implements SerialPortEventListener {
             });
             break;
         default:
-            state = State.ERROR;
+            state = State.NOT_CONNECTED;
             Platform.runLater(() -> {
                 okButtonDescription.setVisible(false);
                 okButton.setVisible(false);
