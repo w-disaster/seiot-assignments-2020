@@ -158,11 +158,12 @@ void ViewerComunicationTask::tick()
         case VC3:
             /* exp */
             sendStateMsgOnce("EXPERIMENTATION");
-            //if
-            sendExperimentData(format(micros() - this->expRelativeTime,
-                                    this->kinematicsData->getDistance(),
-                                    this->kinematicsData->getSpeed(),
-                                    this->kinematicsData->getAcceleration()));
+            if(this->kinematicsData->isDataReady()){
+                sendExperimentData(format(micros() - this->expRelativeTime,
+                                        this->kinematicsData->getDistance(),
+                                        this->kinematicsData->getSpeed(),
+                                        this->kinematicsData->getAcceleration()));
+            }
             break;
         case VC4:
             /* exp over */

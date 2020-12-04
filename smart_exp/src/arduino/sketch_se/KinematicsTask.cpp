@@ -97,7 +97,8 @@ void KinematicsTask::tick(){
             this->kinematicsData->setDistance(distance);
             this->kinematicsData->setSpeed(speed);
             this->kinematicsData->setAcceleration(acceleration);
-
+            this->kinematicsData->setDataReady(true);
+            
             /* prec values update */
             precDistance = distance;
             precSpeed = speed;
