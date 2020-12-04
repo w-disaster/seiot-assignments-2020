@@ -21,6 +21,9 @@ void setup()
   stepTask->init(SLEEP_TIME * MILLIS_TO_SEC);
   scheduler->addTask(stepTask);
 
+  Task *kinematicsTask = new KinematicsTask(experimentation, kinematicsData, sonar, SERVO_MOTOR_PIN);
+  scheduler->addTask(kinematicsTask);
+
   Task *viewerComunicator = new ViewerComunicationTask(experimentation, kinematicsData);
   viewerComunicator->init(SCHED_PERIOD);
   scheduler->addTask(viewerComunicator);
@@ -32,9 +35,6 @@ void setup()
   Task *blinkLedTask = new BlinkLedTask(experimentation, L2);
   blinkLedTask->init(200);
   scheduler->addTask(blinkLedTask);
-
-  Task *kinematicsTask = new KinematicsTask(experimentation, kinematicsData, sonar, SERVO_MOTOR_PIN);
-  scheduler->addTask(kinematicsTask);
 }
 
 void loop()

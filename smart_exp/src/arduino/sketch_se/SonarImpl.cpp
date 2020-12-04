@@ -1,18 +1,21 @@
 #include "SonarImpl.h"
 #include "Arduino.h"
 
-SonarImpl::SonarImpl(int sonarTrigPin, int sonarEchoPin){
+SonarImpl::SonarImpl(int sonarTrigPin, int sonarEchoPin)
+{
     trigPin = sonarTrigPin;
     echoPin = sonarEchoPin;
     pinMode(trigPin, OUTPUT);
-    pinMode(echoPin, INPUT); 
+    pinMode(echoPin, INPUT);
 }
 
-void SonarImpl::init(){
+void SonarImpl::init()
+{
     dht.begin();
 }
 
-float SonarImpl::getDistance(){
+float SonarImpl::getDistance()
+{
     digitalWrite(trigPin, LOW);
     delayMicroseconds(3);
     digitalWrite(trigPin, HIGH);
@@ -25,8 +28,9 @@ float SonarImpl::getDistance(){
     return d;
 }
 
-void SonarImpl::updateSoundSpeed(){
+void SonarImpl::updateSoundSpeed()
+{
     float temperature = dht.readTemperature();
-    Serial.println(temperature);
+    //Serial.println(temperature);
     vs = 331.45 + 0.62 * temperature;
 }

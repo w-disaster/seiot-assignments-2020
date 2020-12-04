@@ -25,7 +25,7 @@ class ViewerComunicationTask : public Task
     /* fields */
     State state;
     Experimentation *experimentation;
-    KinematicsData* kinematicsData;
+    KinematicsData *kinematicsData;
     bool stateMsgAlreadySent;
     long expRelativeTime;
 
@@ -35,10 +35,10 @@ private:
     void sendData(String msg, bool isState);
     void sendStateMsgOnce(String stateKey);
     void sendExperimentData(String data);
-    String format(long t, float p, float v, float a);
+    String format(float t, float p, float v, float a);
 
 public:
-    ViewerComunicationTask(Experimentation *experimentation, KinematicsData* kinematicsData);
+    ViewerComunicationTask(Experimentation *experimentation, KinematicsData *kinematicsData);
     bool updateTimeAndCheckEvent(int basePeriod);
     void tick();
     ~ViewerComunicationTask();
