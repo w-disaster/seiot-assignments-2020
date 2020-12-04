@@ -8,7 +8,12 @@
                 "${workspaceFolder}/**",
                 "/home/luca/Downloads/arduino-1.8.13/hardware/tools/**",
                 "/home/luca/Downloads/arduino-1.8.13/libraries/**",
-                "/home/luca/Arduino/libraries/**"
+                "/home/luca/Arduino/libraries/**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
+                "C:\\Program Files (x86)\\Arduino\\libraries\\**",
+                "C:\\Users\\gigio\\OneDrive\\Documenti\\Arduino\\libraries\\**",
+                "C:\\Program Files (x86)\\Arduino\\tools\\**"
             ],
             "defines": [
                 "USBCON"
@@ -27,7 +32,8 @@
             "cppStandard": "${default}",
             "intelliSenseMode": "${default}",
             "forcedInclude": [
-                "/home/luca/Downloads/arduino-1.8.13/hardware/arduino/avr/cores/arduino/Arduino.h"
+                "/home/luca/Downloads/arduino-1.8.13/hardware/arduino/avr/cores/arduino/Arduino.h",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
             ]
         }
     ],

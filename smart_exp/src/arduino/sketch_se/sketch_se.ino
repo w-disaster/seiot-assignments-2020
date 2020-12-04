@@ -11,7 +11,7 @@ void setup()
   Experimentation *experimentation = new ExperimentationImpl(Experimentation::State::READY);
   KinematicsData *kinematicsData = new KinematicsDataImpl();
 
-  Sonar* sonar = new SonarImpl(TRIG_PIN, ECHO_PIN);
+  Sonar *sonar = new SonarImpl(TRIG_PIN, ECHO_PIN);
   sonar->init();
 
   Led *L1 = new Led(L1_PIN);
@@ -20,16 +20,16 @@ void setup()
   Task *stepTask = new StepTask(experimentation, sonar, BSTART_PIN, BSTOP_PIN);
   stepTask->init(SLEEP_TIME * MILLIS_TO_SEC);
   scheduler->addTask(stepTask);
-/*
+
   Task *viewerComunicator = new ViewerComunicationTask(experimentation, kinematicsData);
-  viewerComunicator->init(SLEEP_TIME * MILLIS_TO_SEC);
+  viewerComunicator->init(SCHED_PERIOD);
   scheduler->addTask(viewerComunicator);
-*/
+
   Task *actionTask = new ActionTask(experimentation, PIR_PIN, L1, L2);
   actionTask->init(SCHED_PERIOD);
   scheduler->addTask(actionTask);
 
-  Task* blinkLedTask = new BlinkLedTask(experimentation, L2);
+  Task *blinkLedTask = new BlinkLedTask(experimentation, L2);
   blinkLedTask->init(200);
   scheduler->addTask(blinkLedTask);
 

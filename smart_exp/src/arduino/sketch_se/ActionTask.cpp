@@ -80,7 +80,7 @@ void ActionTask::tick(){
             sleep_enable();
             sleep_mode();  
             /** The program will continue from here. **/  
-            Serial.println("WAKE UP");
+            //Serial.println("WAKE UP");
             /* First thing to do is disable sleep. */  
             sleep_disable();
 
