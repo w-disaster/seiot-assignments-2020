@@ -35,8 +35,6 @@ void setup()
   Task *blinkLedTask = new BlinkLedTask(experimentation, L2);
   blinkLedTask->init(200);
   scheduler->addTask(blinkLedTask);
-  
-
 }
 
 void loop()

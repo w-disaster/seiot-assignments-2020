@@ -36,7 +36,7 @@ void ViewerComunicationTask::sendExperimentData(String data)
     this->kinematicsData->setDataReady(false);
 }
 
-String ViewerComunicationTask::format(long t, float p, float v, float a)
+String ViewerComunicationTask::format(float t, float p, float v, float a)
 {
     String formattedString = String(t) + DATA_SEPARATOR + String(p) + DATA_SEPARATOR + String(v) + DATA_SEPARATOR + String(a);
     return formattedString;
@@ -151,10 +151,11 @@ void ViewerComunicationTask::tick()
         break;
     case VC3:
         /* exp */
-        sendStateMsgOnce("experiment");
+        sendStateMsgOnce("exp");
+
         if (this->kinematicsData->isDataReady())
         {
-            sendExperimentData(format(micros() - this->expRelativeTime,
+            sendExperimentData(format((micros() - this->expRelativeTime) / 1000,
                                       this->kinematicsData->getDistance(),
                                       this->kinematicsData->getSpeed(),
                                       this->kinematicsData->getAcceleration()));
