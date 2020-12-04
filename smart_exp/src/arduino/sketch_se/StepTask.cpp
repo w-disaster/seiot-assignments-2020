@@ -20,13 +20,14 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
     bool result;
     switch (state){
     case State::ES0:
-        if (Task::updateAndCheckTime(basePeriod)){
+        if (updateAndCheckTime(basePeriod)){
             nextState = State::ES1;
             result = true;
             break;
         }
         if (this->bStart->isPressed()){
-            if (this->sonar->getDistance() < 1.0){
+            this->sonar->updateSoundSpeed();
+            if (this->sonar->getDistance() < 0.5){
                 nextState = State::ES3;
                 init(MAX_TIME * MILLIS_TO_SEC);
             }
@@ -48,7 +49,7 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
         break;
 
     case State::ES2:
-        if (Task::updateAndCheckTime(basePeriod)){
+        if (updateAndCheckTime(basePeriod)){
             nextState = State::ES0;
             init(SLEEP_TIME * MILLIS_TO_SEC);
             result = true;
@@ -58,7 +59,7 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
         break;
 
     case State::ES3:
-        if (Task::updateAndCheckTime(basePeriod) || this->bStop->isPressed()){
+        if (updateAndCheckTime(basePeriod) || this->bStop->isPressed()){
             nextState = State::ES4;
             result = true;
             break;
@@ -67,7 +68,7 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
         break;
 
     case State::ES4:
-        // bOK
+        // bOK if(this->experimentation->getExperimentationState() == Experimentation::READY)
         if (/*this->bStart->isPressed() && */this->bStop->isPressed()){
             nextState = State::ES0;
             init(SLEEP_TIME * MILLIS_TO_SEC);
@@ -83,30 +84,24 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
 
 void StepTask::tick(){
     switch (state){
-    case ES0:
-        Serial.println("andiamo in fase READY");
-        this->experimentation->setExperimentationState(Experimentation::State::READY);
-        break;
-    case ES1:
-        Serial.println("andiamo in fase SUSPENDED");
+        case ES0:
+            this->experimentation->setExperimentationState(Experimentation::State::READY);
+            break;
 
-        this->experimentation->setExperimentationState(Experimentation::State::SUSPENDED);
-        break;
-    case ES2:
-        Serial.println("andiamo in fase ERROR");
+        case ES1:
+            this->experimentation->setExperimentationState(Experimentation::State::SUSPENDED);
+            break;
 
-        this->experimentation->setExperimentationState(Experimentation::State::ERROR);
-        break;
-    case ES3:
+        case ES2:
+            this->experimentation->setExperimentationState(Experimentation::State::ERROR);
+            break;
 
-        Serial.println("andiamo in fase EXPERIMENTATION");
+        case ES3:
+            this->experimentation->setExperimentationState(Experimentation::State::EXPERIMENTATION);
+            break;
 
-        this->experimentation->setExperimentationState(Experimentation::State::EXPERIMENTATION);
-        break;
-    case ES4:
-        Serial.println("andiamo in fase EXP CONCLUDED");
-
-        this->experimentation->setExperimentationState(Experimentation::State::EXPERIMENTATION_CONCLUDED);
-        break;
-    }
+        case ES4:
+            this->experimentation->setExperimentationState(Experimentation::State::EXPERIMENTATION_CONCLUDED);
+            break;
+        }
 }

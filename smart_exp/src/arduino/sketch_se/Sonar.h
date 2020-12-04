@@ -6,7 +6,7 @@
 
 class Sonar{
     public:
-        virtual void init(int sonarTrigPin, int sonarEchoPin) = 0;
+        virtual void init() = 0;
         virtual float getDistance() = 0;
         virtual void updateSoundSpeed() = 0;
 };

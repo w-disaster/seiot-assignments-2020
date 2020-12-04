@@ -4,7 +4,8 @@
 #include "Light.h"
 
 class Led: public Light {
-  int pin; 
+  int pin;
+  
   public:
     Led(int pin);
     void switchOn();

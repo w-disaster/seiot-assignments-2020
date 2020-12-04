@@ -15,26 +15,28 @@ KinematicsTask::KinematicsTask(Experimentation* experimentation, Sonar* sonar, i
 bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod){
     State nextState = state;
     bool result;
+    Experimentation::State expState = this->experimentation->getExperimentationState();
     switch(state){
         case K0:
-            if(this->experimentation->getExperimentationState() == Experimentation::State::EXPERIMENTATION){
+            if(expState == Experimentation::State::EXPERIMENTATION){
                 /* sampling rate */
                 int potValue = analogRead(POT_PIN);
 
-                //int period = roundToNearestMultiple(1020 - map(potValue, 0, 1023, 1/MAX_FREQ * 1000, 1/MIN_FREQ * 1000), 20);
-                int period = roundToNearestMultiple(1050 - map(potValue, 0, 1023, 50, 1000), 50);
-                init(period);
-                Serial.println(String("periodo task cinematica: ") + period + " pot value: " + potValue);
+                int period = roundToNearestMultiple(MAX_PERIOD_MS + MIN_PERIOD_MS 
+                    - map(potValue, 0, 1023, MIN_PERIOD_MS, MAX_PERIOD_MS), MIN_PERIOD_MS);
 
-                /* sound speed update */
-                this->sonar->updateSoundSpeed();
+                //int period = roundToNearestMultiple(1050 - map(potValue, 0, 1023, 50, 1000), 50);
+                init(period);
+                //Serial.println(String("periodo task cinematica: ") + period + " pot value: " + potValue);
+
                 /* servo motor on */
                 this->servoMotor->on();
                 this->servoMotor->setPosition(0);
+                
                 /* start calculating speed from point x0 = 0 and acceleration from v0 = 0*/
                 precDistance = 0;
                 precSpeed = 0;
-                maxSpeed = (MAX_DISTANCE - MIN_DISTANCE) / (period * 0.001);
+                maxSpeed = (MAX_DISTANCE - MIN_DISTANCE) / (period * MS_TO_SEC);
                 Serial.println(maxSpeed);
                 nextState = K1;
             }
@@ -42,7 +44,7 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod){
             break;
         case K1:
             if(updateAndCheckTime(basePeriod)){
-                if(this->experimentation->getExperimentationState() == Experimentation::State::EXPERIMENTATION){
+                if(expState == Experimentation::State::EXPERIMENTATION){
                     result = true;
                     break;
                 } else {
@@ -53,7 +55,7 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod){
                     break;
                 }
             }
-            if(this->experimentation->getExperimentationState() != Experimentation::State::EXPERIMENTATION){
+            if(expState != Experimentation::State::EXPERIMENTATION){
                 nextState = K0;
                 this->servoMotor->setPosition(0);
                 this->servoMotor->off();
@@ -71,20 +73,22 @@ void KinematicsTask::tick(){
             break;
         case K1:
             float distance = this->sonar->getDistance();
-            float deltat = getPeriod() * 0.001;
+            float deltat = getPeriod() * MS_TO_SEC;
             float speed = (distance - precDistance) / deltat;
+            float acceleration = (speed - precSpeed) / deltat;
 
+            /* if it occurs, the sonar's getDistance() wasn't accurate */
             if(abs(speed) > maxSpeed){
                 speed = 0;
             }
-            float acceleration = (speed - precSpeed) / deltat;
-
+            
+            /* speed map to write to the servo motor */
             int value = mapfloat(abs(speed), 0, maxSpeed, 0, 180);
-            Serial.println(distance);
-            Serial.println(speed);
-            Serial.println(value);
-
-            Serial.println("----------------------");
+            
+            
+            Serial.println(getPeriod() * 0.001 + String(":") + 
+                distance + String(":") + speed + String(":") + acceleration + String(";"));
+            //Serial.println("----------------------");
             
             this->servoMotor->setPosition(value);
 
@@ -100,21 +104,12 @@ void KinematicsTask::tick(){
     }
 }
 
-float KinematicsTask::mapfloat(float value, float inMin, float inMax, float outMin, float outMax)
-{
- return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-}
-
 void KinematicsTask::init(int period){
     Task::init(period);
 }
 
-bool KinematicsTask::updateAndCheckTime(int basePeriod){
-    return Task::updateAndCheckTime(basePeriod);
-}
-
-int KinematicsTask::getPeriod(){
-    return Task::getPeriod();
+float KinematicsTask::mapfloat(float value, float inMin, float inMax, float outMin, float outMax){
+    return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
 
 int KinematicsTask::roundToNearestMultiple(int numToRound, int multiple){

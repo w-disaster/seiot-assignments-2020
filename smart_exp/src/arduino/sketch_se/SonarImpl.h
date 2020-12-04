@@ -14,8 +14,8 @@ class SonarImpl : public Sonar{
     float vs;
     
     public:
-        SonarImpl();    
-        void init(int sonarTrigPin, int sonarEchoPin);
+        SonarImpl(int sonarTrigPin, int sonarEchoPin);    
+        void init();
         float getDistance();
         void updateSoundSpeed();
 };

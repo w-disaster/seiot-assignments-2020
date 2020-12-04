@@ -4,9 +4,12 @@
 #include "Task.h"
 #include "Sonar.h"
 #include "ServoMotor.h"
+#include "lib.h"
 
-#define MIN_FREQ 1
-#define MAX_FREQ 25
+#define MIN_FREQ 1.0
+#define MAX_FREQ 10.0
+#define MIN_PERIOD_MS 1/MAX_FREQ * SEC_TO_MS
+#define MAX_PERIOD_MS 1/MIN_FREQ * SEC_TO_MS
 #define MAX_VEL 15
 
 #define POT_PIN A0 
@@ -21,8 +24,6 @@ class KinematicsTask : public Task{
     float maxSpeed;
 
     private:
-        bool updateAndCheckTime(int basePeriod);
-        int getPeriod();
         void init(int period);
         int roundToNearestMultiple(int numToRound, int multiple);
         float mapfloat(float value, float inMin, float inMax, float outMin, float outMax);

@@ -19,38 +19,45 @@ void ActionTask::init(int period){
 bool ActionTask::updateTimeAndCheckEvent(int basePeriod){
     bool result = false;
     State nextState = state;
+    Experimentation::State expState = this->experimentation->getExperimentationState();
     switch(state){
         case A0:
-            if(this->experimentation->getExperimentationState() == Experimentation::State::EXPERIMENTATION){
-                nextState = A3;
-                result = true;
-                break;
-            }
-            if(this->experimentation->getExperimentationState() == Experimentation::State::SUSPENDED){
-                nextState = A1;
-                result = true;
-                break;
-            }
-            if(this->experimentation->getExperimentationState() == Experimentation::State::ERROR){
-                nextState = A2;
-                result = true;
-                break;
+            if(updateAndCheckTime(basePeriod)){
+                if(expState == Experimentation::State::EXPERIMENTATION){
+                    nextState = A3;
+                    result = true;
+                    break;
+                }
+                if(expState == Experimentation::State::SUSPENDED){
+                    nextState = A1;
+                    result = true;
+                    break;
+                }
+                if(expState == Experimentation::State::ERROR){
+                    nextState = A2;
+                    result = true;
+                    break;
+                }
             }
             break;
         case A1:
         case A2:
         case A4:
-            if(this->experimentation->getExperimentationState() == Experimentation::State::READY){
-                nextState = A0;
-                result = true;
+            if(updateAndCheckTime(basePeriod)){
+                if(expState == Experimentation::State::READY){
+                    nextState = A0;
+                    result = true;
+                    break;
+                }
                 break;
             }
-            break;
         case A3:
-            if(this->experimentation->getExperimentationState() == Experimentation::State::EXPERIMENTATION_CONCLUDED){
-                nextState = A4;
-                result = true;
-                break;
+            if(updateAndCheckTime(basePeriod)){
+                if(expState == Experimentation::State::EXPERIMENTATION_CONCLUDED){
+                    nextState = A4;
+                    result = true;
+                    break;
+                }
             }
             break;
     }
@@ -83,7 +90,6 @@ void ActionTask::tick(){
             this->L1->switchOff();
             break;
         case A3:
-            Serial.println("spengo L1 e accendo L2");
             this->L1->switchOff();
             this->L2->switchOn();
             break;

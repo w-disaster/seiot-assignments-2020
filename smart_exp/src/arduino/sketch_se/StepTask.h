@@ -19,9 +19,6 @@ class StepTask : public Task{
     enum State{ES0, ES1, ES2, ES3, ES4};
     State state;
 
-    private:
-        bool updateAndCheckTime(int basePeriod);
-
     public:
         StepTask(Experimentation* experimentation, Sonar* sonar, int bStartPin, int bStopPin);
         void init(int period);

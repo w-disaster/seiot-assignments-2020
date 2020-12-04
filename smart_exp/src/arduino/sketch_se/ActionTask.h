@@ -18,7 +18,7 @@ class ActionTask : public Task{
         void init(int period);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();
-};
+    };
 
 #endif
 
