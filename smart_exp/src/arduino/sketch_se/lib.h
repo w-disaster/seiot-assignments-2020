@@ -14,6 +14,7 @@
 #include "ViewerComunicationTask.h"
 #include "SonarImpl.h"
 #include "PirImpl.h"
+#include "KinematicsDataImpl.h"
 
 #define BSTART_PIN 9
 #define BSTOP_PIN 10

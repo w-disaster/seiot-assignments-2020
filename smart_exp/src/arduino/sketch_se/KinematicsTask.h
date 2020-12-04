@@ -3,6 +3,7 @@
 
 #include "Task.h"
 #include "Sonar.h"
+#include "KinematicsData.h"
 #include "ServoMotor.h"
 #include "lib.h"
 
@@ -16,6 +17,7 @@
 
 class KinematicsTask : public Task{
     Experimentation* experimentation;
+    KinematicsData* kinematicsData;
     Sonar* sonar;
     ServoMotor* servoMotor;
     enum State{K0, K1};
@@ -29,7 +31,7 @@ class KinematicsTask : public Task{
         float mapfloat(float value, float inMin, float inMax, float outMin, float outMax);
 
     public:
-        KinematicsTask(Experimentation* experimentation, Sonar* sonar, int servoMotorPin);
+        KinematicsTask(Experimentation* experimentation, KinematicsData* kinematicsData, Sonar* sonar, int servoMotorPin);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();  
 };

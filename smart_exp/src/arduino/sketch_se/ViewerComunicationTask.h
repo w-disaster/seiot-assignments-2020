@@ -3,6 +3,7 @@
 
 #include "Task.h"
 #include "Arduino.h"
+#include "KinematicsData.h"
 
 #define DATA_SEPARATOR ":"
 #define MSG_END ";"
@@ -24,6 +25,7 @@ class ViewerComunicationTask : public Task
     /* fields */
     State state;
     Experimentation *experimentation;
+    KinematicsData* kinematicsData;
     bool stateMsgAlreadySent;
     long expRelativeTime;
 
@@ -36,7 +38,7 @@ private:
     String format(long t, float p, float v, float a);
 
 public:
-    ViewerComunicationTask(Experimentation *experimentation);
+    ViewerComunicationTask(Experimentation *experimentation, KinematicsData* kinematicsData);
     bool updateTimeAndCheckEvent(int basePeriod);
     void tick();
     ~ViewerComunicationTask();

@@ -3,8 +3,9 @@
 #include "ServoMotorImpl.h"
 #include "KinematicsTask.h"
 
-KinematicsTask::KinematicsTask(Experimentation* experimentation, Sonar* sonar, int servoMotorPin){
+KinematicsTask::KinematicsTask(Experimentation* experimentation, KinematicsData* kinematicsData, Sonar* sonar, int servoMotorPin){
     this->experimentation = experimentation;
+    this->kinematicsData = kinematicsData;
     this->sonar = sonar;
     this->servoMotor = new ServoMotorImpl(servoMotorPin);
     
@@ -93,9 +94,9 @@ void KinematicsTask::tick(){
             this->servoMotor->setPosition(value);
 
             /* write to communicator */
-            this->experimentation->setDistance(distance);
-            this->experimentation->setSpeed(speed);
-            this->experimentation->setAcceleration(acceleration);
+            this->kinematicsData->setDistance(distance);
+            this->kinematicsData->setSpeed(speed);
+            this->kinematicsData->setAcceleration(acceleration);
 
             /* prec values update */
             precDistance = distance;

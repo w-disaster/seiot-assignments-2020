@@ -9,7 +9,8 @@ void setup()
   scheduler->init(SCHED_PERIOD);
 
   Experimentation *experimentation = new ExperimentationImpl(Experimentation::State::READY);
-  
+  KinematicsData *kinematicsData = new KinematicsDataImpl();
+
   Sonar* sonar = new SonarImpl(TRIG_PIN, ECHO_PIN);
   sonar->init();
 
@@ -20,7 +21,7 @@ void setup()
   stepTask->init(SLEEP_TIME * MILLIS_TO_SEC);
   scheduler->addTask(stepTask);
 /*
-  Task *viewerComunicator = new ViewerComunicationTask(experimentation);
+  Task *viewerComunicator = new ViewerComunicationTask(experimentation, kinematicsData);
   viewerComunicator->init(SLEEP_TIME * MILLIS_TO_SEC);
   scheduler->addTask(viewerComunicator);
 */
@@ -32,7 +33,7 @@ void setup()
   blinkLedTask->init(200);
   scheduler->addTask(blinkLedTask);
 
-  Task *kinematicsTask = new KinematicsTask(experimentation, sonar, SERVO_MOTOR_PIN);
+  Task *kinematicsTask = new KinematicsTask(experimentation, kinematicsData, sonar, SERVO_MOTOR_PIN);
   scheduler->addTask(kinematicsTask);
 }
 

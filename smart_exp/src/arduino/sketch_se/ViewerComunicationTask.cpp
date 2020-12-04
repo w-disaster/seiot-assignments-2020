@@ -1,8 +1,9 @@
 #include "ViewerComunicationTask.h"
 
-ViewerComunicationTask::ViewerComunicationTask(Experimentation *experimentation)
+ViewerComunicationTask::ViewerComunicationTask(Experimentation *experimentation, KinematicsData* kinematicsData)
 {
     this->experimentation = experimentation;
+    this->kinematicsData = kinematicsData;
     this->stateMsgAlreadySent = false;
 }
 
@@ -157,10 +158,11 @@ void ViewerComunicationTask::tick()
         case VC3:
             /* exp */
             sendStateMsgOnce("EXPERIMENTATION");
+            //if
             sendExperimentData(format(micros() - this->expRelativeTime,
-                                    this->experimentation->getDistance(),
-                                    this->experimentation->getSpeed(),
-                                    this->experimentation->getAcceleration()));
+                                    this->kinematicsData->getDistance(),
+                                    this->kinematicsData->getSpeed(),
+                                    this->kinematicsData->getAcceleration()));
             break;
         case VC4:
             /* exp over */
