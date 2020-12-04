@@ -184,7 +184,12 @@ public class SerialController implements SerialPortEventListener {
 
         final Map<String, Data<Number, Number>> coordinates = new HashMap<>();
         final String[] dataArray = data.split(SEPARATOR);
-
+        
+        for(int i = 0; i < dataArray.length; i++) {
+            System.out.println(dataArray[i]);
+        }
+        System.out.println("---");
+        
         if (dataArray.length == 4) {
             final int t = Integer.parseInt(dataArray[0]);
             final int s = Integer.parseInt(dataArray[1]);
@@ -209,11 +214,11 @@ public class SerialController implements SerialPortEventListener {
         try {
             final Map<String, Data<Number, Number>> coordinates = getCoordinates(data);
 
-            Platform.runLater(() -> {
+            /*Platform.runLater(() -> {
                     positionGraph.updatePlot(coordinates.get("position"));
                     speedGraph.updatePlot(coordinates.get("speed"));
                     accelerationGraph.updatePlot(coordinates.get("acceleration"));
-                });
+                });*/
         } catch (IllegalArgumentException e) {
             System.out.println(msg);
             System.out.println("Clean up input before starting");

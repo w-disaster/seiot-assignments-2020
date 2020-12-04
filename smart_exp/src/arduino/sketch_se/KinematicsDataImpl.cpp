@@ -1,4 +1,5 @@
 #include "KinematicsDataImpl.h"
+#include "Arduino.h"
 
 KinematicsDataImpl::KinematicsDataImpl(){
     setDataReady(false);

@@ -15,6 +15,7 @@ bool BlinkLedTask::updateTimeAndCheckEvent(int basePeriod){
     State nextState = state;
     bool result = false;
     Experimentation::State expState = this->experimentation->getExperimentationState();
+
     switch(state){
         case BL0:
             if(expState == Experimentation::State::ERROR ||

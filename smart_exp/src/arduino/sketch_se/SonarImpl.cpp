@@ -27,6 +27,6 @@ float SonarImpl::getDistance(){
 
 void SonarImpl::updateSoundSpeed(){
     float temperature = dht.readTemperature();
-    Serial.println(temperature);
+    //Serial.println(temperature);
     vs = 331.45 + 0.62 * temperature;
 }
