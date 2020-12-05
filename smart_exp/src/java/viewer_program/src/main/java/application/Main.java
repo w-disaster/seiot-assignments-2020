@@ -26,18 +26,14 @@ public final class Main extends Application {
 
     private SerialController serialController;
 
-    private Graph g1;
-    private Graph g2;
-    private Graph g3;
-
     @Override
     public void start(final Stage stage) throws Exception {
 
         final GridPane root = new GridPane();
 
-        this.g1 = GraphFactory.createPositionGraph();
-        this.g2 = GraphFactory.createSpeedGraph();
-        this.g3 = GraphFactory.createAccelerationGraph();
+        final Graph g1 = GraphFactory.createPositionGraph();
+        final Graph g2 = GraphFactory.createSpeedGraph();
+        final Graph g3 = GraphFactory.createAccelerationGraph();
 
         final Label stateLabel = new Label();
         stateLabel.setStyle("-fx-font-size: 25pt;"
