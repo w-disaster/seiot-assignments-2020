@@ -4,7 +4,6 @@ Scheduler *scheduler;
 
 void setup()
 {
-  Serial.begin(115200);
   scheduler = new Scheduler();
   scheduler->init(SCHED_PERIOD);
 
@@ -24,13 +23,13 @@ void setup()
   Task *kinematicsTask = new KinematicsTask(experimentation, kinematicsData, sonar, SERVO_MOTOR_PIN);
   scheduler->addTask(kinematicsTask);
 
-  Task *viewerComunicator = new ViewerComunicationTask(experimentation, kinematicsData);
-  viewerComunicator->init(SCHED_PERIOD);
-  scheduler->addTask(viewerComunicator);
-
   Task *actionTask = new ActionTask(experimentation, PIR_PIN, L1, L2);
   actionTask->init(SCHED_PERIOD);
   scheduler->addTask(actionTask);
+
+  Task *viewerComunicator = new ViewerComunicationTask(experimentation, kinematicsData);
+  viewerComunicator->init(SCHED_PERIOD);
+  scheduler->addTask(viewerComunicator);
 
   Task *blinkLedTask = new BlinkLedTask(experimentation, L2);
   blinkLedTask->init(200);
