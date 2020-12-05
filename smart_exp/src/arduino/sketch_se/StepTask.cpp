@@ -68,8 +68,8 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
         break;
 
     case State::ES4:
-        // bOK if(this->experimentation->getExperimentationState() == Experimentation::READY)
-        if (/*this->bStart->isPressed() && */this->bStop->isPressed()){
+        if(this->experimentation->getExperimentationState() == Experimentation::READY){
+        //if (/*this->bStart->isPressed() && */this->bStop->isPressed()){
             nextState = State::ES0;
             init(SLEEP_TIME * MILLIS_TO_SEC);
             result = true;
