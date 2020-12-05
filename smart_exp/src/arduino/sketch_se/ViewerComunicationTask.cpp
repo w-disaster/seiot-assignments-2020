@@ -165,10 +165,12 @@ void ViewerComunicationTask::tick()
         /* exp over */
         sendStateMsgOnce("over");
         /* every tick checks if the user pressed ok */
-        if ((char)Serial.read() == EXP_OVER)
-        {
-            /* tells experimentation to change State */
-            this->experimentation->setExperimentationState(Experimentation::State::READY);
+        if (Serial.available() > 0){
+          if ((char)Serial.read() == EXP_OVER)
+          {
+              /* tells experimentation to change State */
+              this->experimentation->setExperimentationState(Experimentation::State::READY);
+          }
         }
         break;
     default:
