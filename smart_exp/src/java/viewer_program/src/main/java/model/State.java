@@ -28,7 +28,7 @@ public enum State {
     /**
      * The experiment is over.
      */
-    EXPERIMENT_CONLUDED("EXPERIMENT ENDED", "#ffc400"),
+    EXPERIMENT_CONLUDED("EXPERIMENT CONCLUDED", "#ffc400"),
 
     /**
      * An error has occurred.

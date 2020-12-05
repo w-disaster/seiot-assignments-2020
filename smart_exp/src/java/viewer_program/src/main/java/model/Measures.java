@@ -1,9 +1,9 @@
 package model;
 
 enum Measures {
-    POSITION("Posizione", "m", "#0028c9"),
-    SPEED("Velocità", "m/s", "#e68e00"),
-    ACCELERATION("Accelerazione", "m/s^2", "#31d48a");
+    POSITION("Distance", "m", "#0028c9"),
+    SPEED("Speed", "m/s", "#e68e00"),
+    ACCELERATION("Acceleration", "m/s\u00B2", "#31d48a");
 
     private final String name;
     private final String unitOfMeasure;
