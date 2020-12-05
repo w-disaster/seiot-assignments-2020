@@ -3,12 +3,14 @@ package controller;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
-import jssc.*;
+import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
 import model.State;
 import view.Graph;
 
@@ -134,7 +136,7 @@ public class SerialController implements SerialPortEventListener {
                 port.removeEventListener();
                 port.closePort();
             }
-        } catch (Exception e) {
+        } catch (SerialPortException e) {
             System.out.println("Error during SerialPort closing");
             e.printStackTrace();
         }
