@@ -188,7 +188,7 @@ public class SerialController implements SerialPortEventListener {
         final String[] dataArray = data.split(SEPARATOR);
 
         if (dataArray.length == 4) {
-            final double t = Double.parseDouble(dataArray[0]);
+            final double t = Double.parseDouble(dataArray[0]) / 1000;
             final double s = Double.parseDouble(dataArray[1]);
             final double v = Double.parseDouble(dataArray[2]);
             final double a = Double.parseDouble(dataArray[3]);

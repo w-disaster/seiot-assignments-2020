@@ -8,7 +8,7 @@ import javafx.scene.chart.XYChart.Series;
 
 public class GraphImpl implements Graph {
 
-    private static final double MAX_EXP_TIME = 22_000.0;
+    private static final double MAX_EXP_TIME = 21.5;
 
     private final LineChart<Number, Number> chart;
 
@@ -21,7 +21,7 @@ public class GraphImpl implements Graph {
         final NumberAxis yAxis = new NumberAxis();
 
         yAxis.setLabel(unitOfMeasure);
-        xAxis.setLabel("millis");
+        xAxis.setLabel("s");
 
         /* no zoom */
         xAxis.setAutoRanging(false);

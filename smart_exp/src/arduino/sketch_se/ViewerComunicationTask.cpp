@@ -60,7 +60,8 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
     {
     case VC0:
         /* ready */
-        if(updateAndCheckTime(basePeriod)){
+        if (updateAndCheckTime(basePeriod))
+        {
             if (expState == Experimentation::State::SUSPENDED)
             {
                 /* goes to suspended */
@@ -87,7 +88,8 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
 
     case VC1:
         /* suspended */
-        if(updateAndCheckTime(basePeriod)){
+        if (updateAndCheckTime(basePeriod))
+        {
             if (expState == Experimentation::State::READY)
             {
                 /* goes to ready */
@@ -100,7 +102,8 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
 
     case VC2:
         /* error */
-        if(updateAndCheckTime(basePeriod)){
+        if (updateAndCheckTime(basePeriod))
+        {
             if (expState == Experimentation::State::READY)
             {
                 /* goes to ready */
@@ -113,7 +116,8 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
 
     case VC3:
         /* exp */
-        if(updateAndCheckTime(basePeriod)){
+        if (updateAndCheckTime(basePeriod))
+        {
             if (expState == Experimentation::State::EXPERIMENTATION_CONCLUDED)
             {
                 /* goes to exp over */
@@ -127,7 +131,8 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
 
     case VC4:
         /* exp over */
-        if(updateAndCheckTime(basePeriod)){
+        if (updateAndCheckTime(basePeriod))
+        {
             if (expState == Experimentation::State::READY)
             {
                 /* goes to ready */
@@ -177,12 +182,13 @@ void ViewerComunicationTask::tick()
         /* exp over */
         sendStateMsgOnce("over");
         /* every tick checks if the user pressed ok */
-        if (Serial.available() > 0){
-          if ((char)Serial.read() == EXP_OVER)
-          {
-              /* tells experimentation to change State */
-              this->experimentation->setExperimentationState(Experimentation::State::READY);
-          }
+        if (Serial.available() > 0)
+        {
+            if ((char)Serial.read() == EXP_OVER)
+            {
+                /* tells experimentation to change State */
+                this->experimentation->setExperimentationState(Experimentation::State::READY);
+            }
         }
         break;
     default:
