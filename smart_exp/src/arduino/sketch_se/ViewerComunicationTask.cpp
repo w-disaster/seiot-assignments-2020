@@ -7,6 +7,7 @@ ViewerComunicationTask::ViewerComunicationTask(Experimentation *experimentation,
     this->experimentation = experimentation;
     this->kinematicsData = kinematicsData;
     this->stateMsgAlreadySent = false;
+    this->stateMsg = "";
 }
 
 void ViewerComunicationTask::sendData(String msg, bool isState)
@@ -21,7 +22,7 @@ void ViewerComunicationTask::sendStateMsgOnce(String stateKey)
         /* sends the State to serial */
         sendData(stateKey, true);
 
-        if (state == VC3)
+        if (state == VC1)
         {
             /* start the relative clock if we are experimenting */
             expRelativeTime = micros();
@@ -59,77 +60,68 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
     switch (state)
     {
     case VC0:
-        /* ready */
         if (updateAndCheckTime(basePeriod))
         {
-            if (expState == Experimentation::State::SUSPENDED)
+            /* if current is not the same we go in the next accordingly */
+            if (expState != currentExpState)
             {
-                /* goes to suspended */
-                nextState = VC1;
+                /* send new state */
                 this->stateMsgAlreadySent = false;
+                /* update expState */
+                this->currentExpState = expState;
+                /* return true */
                 result = true;
-            }
-            else if (expState == Experimentation::State::ERROR)
-            {
-                /* goes to error */
-                nextState = VC2;
-                this->stateMsgAlreadySent = false;
-                result = true;
-            }
-            else if (expState == Experimentation::State::EXPERIMENTATION)
-            {
-                /* goes to exp */
-                nextState = VC3;
-                this->stateMsgAlreadySent = false;
-                result = true;
+
+                switch (this->currentExpState)
+                {
+
+                case Experimentation::State::READY:
+                    /* goes to ready */
+                    nextState = VC0;
+                    this->stateMsg = "ready";
+                    break;
+
+                case Experimentation::State::SUSPENDED:
+                    /* goes to suspended */
+                    nextState = VC0;
+                    this->stateMsg = "suspended";
+                    break;
+
+                case Experimentation::State::ERROR:
+                    /* goes to error */
+                    nextState = VC0;
+                    this->stateMsg = "error";
+                    break;
+
+                case Experimentation::State::EXPERIMENTATION:
+                    /* goes to ready */
+                    nextState = VC1;
+                    this->stateMsg = "exp";
+                    break;
+
+                default:
+                    break;
+                }
             }
         }
         break;
-
     case VC1:
-        /* suspended */
-        if (updateAndCheckTime(basePeriod))
-        {
-            if (expState == Experimentation::State::READY)
-            {
-                /* goes to ready */
-                nextState = VC0;
-                this->stateMsgAlreadySent = false;
-                result = true;
-            }
-        }
-        break;
-
-    case VC2:
-        /* error */
-        if (updateAndCheckTime(basePeriod))
-        {
-            if (expState == Experimentation::State::READY)
-            {
-                /* goes to ready */
-                nextState = VC0;
-                this->stateMsgAlreadySent = false;
-                result = true;
-            }
-        }
-        break;
-
-    case VC3:
         /* exp */
         if (updateAndCheckTime(basePeriod))
         {
             if (expState == Experimentation::State::EXPERIMENTATION_CONCLUDED)
             {
                 /* goes to exp over */
-                nextState = VC4;
+                nextState = VC2;
                 this->stateMsgAlreadySent = false;
+                this->stateMsg = "over";
             }
             /* keep ticking */
             result = true;
         }
         break;
 
-    case VC4:
+    case VC2:
         /* exp over */
         if (updateAndCheckTime(basePeriod))
         {
@@ -138,6 +130,7 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
                 /* goes to ready */
                 nextState = VC0;
                 this->stateMsgAlreadySent = false;
+                this->stateMsg = "ready";
             }
             /* keep ticking */
             result = true;
@@ -150,26 +143,15 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
 
 void ViewerComunicationTask::tick()
 {
+    sendStateMsgOnce(this->stateMsg);
     switch (state)
     {
     case VC0:
-        /* ready */
-        sendStateMsgOnce("ready");
+        /* step */
         delay(5);
         break;
     case VC1:
-        /* suspended */
-        sendStateMsgOnce("suspended");
-        delay(5);
-        break;
-    case VC2:
-        /* error */
-        sendStateMsgOnce("error");
-        break;
-    case VC3:
         /* exp */
-        sendStateMsgOnce("exp");
-
         if (this->kinematicsData->isDataReady())
         {
             sendExperimentData(format((micros() - this->expRelativeTime) / 1000,
@@ -178,9 +160,8 @@ void ViewerComunicationTask::tick()
                                       this->kinematicsData->getAcceleration()));
         }
         break;
-    case VC4:
+    case VC2:
         /* exp over */
-        sendStateMsgOnce("over");
         /* every tick checks if the user pressed ok */
         if (Serial.available() > 0)
         {

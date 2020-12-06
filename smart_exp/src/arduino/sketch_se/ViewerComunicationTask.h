@@ -18,12 +18,12 @@ class ViewerComunicationTask : public Task
         VC0,
         VC1,
         VC2,
-        VC3,
-        VC4
     };
 
     /* fields */
     State state;
+    Experimentation::State currentExpState;
+    String stateMsg;
     Experimentation *experimentation;
     KinematicsData *kinematicsData;
     bool stateMsgAlreadySent;
