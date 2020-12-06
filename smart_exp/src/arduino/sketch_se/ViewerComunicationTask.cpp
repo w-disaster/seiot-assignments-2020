@@ -115,6 +115,9 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
                 nextState = VC2;
                 this->stateMsgAlreadySent = false;
                 this->stateMsg = "over";
+
+                /* update expState */
+                this->currentExpState = expState;
             }
             /* keep ticking */
             result = true;
@@ -131,6 +134,9 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
                 nextState = VC0;
                 this->stateMsgAlreadySent = false;
                 this->stateMsg = "ready";
+
+                /* update expState */
+                this->currentExpState = expState;
             }
             /* keep ticking */
             result = true;
