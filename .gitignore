@@ -6,8 +6,8 @@
 ./smart_exp/src/java/viewer/build/
 ./smart_exp/src/java/viewer/bin/
 ./smart_exp/src/java/viewer/.classpath
-
-
+./smart_exp/src/java/viewer_program/bin/main/application/Main.class
+./smart_exp/src/java/viewer_program/bin/main/model/
 
 
 

@@ -13,6 +13,8 @@ void setup()
   Sonar *sonar = new SonarImpl(TRIG_PIN, ECHO_PIN);
   sonar->init();
 
+  Pir* pir = new PirImpl(PIR_PIN);
+
   Led *L1 = new Led(L1_PIN);
   Led *L2 = new Led(L2_PIN);
 
@@ -23,13 +25,13 @@ void setup()
   Task *kinematicsTask = new KinematicsTask(experimentation, kinematicsData, sonar, SERVO_MOTOR_PIN);
   scheduler->addTask(kinematicsTask);
 
-  Task *actionTask = new ActionTask(experimentation, PIR_PIN, L1, L2);
-  actionTask->init(SCHED_PERIOD);
-  scheduler->addTask(actionTask);
-
   Task *viewerComunicator = new ViewerComunicationTask(experimentation, kinematicsData);
   viewerComunicator->init(SCHED_PERIOD);
   scheduler->addTask(viewerComunicator);
+
+  Task *actionTask = new ActionTask(experimentation, pir, L1, L2);
+  actionTask->init(SCHED_PERIOD);
+  scheduler->addTask(actionTask);
 
   Task *blinkLedTask = new BlinkLedTask(experimentation, L2);
   blinkLedTask->init(200);

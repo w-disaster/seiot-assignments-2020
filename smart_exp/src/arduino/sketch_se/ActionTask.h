@@ -14,7 +14,7 @@ class ActionTask : public Task{
     State state;
 
     public:
-        ActionTask(Experimentation* experimentation, int pirPin, Led* L1, Led* L2);
+        ActionTask(Experimentation* experimentation, Pir* pir, Led* L1, Led* L2);
         void init(int period);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();
