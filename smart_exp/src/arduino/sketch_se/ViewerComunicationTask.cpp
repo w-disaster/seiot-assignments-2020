@@ -1,33 +1,33 @@
 #include "ViewerComunicationTask.h"
 #include "Arduino.h"
 
-ViewerComunicationTask::ViewerComunicationTask(Experimentation *experimentation, KinematicsData *kinematicsData)
+ViewerComunicationTask::ViewerComunicationTask(ExperimentationStep *experimentationStep, KinematicsData *kinematicsData)
 {
     Serial.begin(115200);
-    this->experimentation = experimentation;
+    this->experimentationStep = experimentationStep;
     this->kinematicsData = kinematicsData;
-    this->stateMsgAlreadySent = false;
-    this->currentExpState = this->experimentation->getExperimentationState();
+    this->stepMsgAlreadySent = false;
+    this->currentExpStep = this->experimentationStep->getStep();
 }
 
-void ViewerComunicationTask::sendData(String msg, bool isState)
+void ViewerComunicationTask::sendData(String msg, bool isStep)
 {
-    isState ? Serial.print(msg + STATE_END + MSG_END) : Serial.print(msg + MSG_END);
+    isStep ? Serial.print(msg + STEP_END + MSG_END) : Serial.print(msg + MSG_END);
 }
 
-void ViewerComunicationTask::sendStateMsgOnce(String stateKey)
+void ViewerComunicationTask::sendStepMsgOnce(String stepKey)
 {
-    if (!stateMsgAlreadySent)
+    if (!stepMsgAlreadySent)
     {
-        /* sends the State to serial */
-        sendData(stateKey, true);
+        /* sends the Step to serial */
+        sendData(stepKey, true);
 
-        if (state == VC1)
+        if (step == VC1)
         {
             /* start the relative clock if we are experimenting */
             expRelativeTime = micros();
         }
-        stateMsgAlreadySent = true;
+        stepMsgAlreadySent = true;
     }
 }
 
@@ -46,7 +46,7 @@ String ViewerComunicationTask::format(float t, float p, float v, float a)
 
 void ViewerComunicationTask::init(int period)
 {
-    this->state = VC0;
+    this->step = VC0;
     tick();
     Task::init(period);
 }
@@ -54,26 +54,26 @@ void ViewerComunicationTask::init(int period)
 bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
 {
     bool result = false;
-    State nextState = state;
-    Experimentation::State expState = this->experimentation->getExperimentationState();
+    Step nextStep = step;
+    ExperimentationStep::Step expStep = this->experimentationStep->getStep();
 
-    switch (state)
+    switch (step)
     {
     case VC0:
         if (updateAndCheckTime(basePeriod))
         {
             /* if current is not the same we go in the next accordingly */
-            if (expState != currentExpState)
+            if (expStep != currentExpStep)
             {
-                /* send new state */
-                this->stateMsgAlreadySent = false;
-                /* update expState */
-                this->currentExpState = expState;
+                /* send new step */
+                this->stepMsgAlreadySent = false;
+                /* update expStep */
+                this->currentExpStep = expStep;
                 /* return true */
                 result = true;
 
-                if(this->currentExpState == Experimentation::State::EXPERIMENTATION){
-                    nextState = VC1;
+                if(this->currentExpStep == ExperimentationStep::Step::EXPERIMENTATION){
+                    nextStep = VC1;
                     break;
                 }
             }
@@ -83,13 +83,13 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
         /* exp */
         if (updateAndCheckTime(basePeriod))
         {
-            if (expState == Experimentation::State::EXPERIMENTATION_CONCLUDED)
+            if (expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED)
             {
                 /* goes to exp over */
-                nextState = VC2;
-                this->stateMsgAlreadySent = false;
-                /* update expState */
-                this->currentExpState = expState;
+                nextStep = VC2;
+                this->stepMsgAlreadySent = false;
+                /* update expStep */
+                this->currentExpStep = expStep;
             }
             /* keep ticking */
             result = true;
@@ -100,46 +100,46 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
         /* exp over */
         if (updateAndCheckTime(basePeriod))
         {
-            if (expState == Experimentation::State::READY)
+            if (expStep == ExperimentationStep::Step::READY)
             {
                 /* goes to ready */
-                nextState = VC0;
-                this->stateMsgAlreadySent = false;
-                /* update expState */
-                this->currentExpState = expState;
+                nextStep = VC0;
+                this->stepMsgAlreadySent = false;
+                /* update expStep */
+                this->currentExpStep = expStep;
             }
             /* keep ticking */
             result = true;
         }
         break;
     }
-    state = nextState;
+    step = nextStep;
     return result;
 }
 
 void ViewerComunicationTask::tick()
 {
-    switch (state)
+    switch (step)
     {
     case VC0:
-        switch (this->currentExpState){
-            case Experimentation::State::READY:
-                sendStateMsgOnce("ready");
+        switch (this->currentExpStep){
+            case ExperimentationStep::Step::READY:
+                sendStepMsgOnce("ready");
                 break;
 
-            case Experimentation::State::SUSPENDED:
-                sendStateMsgOnce("suspended");
+            case ExperimentationStep::Step::SUSPENDED:
+                sendStepMsgOnce("suspended");
                 delay(5);
                 break;
 
-            case Experimentation::State::ERROR:
-                sendStateMsgOnce("error");
+            case ExperimentationStep::Step::ERROR:
+                sendStepMsgOnce("error");
                 break;
         }
         break;
     case VC1:
         /* exp */
-        sendStateMsgOnce("exp");
+        sendStepMsgOnce("exp");
         if (this->kinematicsData->isDataReady())
         {
             sendExperimentData(format((micros() - this->expRelativeTime) / 1000,
@@ -150,13 +150,13 @@ void ViewerComunicationTask::tick()
         break;
     case VC2:
         /* exp over */
-        sendStateMsgOnce("over");        
+        sendStepMsgOnce("over");        
         if (Serial.available() > 0)
         {
             if ((char)Serial.read() == EXP_OVER)
             {
-                /* tells experimentation to change State */
-                this->experimentation->setExperimentationState(Experimentation::State::READY);
+                /* tells experimentationStep to change Step */
+                this->experimentationStep->setStep(ExperimentationStep::Step::READY);
             }
         }
         break;

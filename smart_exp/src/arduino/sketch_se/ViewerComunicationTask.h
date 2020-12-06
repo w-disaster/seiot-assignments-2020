@@ -7,31 +7,34 @@
 
 #define DATA_SEPARATOR ":"
 #define MSG_END ";"
-#define STATE_END "!"
+#define STEP_END "!"
 #define EXP_OVER '>'
 
-class ViewerComunicationTask : public Task
-{
+class ViewerComunicationTask : public Task {
 
-    enum State{ VC0, VC1, VC2 };
+    enum Step { 
+        VC0, 
+        VC1, 
+        VC2 
+    };
     /* fields */
-    State state;
-    Experimentation::State currentExpState;
-    Experimentation *experimentation;
+    Step step;
+    ExperimentationStep::Step currentExpStep;
+    ExperimentationStep *experimentationStep;
     KinematicsData *kinematicsData;
-    bool stateMsgAlreadySent;
+    bool stepMsgAlreadySent;
     long expRelativeTime;
 
 private:
     /* functions */
     void init(int period);
-    void sendData(String msg, bool isState);
-    void sendStateMsgOnce(String stateKey);
+    void sendData(String msg, bool isStep);
+    void sendStepMsgOnce(String stepKey);
     void sendExperimentData(String data);
     String format(float t, float p, float v, float a);
 
 public:
-    ViewerComunicationTask(Experimentation *experimentation, KinematicsData *kinematicsData);
+    ViewerComunicationTask(ExperimentationStep *experimentationStep, KinematicsData *kinematicsData);
     bool updateTimeAndCheckEvent(int basePeriod);
     void tick();
     ~ViewerComunicationTask();

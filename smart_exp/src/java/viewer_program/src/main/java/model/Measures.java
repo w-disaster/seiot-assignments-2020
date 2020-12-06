@@ -1,7 +1,7 @@
 package model;
 
 enum Measures {
-    POSITION("Distance", "m", "#0028c9"),
+    DISTANCE("Distance", "m", "#0028c9"),
     SPEED("Speed", "m/s", "#e68e00"),
     ACCELERATION("Acceleration", "m/s\u00B2", "#31d48a");
 

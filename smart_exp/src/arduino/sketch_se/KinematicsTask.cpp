@@ -3,26 +3,26 @@
 #include "ServoMotorImpl.h"
 #include "KinematicsTask.h"
 
-KinematicsTask::KinematicsTask(Experimentation *experimentation, KinematicsData *kinematicsData, Sonar *sonar, int servoMotorPin)
+KinematicsTask::KinematicsTask(ExperimentationStep *experimentationStep, KinematicsData *kinematicsData, Sonar *sonar, int servoMotorPin)
 {
-    this->experimentation = experimentation;
+    this->experimentationStep = experimentationStep;
     this->kinematicsData = kinematicsData;
     this->sonar = sonar;
     this->servoMotor = new ServoMotorImpl(servoMotorPin);
 
-    this->state = K0;
+    this->step = K0;
     pinMode(POT_PIN, INPUT);
 }
 
 bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod)
 {
-    State nextState = state;
+    Step nextStep = step;
     bool result;
-    Experimentation::State expState = this->experimentation->getExperimentationState();
-    switch (state)
+    ExperimentationStep::Step expStep = this->experimentationStep->getStep();
+    switch (step)
     {
     case K0:
-        if (expState == Experimentation::State::EXPERIMENTATION)
+        if (expStep == ExperimentationStep::Step::EXPERIMENTATION)
         {
             /* sampling rate */
             int potValue = analogRead(POT_PIN);
@@ -31,7 +31,6 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod)
 
             //int period = roundToNearestMultiple(1050 - map(potValue, 0, 1023, 50, 1000), 50);
             init(period);
-            //Serial.println(String("periodo task cinematica: ") + period + " pot value: " + potValue);
 
             /* servo motor on */
             this->servoMotor->on();
@@ -42,43 +41,43 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod)
             precSpeed = 0;
             maxSpeed = (MAX_DISTANCE - MIN_DISTANCE) / (period * MS_TO_SEC);
             //Serial.println(maxSpeed);
-            nextState = K1;
+            nextStep = K1;
         }
         result = true;
         break;
     case K1:
         if (updateAndCheckTime(basePeriod))
         {
-            if (expState == Experimentation::State::EXPERIMENTATION)
+            if (expStep == ExperimentationStep::Step::EXPERIMENTATION)
             {
                 result = true;
                 break;
             }
             else
             {
-                nextState = K0;
+                nextStep = K0;
                 this->servoMotor->setPosition(0);
                 this->servoMotor->off();
                 result = false;
                 break;
             }
         }
-        if (expState != Experimentation::State::EXPERIMENTATION)
+        if (expStep != ExperimentationStep::Step::EXPERIMENTATION)
         {
-            nextState = K0;
+            nextStep = K0;
             this->servoMotor->setPosition(0);
             this->servoMotor->off();
         }
         result = false;
         break;
     }
-    state = nextState;
+    step = nextStep;
     return result;
 }
 
 void KinematicsTask::tick()
 {
-    switch (state)
+    switch (step)
     {
     case K0:
         break;

@@ -1,26 +1,26 @@
 #include "BlinkLedTask.h"
 #include "Arduino.h"
 
-BlinkLedTask::BlinkLedTask(Experimentation* experimentation, Led* led){
-    this->experimentation = experimentation;
+BlinkLedTask::BlinkLedTask(ExperimentationStep* experimentationStep, Led* led){
+    this->experimentationStep = experimentationStep;
     this->led = led;
 }
 
 void BlinkLedTask::init(int period){
-    state = BL0;
+    step = BL0;
     Task::init(period);
 }
 
 bool BlinkLedTask::updateTimeAndCheckEvent(int basePeriod){
-    State nextState = state;
+    Step nextStep = step;
     bool result = false;
-    Experimentation::State expState = this->experimentation->getExperimentationState();
+    ExperimentationStep::Step expStep = this->experimentationStep->getStep();
 
-    switch(state){
+    switch(step){
         case BL0:
-            if(expState == Experimentation::State::ERROR ||
-                expState == Experimentation::State::EXPERIMENTATION_CONCLUDED){
-                nextState = BL1;
+            if(expStep == ExperimentationStep::Step::ERROR ||
+                expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED){
+                nextStep = BL1;
                 result = true;
                 Task::init(getPeriod());
                 break;
@@ -28,41 +28,41 @@ bool BlinkLedTask::updateTimeAndCheckEvent(int basePeriod){
             break;
         
         case BL1:
-            if(expState == Experimentation::State::ERROR ||
-                expState == Experimentation::State::EXPERIMENTATION_CONCLUDED){
+            if(expStep == ExperimentationStep::Step::ERROR ||
+                expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED){
                     if(updateAndCheckTime(basePeriod)){
-                        nextState = BL2;
+                        nextStep = BL2;
                         result = true;
                         break;
                     }
                     break;
             } else {
-                nextState = BL0;
+                nextStep = BL0;
                 result = true;
                 break;
             }
         
         case BL2:
-            if(expState == Experimentation::State::ERROR ||
-                expState == Experimentation::State::EXPERIMENTATION_CONCLUDED){
+            if(expStep == ExperimentationStep::Step::ERROR ||
+                expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED){
                     if(updateAndCheckTime(basePeriod)){
-                        nextState = BL1;
+                        nextStep = BL1;
                         result = true;
                         break;
                     }
                     break;
             } else {
-                nextState = BL0;
+                nextStep = BL0;
                 result = true;
                 break;
             }     
     }
-    state = nextState;
+    step = nextStep;
     return result;
 }
 
 void BlinkLedTask::tick(){
-    switch(state){
+    switch(step){
         case BL0:
         case BL2:
             this->led->switchOff();

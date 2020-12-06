@@ -5,13 +5,13 @@
 #include "Led.h"
 
 class BlinkLedTask : public Task{
-    Experimentation* experimentation;
+    ExperimentationStep* experimentationStep;
     Led* led;
-    enum State{BL0, BL1, BL2};
-    State state;
+    enum Step{BL0, BL1, BL2};
+    Step step;
 
     public:
-        BlinkLedTask(Experimentation* experimentation, Led* led);
+        BlinkLedTask(ExperimentationStep* experimentationStep, Led* led);
         void init(int period);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();

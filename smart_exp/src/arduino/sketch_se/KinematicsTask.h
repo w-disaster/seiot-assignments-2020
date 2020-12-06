@@ -16,12 +16,12 @@
 #define POT_PIN A0 
 
 class KinematicsTask : public Task{
-    Experimentation* experimentation;
+    ExperimentationStep* experimentationStep;
     KinematicsData* kinematicsData;
     Sonar* sonar;
     ServoMotor* servoMotor;
-    enum State{K0, K1};
-    State state;
+    enum Step{K0, K1};
+    Step step;
     float precDistance, precSpeed;
     float maxSpeed;
 
@@ -31,7 +31,7 @@ class KinematicsTask : public Task{
         float mapfloat(float value, float inMin, float inMax, float outMin, float outMax);
 
     public:
-        KinematicsTask(Experimentation* experimentation, KinematicsData* kinematicsData, Sonar* sonar, int servoMotorPin);
+        KinematicsTask(ExperimentationStep* experimentationStep, KinematicsData* kinematicsData, Sonar* sonar, int servoMotorPin);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();  
 };

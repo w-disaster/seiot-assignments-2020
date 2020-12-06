@@ -2,38 +2,38 @@
 #include <Arduino.h>
 #include <avr/sleep.h>
 
-ActionTask::ActionTask(Experimentation* experimentation, Pir* pir, Led* L1, Led* L2){
-    this->experimentation = experimentation;
+ActionTask::ActionTask(ExperimentationStep* experimentationStep, Pir* pir, Led* L1, Led* L2){
+    this->experimentationStep = experimentationStep;
     this->pir = pir;
     this->L1 = L1;
     this->L2 = L2;
 }
 
 void ActionTask::init(int period){
-    state = A0;
+    step = A0;
     tick();
     Task::init(period);
 }
 
 bool ActionTask::updateTimeAndCheckEvent(int basePeriod){
     bool result = false;
-    State nextState = state;
-    Experimentation::State expState = this->experimentation->getExperimentationState();
-    switch(state){
+    Step nextStep = step;
+    ExperimentationStep::Step expStep = this->experimentationStep->getStep();
+    switch(step){
         case A0:
             if(updateAndCheckTime(basePeriod)){
-                if(expState == Experimentation::State::EXPERIMENTATION){
-                    nextState = A3;
+                if(expStep == ExperimentationStep::Step::EXPERIMENTATION){
+                    nextStep = A3;
                     result = true;
                     break;
                 }
-                if(expState == Experimentation::State::SUSPENDED){
-                    nextState = A1;
+                if(expStep == ExperimentationStep::Step::SUSPENDED){
+                    nextStep = A1;
                     result = true;
                     break;
                 }
-                if(expState == Experimentation::State::ERROR){
-                    nextState = A2;
+                if(expStep == ExperimentationStep::Step::ERROR){
+                    nextStep = A2;
                     result = true;
                     break;
                 }
@@ -43,8 +43,8 @@ bool ActionTask::updateTimeAndCheckEvent(int basePeriod){
         case A2:
         case A4:
             if(updateAndCheckTime(basePeriod)){
-                if(expState == Experimentation::State::READY){
-                    nextState = A0;
+                if(expStep == ExperimentationStep::Step::READY){
+                    nextStep = A0;
                     result = true;
                     break;
                 }
@@ -52,20 +52,20 @@ bool ActionTask::updateTimeAndCheckEvent(int basePeriod){
             break;
         case A3:
             if(updateAndCheckTime(basePeriod)){
-                if(expState == Experimentation::State::EXPERIMENTATION_CONCLUDED){
-                    nextState = A4;
+                if(expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED){
+                    nextStep = A4;
                     result = true;
                     break;
                 }
             }
             break;
     }
-    state = nextState;
+    step = nextStep;
     return result;
 }
 
 void ActionTask::tick(){
-    switch(state){
+    switch(step){
         case A0:
             this->L1->switchOn();
             this->L2->switchOff();
@@ -79,7 +79,7 @@ void ActionTask::tick(){
             sleep_enable();
             sleep_mode();  
             /** The program will continue from here. **/  
-            //Serial.println("WAKE UP");
+            
             /* First thing to do is disable sleep. */  
             sleep_disable();
 

@@ -1,38 +1,38 @@
 #include "Arduino.h"
-#include "StepTask.h"
+#include "ChangeStepTask.h"
 #include "ButtonImpl.h"
 
-StepTask::StepTask(Experimentation *experimentation, Sonar* sonar, int bStartPin, int bStopPin){
-    this->experimentation = experimentation;
+ChangeStepTask::ChangeStepTask(ExperimentationStep *experimentationStep, Sonar* sonar, int bStartPin, int bStopPin){
+    this->experimentationStep = experimentationStep;
     this->sonar = sonar;
     this->bStart = new ButtonImpl(bStartPin);
     this->bStop = new ButtonImpl(bStopPin);
 }
 
-void StepTask::init(int period){
-    state = State::ES0;
-    this->experimentation->setExperimentationState(Experimentation::State::READY);
+void ChangeStepTask::init(int period){
+    step = Step::ES0;
+    this->experimentationStep->setStep(ExperimentationStep::Step::READY);
     Task::init(period);
 }
 
-bool StepTask::updateTimeAndCheckEvent(int basePeriod){
-    State nextState = state;
+bool ChangeStepTask::updateTimeAndCheckEvent(int basePeriod){
+    Step nextStep = step;
     bool result;
-    switch (state){
-    case State::ES0:
+    switch (step){
+    case Step::ES0:
         if (updateAndCheckTime(basePeriod)){
-            nextState = State::ES1;
+            nextStep = Step::ES1;
             result = true;
             break;
         }
         if (this->bStart->isPressed()){
             this->sonar->updateSoundSpeed();
             if (this->sonar->getDistance() < 0.5){
-                nextState = State::ES3;
+                nextStep = Step::ES3;
                 init(MAX_TIME * MILLIS_TO_SEC);
             }
             else {
-                nextState = State::ES2;
+                nextStep = Step::ES2;
                 init(ERROR_TIME * MILLIS_TO_SEC);
             }
             result = true;
@@ -41,16 +41,16 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
         result = false;
         break;
 
-    case State::ES1:
+    case Step::ES1:
         /* At this point Arduino woke up from sleep mode */
-        nextState = State::ES0;
+        nextStep = Step::ES0;
         init(SLEEP_TIME * MILLIS_TO_SEC);
         result = true;
         break;
 
-    case State::ES2:
+    case Step::ES2:
         if (updateAndCheckTime(basePeriod)){
-            nextState = State::ES0;
+            nextStep = Step::ES0;
             init(SLEEP_TIME * MILLIS_TO_SEC);
             result = true;
             break;
@@ -58,18 +58,18 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
         result = false;
         break;
 
-    case State::ES3:
+    case Step::ES3:
         if (updateAndCheckTime(basePeriod) || this->bStop->isPressed()){
-            nextState = State::ES4;
+            nextStep = Step::ES4;
             result = true;
             break;
         }
         result = false;
         break;
 
-    case State::ES4:
-        if(this->experimentation->getExperimentationState() == Experimentation::READY){
-            nextState = State::ES0;
+    case Step::ES4:
+        if(this->experimentationStep->getStep() == ExperimentationStep::READY){
+            nextStep = Step::ES0;
             init(SLEEP_TIME * MILLIS_TO_SEC);
             result = true;
             break;
@@ -77,30 +77,30 @@ bool StepTask::updateTimeAndCheckEvent(int basePeriod){
         result = false;
         break;
     }
-    state = nextState;
+    step = nextStep;
     return result;
 }
 
-void StepTask::tick(){
-    switch (state){
+void ChangeStepTask::tick(){
+    switch (step){
         case ES0:
-            this->experimentation->setExperimentationState(Experimentation::State::READY);
+            this->experimentationStep->setStep(ExperimentationStep::Step::READY);
             break;
 
         case ES1:
-            this->experimentation->setExperimentationState(Experimentation::State::SUSPENDED);
+            this->experimentationStep->setStep(ExperimentationStep::Step::SUSPENDED);
             break;
 
         case ES2:
-            this->experimentation->setExperimentationState(Experimentation::State::ERROR);
+            this->experimentationStep->setStep(ExperimentationStep::Step::ERROR);
             break;
 
         case ES3:
-            this->experimentation->setExperimentationState(Experimentation::State::EXPERIMENTATION);
+            this->experimentationStep->setStep(ExperimentationStep::Step::EXPERIMENTATION);
             break;
 
         case ES4:
-            this->experimentation->setExperimentationState(Experimentation::State::EXPERIMENTATION_CONCLUDED);
+            this->experimentationStep->setStep(ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED);
             break;
         }
 }

@@ -27,14 +27,14 @@ public class SerialController implements SerialPortEventListener {
     private final Button okButton;
     private final Text okButtonDescription;
 
-    private final Graph positionGraph;
+    private final Graph distanceGraph;
     private final Graph speedGraph;
     private final Graph accelerationGraph;
 
     private String msg;
     private State state;
 
-    public SerialController(final String portName, final Graph positionGraph, final Graph speedGraph,
+    public SerialController(final String portName, final Graph distanceGraph, final Graph speedGraph,
             final Graph accelerationGraph, final Label stateLabel, final Button okButton, final Text okButtonDescription) {
         /* msg set up */
         msg = "";
@@ -63,7 +63,7 @@ public class SerialController implements SerialPortEventListener {
         updateStateLabel();
 
         /* set up graph reference */
-        this.positionGraph = positionGraph;
+        this.distanceGraph = distanceGraph;
         this.speedGraph = speedGraph;
         this.accelerationGraph = accelerationGraph;
 
@@ -192,7 +192,7 @@ public class SerialController implements SerialPortEventListener {
             final double s = Double.parseDouble(dataArray[1]);
             final double v = Double.parseDouble(dataArray[2]);
             final double a = Double.parseDouble(dataArray[3]);
-            coordinates.put("position", new Data<Number, Number>(t, s));
+            coordinates.put("distance", new Data<Number, Number>(t, s));
             coordinates.put("speed", new Data<Number, Number>(t, v));
             coordinates.put("acceleration", new Data<Number, Number>(t, a));
 
@@ -212,7 +212,7 @@ public class SerialController implements SerialPortEventListener {
             final Map<String, Data<Number, Number>> coordinates = getCoordinates(data);
 
             Platform.runLater(() -> {
-                    positionGraph.updatePlot(coordinates.get("position"));
+                    distanceGraph.updatePlot(coordinates.get("distance"));
                     speedGraph.updatePlot(coordinates.get("speed"));
                     accelerationGraph.updatePlot(coordinates.get("acceleration"));
                 });
@@ -251,7 +251,7 @@ public class SerialController implements SerialPortEventListener {
         case "exp!":
             Platform.runLater(() -> {
                     /* clear any old graph before the experiment starts */
-                    positionGraph.reset();
+                    distanceGraph.reset();
                     speedGraph.reset();
                     accelerationGraph.reset();
                 });

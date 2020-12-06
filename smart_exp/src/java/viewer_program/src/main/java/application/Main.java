@@ -31,7 +31,7 @@ public final class Main extends Application {
 
         final GridPane root = new GridPane();
 
-        final Graph g1 = GraphFactory.createPositionGraph();
+        final Graph g1 = GraphFactory.createDistanceGraph();
         final Graph g2 = GraphFactory.createSpeedGraph();
         final Graph g3 = GraphFactory.createAccelerationGraph();
 

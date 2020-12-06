@@ -7,8 +7,8 @@ public final class GraphFactory {
 
     private GraphFactory() { }
 
-    public static Graph createPositionGraph() {
-        return createGraph(Measures.POSITION);
+    public static Graph createDistanceGraph() {
+        return createGraph(Measures.DISTANCE);
     }
 
     public static Graph createSpeedGraph() {

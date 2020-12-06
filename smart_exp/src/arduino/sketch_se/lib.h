@@ -6,11 +6,11 @@
 #define SEC_TO_MS 1000
 
 #include "Scheduler.h"
-#include "StepTask.h"
+#include "ChangeStepTask.h"
 #include "ActionTask.h"
 #include "BlinkLedTask.h"
 #include "KinematicsTask.h"
-#include "ExperimentationImpl.h"
+#include "ExperimentationStepImpl.h"
 #include "ViewerComunicationTask.h"
 #include "SonarImpl.h"
 #include "PirImpl.h"
