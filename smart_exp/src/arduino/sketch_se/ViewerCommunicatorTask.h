@@ -10,15 +10,11 @@
 #define STEP_END "!"
 #define EXP_OVER '>'
 
-class ViewerComunicationTask : public Task {
+class ViewerCommunicatorTask : public Task {
 
-    enum Step { 
-        VC0, 
-        VC1, 
-        VC2 
-    };
+    enum State { VC0, VC1, VC2 };
     /* fields */
-    Step step;
+    State state;
     ExperimentationStep::Step currentExpStep;
     ExperimentationStep *experimentationStep;
     KinematicsData *kinematicsData;
@@ -34,10 +30,9 @@ private:
     String format(float t, float p, float v, float a);
 
 public:
-    ViewerComunicationTask(ExperimentationStep *experimentationStep, KinematicsData *kinematicsData);
+    ViewerCommunicatorTask(ExperimentationStep *experimentationStep, KinematicsData *kinematicsData);
     bool updateTimeAndCheckEvent(int basePeriod);
     void tick();
-    ~ViewerComunicationTask();
 };
 
 #endif

@@ -10,16 +10,16 @@ KinematicsTask::KinematicsTask(ExperimentationStep *experimentationStep, Kinemat
     this->sonar = sonar;
     this->servoMotor = new ServoMotorImpl(servoMotorPin);
 
-    this->step = K0;
+    this->state = K0;
     pinMode(POT_PIN, INPUT);
 }
 
 bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod)
 {
-    Step nextStep = step;
+    State nextState = state;
     bool result;
     ExperimentationStep::Step expStep = this->experimentationStep->getStep();
-    switch (step)
+    switch (state)
     {
     case K0:
         if (expStep == ExperimentationStep::Step::EXPERIMENTATION)
@@ -41,7 +41,7 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod)
             precSpeed = 0;
             maxSpeed = (MAX_DISTANCE - MIN_DISTANCE) / (period * MS_TO_SEC);
             //Serial.println(maxSpeed);
-            nextStep = K1;
+            nextState = K1;
         }
         result = true;
         break;
@@ -55,7 +55,7 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod)
             }
             else
             {
-                nextStep = K0;
+                nextState = K0;
                 this->servoMotor->setPosition(0);
                 this->servoMotor->off();
                 result = false;
@@ -64,20 +64,20 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod)
         }
         if (expStep != ExperimentationStep::Step::EXPERIMENTATION)
         {
-            nextStep = K0;
+            nextState = K0;
             this->servoMotor->setPosition(0);
             this->servoMotor->off();
         }
         result = false;
         break;
     }
-    step = nextStep;
+    state = nextState;
     return result;
 }
 
 void KinematicsTask::tick()
 {
-    switch (step)
+    switch (state)
     {
     case K0:
         break;

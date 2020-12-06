@@ -10,8 +10,8 @@ class ActionTask : public Task{
     Led* L1;
     Led* L2;
     Pir* pir;
-    enum Step{A0, A1, A2, A3, A4};
-    Step step;
+    enum State{A0, A1, A2, A3, A4};
+    State state;
 
     public:
         ActionTask(ExperimentationStep* experimentationStep, Pir* pir, Led* L1, Led* L2);

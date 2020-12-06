@@ -10,30 +10,30 @@ ActionTask::ActionTask(ExperimentationStep* experimentationStep, Pir* pir, Led* 
 }
 
 void ActionTask::init(int period){
-    step = A0;
+    state = A0;
     tick();
     Task::init(period);
 }
 
 bool ActionTask::updateTimeAndCheckEvent(int basePeriod){
     bool result = false;
-    Step nextStep = step;
+    State nextState = state;
     ExperimentationStep::Step expStep = this->experimentationStep->getStep();
-    switch(step){
+    switch(state){
         case A0:
             if(updateAndCheckTime(basePeriod)){
                 if(expStep == ExperimentationStep::Step::EXPERIMENTATION){
-                    nextStep = A3;
+                    nextState = A3;
                     result = true;
                     break;
                 }
                 if(expStep == ExperimentationStep::Step::SUSPENDED){
-                    nextStep = A1;
+                    nextState = A1;
                     result = true;
                     break;
                 }
                 if(expStep == ExperimentationStep::Step::ERROR){
-                    nextStep = A2;
+                    nextState = A2;
                     result = true;
                     break;
                 }
@@ -44,7 +44,7 @@ bool ActionTask::updateTimeAndCheckEvent(int basePeriod){
         case A4:
             if(updateAndCheckTime(basePeriod)){
                 if(expStep == ExperimentationStep::Step::READY){
-                    nextStep = A0;
+                    nextState = A0;
                     result = true;
                     break;
                 }
@@ -53,19 +53,19 @@ bool ActionTask::updateTimeAndCheckEvent(int basePeriod){
         case A3:
             if(updateAndCheckTime(basePeriod)){
                 if(expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED){
-                    nextStep = A4;
+                    nextState = A4;
                     result = true;
                     break;
                 }
             }
             break;
     }
-    step = nextStep;
+    state = nextState;
     return result;
 }
 
 void ActionTask::tick(){
-    switch(step){
+    switch(state){
         case A0:
             this->L1->switchOn();
             this->L2->switchOff();

@@ -28,9 +28,9 @@ void setup() {
   Task *kinematicsTask = new KinematicsTask(experimentationStep, kinematicsData, sonar, SERVO_MOTOR_PIN);
   scheduler->addTask(kinematicsTask);
 
-  Task *viewerComunicator = new ViewerComunicationTask(experimentationStep, kinematicsData);
-  viewerComunicator->init(SCHED_PERIOD);
-  scheduler->addTask(viewerComunicator);
+  Task *viewerCommunicator = new ViewerCommunicatorTask(experimentationStep, kinematicsData);
+  viewerCommunicator->init(SCHED_PERIOD);
+  scheduler->addTask(viewerCommunicator);
 
   Task *actionTask = new ActionTask(experimentationStep, pir, L1, L2);
   actionTask->init(SCHED_PERIOD);

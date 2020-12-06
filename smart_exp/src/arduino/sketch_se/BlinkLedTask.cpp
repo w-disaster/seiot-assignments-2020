@@ -7,20 +7,20 @@ BlinkLedTask::BlinkLedTask(ExperimentationStep* experimentationStep, Led* led){
 }
 
 void BlinkLedTask::init(int period){
-    step = BL0;
+    state = BL0;
     Task::init(period);
 }
 
 bool BlinkLedTask::updateTimeAndCheckEvent(int basePeriod){
-    Step nextStep = step;
+    State nextState = state;
     bool result = false;
     ExperimentationStep::Step expStep = this->experimentationStep->getStep();
 
-    switch(step){
+    switch(state){
         case BL0:
             if(expStep == ExperimentationStep::Step::ERROR ||
                 expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED){
-                nextStep = BL1;
+                nextState = BL1;
                 result = true;
                 Task::init(getPeriod());
                 break;
@@ -31,13 +31,13 @@ bool BlinkLedTask::updateTimeAndCheckEvent(int basePeriod){
             if(expStep == ExperimentationStep::Step::ERROR ||
                 expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED){
                     if(updateAndCheckTime(basePeriod)){
-                        nextStep = BL2;
+                        nextState = BL0;
                         result = true;
                         break;
                     }
                     break;
             } else {
-                nextStep = BL0;
+                nextState = BL0;
                 result = true;
                 break;
             }
@@ -46,23 +46,23 @@ bool BlinkLedTask::updateTimeAndCheckEvent(int basePeriod){
             if(expStep == ExperimentationStep::Step::ERROR ||
                 expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED){
                     if(updateAndCheckTime(basePeriod)){
-                        nextStep = BL1;
+                        nextState = BL1;
                         result = true;
                         break;
                     }
                     break;
             } else {
-                nextStep = BL0;
+                nextState = BL0;
                 result = true;
                 break;
             }     
     }
-    step = nextStep;
+    state = nextState;
     return result;
 }
 
 void BlinkLedTask::tick(){
-    switch(step){
+    switch(state){
         case BL0:
         case BL2:
             this->led->switchOff();

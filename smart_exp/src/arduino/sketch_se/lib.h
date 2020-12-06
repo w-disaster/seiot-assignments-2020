@@ -11,7 +11,7 @@
 #include "BlinkLedTask.h"
 #include "KinematicsTask.h"
 #include "ExperimentationStepImpl.h"
-#include "ViewerComunicationTask.h"
+#include "ViewerCommunicatorTask.h"
 #include "SonarImpl.h"
 #include "PirImpl.h"
 #include "KinematicsDataImpl.h"

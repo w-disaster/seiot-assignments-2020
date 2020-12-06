@@ -16,8 +16,8 @@ class ChangeStepTask : public Task{
     Button* bStart;
     Button* bStop;
     
-    enum Step{ES0, ES1, ES2, ES3, ES4};
-    Step step;
+    enum State{ES0, ES1, ES2, ES3, ES4};
+    State state;
 
     public:
         ChangeStepTask(ExperimentationStep* experimentationStep, Sonar* sonar, int bStartPin, int bStopPin);

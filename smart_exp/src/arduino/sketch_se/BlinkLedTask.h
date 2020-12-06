@@ -7,8 +7,8 @@
 class BlinkLedTask : public Task{
     ExperimentationStep* experimentationStep;
     Led* led;
-    enum Step{BL0, BL1, BL2};
-    Step step;
+    enum State{BL0, BL1, BL2};
+    State state;
 
     public:
         BlinkLedTask(ExperimentationStep* experimentationStep, Led* led);

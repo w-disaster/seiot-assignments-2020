@@ -10,29 +10,29 @@ ChangeStepTask::ChangeStepTask(ExperimentationStep *experimentationStep, Sonar* 
 }
 
 void ChangeStepTask::init(int period){
-    step = Step::ES0;
+    state = State::ES0;
     this->experimentationStep->setStep(ExperimentationStep::Step::READY);
     Task::init(period);
 }
 
 bool ChangeStepTask::updateTimeAndCheckEvent(int basePeriod){
-    Step nextStep = step;
+    State nextState = state;
     bool result;
-    switch (step){
-    case Step::ES0:
+    switch (state){
+    case ES0:
         if (updateAndCheckTime(basePeriod)){
-            nextStep = Step::ES1;
+            nextState = ES1;
             result = true;
             break;
         }
         if (this->bStart->isPressed()){
             this->sonar->updateSoundSpeed();
             if (this->sonar->getDistance() < 0.5){
-                nextStep = Step::ES3;
+                nextState = ES3;
                 init(MAX_TIME * MILLIS_TO_SEC);
             }
             else {
-                nextStep = Step::ES2;
+                nextState = ES2;
                 init(ERROR_TIME * MILLIS_TO_SEC);
             }
             result = true;
@@ -41,16 +41,16 @@ bool ChangeStepTask::updateTimeAndCheckEvent(int basePeriod){
         result = false;
         break;
 
-    case Step::ES1:
+    case ES1:
         /* At this point Arduino woke up from sleep mode */
-        nextStep = Step::ES0;
+        nextState = ES0;
         init(SLEEP_TIME * MILLIS_TO_SEC);
         result = true;
         break;
 
-    case Step::ES2:
+    case ES2:
         if (updateAndCheckTime(basePeriod)){
-            nextStep = Step::ES0;
+            nextState = ES0;
             init(SLEEP_TIME * MILLIS_TO_SEC);
             result = true;
             break;
@@ -58,18 +58,18 @@ bool ChangeStepTask::updateTimeAndCheckEvent(int basePeriod){
         result = false;
         break;
 
-    case Step::ES3:
+    case ES3:
         if (updateAndCheckTime(basePeriod) || this->bStop->isPressed()){
-            nextStep = Step::ES4;
+            nextState = ES4;
             result = true;
             break;
         }
         result = false;
         break;
 
-    case Step::ES4:
+    case ES4:
         if(this->experimentationStep->getStep() == ExperimentationStep::READY){
-            nextStep = Step::ES0;
+            nextState = ES0;
             init(SLEEP_TIME * MILLIS_TO_SEC);
             result = true;
             break;
@@ -77,12 +77,12 @@ bool ChangeStepTask::updateTimeAndCheckEvent(int basePeriod){
         result = false;
         break;
     }
-    step = nextStep;
+    state = nextState;
     return result;
 }
 
 void ChangeStepTask::tick(){
-    switch (step){
+    switch (state){
         case ES0:
             this->experimentationStep->setStep(ExperimentationStep::Step::READY);
             break;

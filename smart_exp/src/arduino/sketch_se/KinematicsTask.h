@@ -20,8 +20,8 @@ class KinematicsTask : public Task{
     KinematicsData* kinematicsData;
     Sonar* sonar;
     ServoMotor* servoMotor;
-    enum Step{K0, K1};
-    Step step;
+    enum State{K0, K1};
+    State state;
     float precDistance, precSpeed;
     float maxSpeed;
 

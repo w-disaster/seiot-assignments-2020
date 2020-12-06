@@ -1,7 +1,7 @@
-#include "ViewerComunicationTask.h"
+#include "ViewerCommunicatorTask.h"
 #include "Arduino.h"
 
-ViewerComunicationTask::ViewerComunicationTask(ExperimentationStep *experimentationStep, KinematicsData *kinematicsData)
+ViewerCommunicatorTask::ViewerCommunicatorTask(ExperimentationStep *experimentationStep, KinematicsData *kinematicsData)
 {
     Serial.begin(115200);
     this->experimentationStep = experimentationStep;
@@ -10,19 +10,19 @@ ViewerComunicationTask::ViewerComunicationTask(ExperimentationStep *experimentat
     this->currentExpStep = this->experimentationStep->getStep();
 }
 
-void ViewerComunicationTask::sendData(String msg, bool isStep)
+void ViewerCommunicatorTask::sendData(String msg, bool isStep)
 {
     isStep ? Serial.print(msg + STEP_END + MSG_END) : Serial.print(msg + MSG_END);
 }
 
-void ViewerComunicationTask::sendStepMsgOnce(String stepKey)
+void ViewerCommunicatorTask::sendStepMsgOnce(String stepKey)
 {
     if (!stepMsgAlreadySent)
     {
         /* sends the Step to serial */
         sendData(stepKey, true);
 
-        if (step == VC1)
+        if (state == VC1)
         {
             /* start the relative clock if we are experimenting */
             expRelativeTime = micros();
@@ -31,33 +31,33 @@ void ViewerComunicationTask::sendStepMsgOnce(String stepKey)
     }
 }
 
-void ViewerComunicationTask::sendExperimentData(String data)
+void ViewerCommunicatorTask::sendExperimentData(String data)
 {
     /* sends msg ad experiment data */
     sendData(data, false);
     this->kinematicsData->setDataReady(false);
 }
 
-String ViewerComunicationTask::format(float t, float p, float v, float a)
+String ViewerCommunicatorTask::format(float t, float p, float v, float a)
 {
     String formattedString = String(t) + DATA_SEPARATOR + String(p) + DATA_SEPARATOR + String(v) + DATA_SEPARATOR + String(a);
     return formattedString;
 }
 
-void ViewerComunicationTask::init(int period)
+void ViewerCommunicatorTask::init(int period)
 {
-    this->step = VC0;
+    this->state = VC0;
     tick();
     Task::init(period);
 }
 
-bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
+bool ViewerCommunicatorTask::updateTimeAndCheckEvent(int basePeriod)
 {
     bool result = false;
-    Step nextStep = step;
+    State nextState = state;
     ExperimentationStep::Step expStep = this->experimentationStep->getStep();
 
-    switch (step)
+    switch (state)
     {
     case VC0:
         if (updateAndCheckTime(basePeriod))
@@ -73,7 +73,7 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
                 result = true;
 
                 if(this->currentExpStep == ExperimentationStep::Step::EXPERIMENTATION){
-                    nextStep = VC1;
+                    nextState = VC1;
                     break;
                 }
             }
@@ -86,7 +86,7 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
             if (expStep == ExperimentationStep::Step::EXPERIMENTATION_CONCLUDED)
             {
                 /* goes to exp over */
-                nextStep = VC2;
+                nextState = VC2;
                 this->stepMsgAlreadySent = false;
                 /* update expStep */
                 this->currentExpStep = expStep;
@@ -103,7 +103,7 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
             if (expStep == ExperimentationStep::Step::READY)
             {
                 /* goes to ready */
-                nextStep = VC0;
+                nextState = VC0;
                 this->stepMsgAlreadySent = false;
                 /* update expStep */
                 this->currentExpStep = expStep;
@@ -113,13 +113,13 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
         }
         break;
     }
-    step = nextStep;
+    state = nextState;
     return result;
 }
 
-void ViewerComunicationTask::tick()
+void ViewerCommunicatorTask::tick()
 {
-    switch (step)
+    switch (state)
     {
     case VC0:
         switch (this->currentExpStep){
