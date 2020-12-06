@@ -1,24 +1,15 @@
-#ifndef __LED_H__
-#define __LED_H__
+#ifndef __LED__
+#define __LED__
 
-class Led
-{
-public:
-  /**
-   * Turns the led on.
-   */
-  virtual void turnOn() = 0;
+#include "Light.h"
 
-  /**
-   * Turns the led off.
-   */
-  virtual void turnOff() = 0;
-
-  /**
-   * Makes the led turn on and off for the specified period of milliseconds.
-   * The led switches between On and Off state every blinkStep milliseconds.
-   * After the specified milliseconds have passed the led will turn Off.
-   */
-  virtual void blinkLed(int milliseconds, int blinkStep) = 0;
+class Led: public Light {
+  int pin;
+  
+  public:
+    Led(int pin);
+    void switchOn();
+    void switchOff();    
 };
+
 #endif

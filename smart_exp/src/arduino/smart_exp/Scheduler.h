@@ -1,20 +1,21 @@
-#ifndef __SCHEDULER_H__
-#define __SCHEDULER_H__
+#ifndef __SCHEDULER__
+#define __SCHEDULER__
 
+#include "Timer.h"
 #include "Task.h"
 
-class Scheduler
-{
+#define MAX_TASKS 5
+
+class Scheduler {
+  int basePeriod;
+  int nTasks;
+  Task* taskList[MAX_TASKS];  
+  Timer timer;
 
 public:
-  /**
-   * Adds a Task to the list of tasks to schedule.
-   */
-  virtual void addTask(Task *task) = 0;
-
-  /**
-   * Goes to the next Task.
-   */
-  virtual void schedule() = 0;
+  void init(int basePeriod);  
+  virtual bool addTask(Task* task);  
+  virtual void schedule();
 };
+
 #endif

@@ -1,14 +1,9 @@
-#ifndef __BUTTON_H__
-#define __BUTTON_H__
+#ifndef __BUTTON__
+#define __BUTTON__
 
-class Button
-{
-
-public:
-  /** 
-   * Starts the apropriate routine for the button pressed.
-  */
-  virtual void pressButton() = 0;
+class Button{
+    public:
+        virtual bool isPressed() = 0;
 };
 
 #endif
