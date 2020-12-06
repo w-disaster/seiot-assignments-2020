@@ -1,4 +1,5 @@
 ./smart_exp/src/arduino/sketch_smart_exp/.vscode/
+./smart_exp/src/arduino/sketch_se/.vscode/
 ./smart_exp/src/java/viewer/.project
 ./smart_exp/src/java/viewer/.gradle/
 ./smart_exp/src/java/viewer/.settings/
