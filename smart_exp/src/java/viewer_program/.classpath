@@ -12,6 +12,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
-	<classpathentry kind="lib" path="/home/luca/Arduino/seiot2021/java/lib/jssc.jar"/>
+	<classpathentry kind="lib" path="lib/jssc-2.9.2.jar"/>
 	<classpathentry kind="output" path="bin/default"/>
 </classpath>
