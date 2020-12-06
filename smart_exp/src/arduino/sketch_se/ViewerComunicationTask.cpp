@@ -7,7 +7,7 @@ ViewerComunicationTask::ViewerComunicationTask(Experimentation *experimentation,
     this->experimentation = experimentation;
     this->kinematicsData = kinematicsData;
     this->stateMsgAlreadySent = false;
-    this->stateMsg = "";
+    this->currentExpState = this->experimentation->getExperimentationState();
 }
 
 void ViewerComunicationTask::sendData(String msg, bool isState)
@@ -72,34 +72,8 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
                 /* return true */
                 result = true;
 
-                switch (this->currentExpState)
-                {
-
-                case Experimentation::State::READY:
-                    /* goes to ready */
-                    nextState = VC0;
-                    this->stateMsg = "ready";
-                    break;
-
-                case Experimentation::State::SUSPENDED:
-                    /* goes to suspended */
-                    nextState = VC0;
-                    this->stateMsg = "suspended";
-                    break;
-
-                case Experimentation::State::ERROR:
-                    /* goes to error */
-                    nextState = VC0;
-                    this->stateMsg = "error";
-                    break;
-
-                case Experimentation::State::EXPERIMENTATION:
-                    /* goes to ready */
+                if(this->currentExpState == Experimentation::State::EXPERIMENTATION){
                     nextState = VC1;
-                    this->stateMsg = "exp";
-                    break;
-
-                default:
                     break;
                 }
             }
@@ -114,8 +88,6 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
                 /* goes to exp over */
                 nextState = VC2;
                 this->stateMsgAlreadySent = false;
-                this->stateMsg = "over";
-
                 /* update expState */
                 this->currentExpState = expState;
             }
@@ -133,8 +105,6 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
                 /* goes to ready */
                 nextState = VC0;
                 this->stateMsgAlreadySent = false;
-                this->stateMsg = "ready";
-
                 /* update expState */
                 this->currentExpState = expState;
             }
@@ -149,15 +119,27 @@ bool ViewerComunicationTask::updateTimeAndCheckEvent(int basePeriod)
 
 void ViewerComunicationTask::tick()
 {
-    sendStateMsgOnce(this->stateMsg);
     switch (state)
     {
     case VC0:
-        /* step */
-        delay(5);
+        switch (this->currentExpState){
+            case Experimentation::State::READY:
+                sendStateMsgOnce("ready");
+                break;
+
+            case Experimentation::State::SUSPENDED:
+                sendStateMsgOnce("suspended");
+                delay(5);
+                break;
+
+            case Experimentation::State::ERROR:
+                sendStateMsgOnce("error");
+                break;
+        }
         break;
     case VC1:
         /* exp */
+        sendStateMsgOnce("exp");
         if (this->kinematicsData->isDataReady())
         {
             sendExperimentData(format((micros() - this->expRelativeTime) / 1000,
@@ -168,7 +150,7 @@ void ViewerComunicationTask::tick()
         break;
     case VC2:
         /* exp over */
-        /* every tick checks if the user pressed ok */
+        sendStateMsgOnce("over");        
         if (Serial.available() > 0)
         {
             if ((char)Serial.read() == EXP_OVER)
@@ -178,11 +160,7 @@ void ViewerComunicationTask::tick()
             }
         }
         break;
-    default:
-        break;
     }
 }
 
-ViewerComunicationTask::~ViewerComunicationTask()
-{
-}
+

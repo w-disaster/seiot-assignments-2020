@@ -13,17 +13,10 @@
 class ViewerComunicationTask : public Task
 {
 
-    enum State
-    {
-        VC0,
-        VC1,
-        VC2,
-    };
-
+    enum State{ VC0, VC1, VC2 };
     /* fields */
     State state;
     Experimentation::State currentExpState;
-    String stateMsg;
     Experimentation *experimentation;
     KinematicsData *kinematicsData;
     bool stateMsgAlreadySent;
