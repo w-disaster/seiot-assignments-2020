@@ -19,11 +19,9 @@ bool Scheduler::addTask(Task* task){
   
 void Scheduler::schedule(){
   timer.waitForNextTick();
-  //long t_start = micros();
   for (int i = 0; i < nTasks; i++){
     if (taskList[i]->updateTimeAndCheckEvent(basePeriod)){
       taskList[i]->tick();
     }
   }
-  //Serial.println(String("tempo: ") + (micros() - t_start));
 }

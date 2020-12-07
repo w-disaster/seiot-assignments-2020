@@ -27,9 +27,10 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod)
             /* sampling rate */
             int potValue = analogRead(POT_PIN);
 
+            /* we map the value of the potentiometer to the range 100 (ms) - 1000 (ms) and then we 
+            approximate it to the nearest SCHED_PERIOD multiple */
             int period = roundToNearestMultiple(MAX_PERIOD_MS + MIN_PERIOD_MS - map(potValue, 0, 1023, MIN_PERIOD_MS, MAX_PERIOD_MS), MIN_PERIOD_MS);
 
-            //int period = roundToNearestMultiple(1050 - map(potValue, 0, 1023, 50, 1000), 50);
             init(period);
 
             /* servo motor on */
@@ -39,8 +40,10 @@ bool KinematicsTask::updateTimeAndCheckEvent(int basePeriod)
             /* start calculating speed from point x0 = 0 and acceleration from v0 = 0*/
             precDistance = 0;
             precSpeed = 0;
+
+            /* the maximum speed is calculated every time before the experiment starts: the HC-SR04 Sonar
+            can read from 2 cm distance to 400 cm and deltat is equal to the time between two samples */
             maxSpeed = (MAX_DISTANCE - MIN_DISTANCE) / (period * MS_TO_SEC);
-            //Serial.println(maxSpeed);
             nextState = K1;
         }
         result = true;
