@@ -1,38 +1,47 @@
+const chartColor = '0, 149, 255';
+
 var ctx = document.getElementById('chart').getContext('2d');
 
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
+var data = {
+    labels:[1,2,3,4],
+    datasets: [{
+        label: 'Level of Water',
+        lineTension: 0,
+        data: [10,100,50,70],
+        backgroundColor: 'rgba('+chartColor+', 0.2)',
+        borderColor: 'rgba('+chartColor+', 1)',
+        borderWidth: 1,
+        pointHoverRadius: 10,xAxesID: 'Time'
+    }],
+};
+
+var options = {
+    scales: {
+        yAxes: [{
+            ticks: {
+                max:100,
+                min:0,
+                beginAtZero: true
+            },
+            scaleLabel: {
+                display: true,
+                labelString: 'Water Level Percentage'
+              }
+        }],
+        xAxes: [{
+            ticks: {
+                beginAtZero: false
+            },
+            scaleLabel: {
+                display: true,
+                labelString: 'Time of Measurement'
+              }
         }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true
-                }
-            }]
-        }
     }
+};
+
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: options
 });

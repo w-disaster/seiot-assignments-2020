@@ -63,7 +63,7 @@ $params = array(
 
         <div id="chart-section" class="col-md-6">
             <p class="text-center">Char of the last N measurments</p>
-            <canvas id="chart" width="400" height="400"></canvas>
+            <canvas id="chart" class="img-responsive"></canvas>
 
             <!-- javascript chart import -->
             <script src="chart.js"></script>
