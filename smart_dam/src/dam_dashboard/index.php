@@ -56,9 +56,9 @@ $alertLevelShow = 0;
         <h1 class="py-5 col-12">Dam Dashboard</h1>
     </header>
 
-    <main class="container row">
+    <main class="row">
 
-        <div class="text-center col-12 col-md-6">
+        <div id="data-section" class="text-center col-12">
             <?php foreach ($params as $param) : ?>
                 <div id="<?php echo $param["id"] ?>" class="data py-3 lvl-<?php echo $alertLevelShow ?>">
                     <p><?php echo $param["label"] ?></p>
@@ -73,9 +73,9 @@ $alertLevelShow = 0;
             <?php endforeach ?>
         </div>
 
-        <div id="chart-section" class="col-md-6 data lvl-1">
+        <div id="chart-section" class="col-md-7 data lvl-1">
             <p class="text-center">Char of the last N measurments</p>
-            <canvas id="chart" class="img-responsive"></canvas>
+            <canvas id="chart" class="img-responsive px-5"></canvas>
 
             <!-- javascript chart import -->
             <script src="chart.js"></script>

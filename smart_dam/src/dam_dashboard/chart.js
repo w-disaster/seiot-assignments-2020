@@ -70,6 +70,16 @@ Number.prototype.allertToStatus = function(){
     };
 }
 
+//! FOR TESTING
+Date.prototype.toXLabel = function() {
+    return String(this.getDate()).padStart(2, '0') + "/" 
+    + String(this.getMonth() + 1).padStart(2, '0') + "-" 
+    + String(this.getHours()) + ":"
+    + String(this.getMinutes()) + ":"
+    + String(this.getSeconds());    
+}
+//!------------
+
 function findLvl(className) {
     return className.includes("lvl-");
 }
@@ -77,7 +87,7 @@ function findLvl(className) {
 
 $(function(){
     //! FOR TESTING
-        const allertLevel = 0
+        const allertLevel = 2
     //!------------
 
     const status = allertLevel.allertToStatus().status;
@@ -93,13 +103,18 @@ $(function(){
            $(this).show();
        }
     });
-    //! FOR TESTING
 
-    for (let i = 0; i < 20; i++) {
-        data.labels.push("2020-"); // adds X    
+    if(allertLevel == 0){
+        $("div#data-section").removeClass("col-md-5");
+    }else{
+        $("div#data-section").addClass("col-md-5");
     }
-    
-    data.datasets[0].data.push(20); // adds Y
+
+    //! FOR TESTING
+    for (let i = 0; i < 20; i++) {
+        data.labels.push(new Date().toXLabel()); // adds X    
+        data.datasets[0].data.push(Math.floor(Math.random()* 101)); // adds Y
+    }
     //!------------
 
     //canvas element
