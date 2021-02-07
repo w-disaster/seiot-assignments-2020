@@ -87,13 +87,60 @@ function findLvl(className) {
 
 $(function(){
     //! FOR TESTING
-        const allertLevel = 2
+        
+        //! questi valori andranno presi da DS
+        let allertLevel = 0;
+        $("div#state").after('<button>Change status</button>');
+        $("button").on("click", function(){
+            allertLevel = Math.floor(Math.random()* 3);
+            
+            $("div.data").each(function() {
+                showLvl = $(this).attr("class").split(/\s+/).find(findLvl).split("-")[1];
+                if(showLvl > allertLevel){
+                    $(this).hide();
+                }else{
+                    $(this).show();
+                }
+             });
+
+            if(allertLevel == 0){
+                $("div#data-section").removeClass("col-md-5");
+            }else{
+                $("div#data-section").addClass("col-md-5");
+            }
+            
+            updateStatus();
+        });
+        let waterLevel = 0;
+        let damLevel = 100; 
+        let context = "Automatico";
+
     //!------------
 
-    const status = allertLevel.allertToStatus().status;
-    const color = allertLevel.allertToStatus().color;
+    function updateStatus(){
+        const status = allertLevel.allertToStatus().status;
+        const color = allertLevel.allertToStatus().color;
 
-    $("div#state > p.value").html('<span class="text-'+color+'">' + status+'</span>');
+        // set values
+        $("div#state > p.value").html('<span class="text-'+color+'">' + status+'</span>');
+    }
+
+    function updateWaterLevel(){
+        $("div#w-lvl > p.value").html(waterLevel +" %");
+    }
+
+    function updateDamLevel(){
+        $("div#d-lvl > p.value").html(damLevel +" %");
+    }
+
+    function updateContext() {
+        $("div#context > p.value").html(context);
+    }
+    
+    updateStatus();
+    updateWaterLevel();
+    updateDamLevel();
+    updateContext();
 
     $("div.data").each(function() {
        showLvl = $(this).attr("class").split(/\s+/).find(findLvl).split("-")[1];
@@ -113,7 +160,10 @@ $(function(){
     //! FOR TESTING
     for (let i = 0; i < 20; i++) {
         data.labels.push(new Date().toXLabel()); // adds X    
-        data.datasets[0].data.push(Math.floor(Math.random()* 101)); // adds Y
+        waterLevel = Math.floor(Math.random()* 101);
+        updateWaterLevel();
+        data.datasets[0].data.push(waterLevel); // adds Y
+
     }
     //!------------
 
