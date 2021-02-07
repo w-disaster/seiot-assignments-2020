@@ -1,5 +1,7 @@
 <?php
 
+define('MAX_ALLERT', 2);
+
 # all data to show in DD
 $params = array(
     array(
@@ -19,7 +21,11 @@ $params = array(
         "label" => "Dam Control Mode",
     ),
 );
+
+$alertLevelShow = 0;
+
 //TODO: prendere con ajax i dati ogni tot tempo
+
 ?>
 
 <!DOCTYPE html>
@@ -54,14 +60,20 @@ $params = array(
 
         <div class="text-center col-12 col-md-6">
             <?php foreach ($params as $param) : ?>
-                <div id="<?php echo $param["id"] ?>" class="data py-3">
+                <div id="<?php echo $param["id"] ?>" class="data py-3 lvl-<?php echo $alertLevelShow ?>">
                     <p><?php echo $param["label"] ?></p>
-                    <p class="value fw-bold fs-3">Test</p>
+                    <p class="value fw-bold fs-3"></p>
                 </div>
+                <?php
+                $alertLevelShow = $alertLevelShow + 1;
+                if ($alertLevelShow > MAX_ALLERT) {
+                    $alertLevelShow = MAX_ALLERT;
+                }
+                ?>
             <?php endforeach ?>
         </div>
 
-        <div id="chart-section" class="col-md-6">
+        <div id="chart-section" class="col-md-6 data lvl-1">
             <p class="text-center">Char of the last N measurments</p>
             <canvas id="chart" class="img-responsive"></canvas>
 
