@@ -74,12 +74,16 @@ $alertLevelShow = 0;
             <?php endforeach ?>
         </div>
 
-        <div id="chart-section" class="col-md-7 data lvl-1">
-            <p class="text-center">Char of the last <?php echo N_RIL ?> measurments</p>
-            <canvas id="chart" class="img-responsive px-5"></canvas>
+        <div id="chart-section" class="col-md-6 data lvl-1">
+            <p class="text-center">Chart of the last <?php echo N_RIL ?> measurments</p>
+            <canvas id="chart" class="img-responsive"></canvas>
 
             <!-- javascript chart import -->
             <script src="chart.js"></script>
+        </div>
+
+        <div class="col-md-1">
+            <!--empty space-->
         </div>
     </main>
 </body>

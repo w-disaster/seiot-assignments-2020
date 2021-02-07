@@ -11,7 +11,7 @@ var data = {
         backgroundColor: 'rgba('+chartColor+', 0.2)',
         borderColor: 'rgba('+chartColor+', 1)',
         borderWidth: 1,
-        pointHoverRadius: 10,xAxesID: 'Time'
+        pointHoverRadius: 10,
     }],
 };
 
@@ -36,7 +36,7 @@ var options = {
             scaleLabel: {
                 display: true,
                 labelString: 'Time of Measurement'
-                }
+            }
         }]
     }
 };
@@ -89,7 +89,7 @@ $(function(){
     //! FOR TESTING
         
         //! questi valori andranno presi da DS
-        let allertLevel = 0;
+        let allertLevel = 2;
         $("div#state").after('<button>Change status</button>');
         $("button").on("click", function(){
             allertLevel = Math.floor(Math.random()* 3);
@@ -136,7 +136,23 @@ $(function(){
     function updateContext() {
         $("div#context > p.value").html(context);
     }
+
     
+    function addData(time){
+        chart.data.labels.push(time); // adds X
+        chart.data.datasets[0].data.push(waterLevel); // adds Y
+
+        if(chart.data.labels.length > nMeasurements){
+            chart.data.labels.shift(); // removes first X if over nRil
+        }  
+        
+        if(chart.data.datasets[0].data.length > nMeasurements){
+            chart.data.datasets[0].data.shift(); // removes first Y if over nRil
+        }
+
+        chart.update();
+    }
+
     updateStatus();
     updateWaterLevel();
     updateDamLevel();
@@ -156,25 +172,27 @@ $(function(){
     }else{
         $("div#data-section").addClass("col-md-5");
     }
-
-    //! FOR TESTING
-    for (let i = 0; i < 20; i++) {
-        data.labels.push(new Date().toXLabel()); // adds X    
-        waterLevel = Math.floor(Math.random()* 101);
-        updateWaterLevel();
-        data.datasets[0].data.push(waterLevel); // adds Y
-
-    }
-    //!------------
-
+    
     //canvas element
     var ctx = document.getElementById('chart').getContext('2d');
 
     // chart creation
-    var myChart = new Chart(ctx, {
+    const chart = new Chart(ctx, {
         type: 'line',
         data: data,
         options: options
     });
+
+    //! FOR TESTING
+    setInterval(function() {   
+        time = new Date().toXLabel(); 
+
+        waterLevel = Math.floor(Math.random()* 101);
+        updateWaterLevel();
+        
+        addData(time);
+    },1000);
+    //!------------
+    
 });
 
