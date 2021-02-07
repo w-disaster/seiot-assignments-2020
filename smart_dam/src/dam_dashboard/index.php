@@ -1,6 +1,7 @@
 <?php
 
 define('MAX_ALLERT', 2);
+define('N_RIL', 20);
 
 # all data to show in DD
 $params = array(
@@ -74,7 +75,7 @@ $alertLevelShow = 0;
         </div>
 
         <div id="chart-section" class="col-md-7 data lvl-1">
-            <p class="text-center">Char of the last N measurments</p>
+            <p class="text-center">Char of the last <?php echo N_RIL ?> measurments</p>
             <canvas id="chart" class="img-responsive px-5"></canvas>
 
             <!-- javascript chart import -->

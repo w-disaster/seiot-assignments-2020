@@ -113,7 +113,7 @@ $(function(){
         });
         let waterLevel = 0;
         let damLevel = 100; 
-        let context = "Automatico";
+        let context = "Automatic";
 
     //!------------
 
@@ -126,7 +126,7 @@ $(function(){
     }
 
     function updateWaterLevel(){
-        $("div#w-lvl > p.value").html(waterLevel +" %");
+        $("div#w-lvl > p.value").html("<span class='text-primary'>"+waterLevel +" %</span>");
     }
 
     function updateDamLevel(){
