@@ -24,9 +24,6 @@ $params = array(
 );
 
 $alertLevelShow = 0;
-
-//TODO: prendere con ajax i dati ogni tot tempo
-
 ?>
 
 <!DOCTYPE html>
