@@ -1,5 +1,7 @@
+// constants
 const chartColor = '0, 149, 255';
 const nMeasurements = 20;
+const server = 'TEST_SERVER.php';
 
 //data sets ( labels -> x | data -> y )
 var data = {
@@ -11,7 +13,7 @@ var data = {
         backgroundColor: 'rgba('+chartColor+', 0.2)',
         borderColor: 'rgba('+chartColor+', 1)',
         borderWidth: 1,
-        pointHoverRadius: 10,xAxesID: 'Time'
+        pointHoverRadius: 10,
     }],
 };
 
@@ -36,26 +38,26 @@ var options = {
             scaleLabel: {
                 display: true,
                 labelString: 'Time of Measurement'
-                }
+            }
         }]
     }
 };
 
-Number.prototype.allertToStatus = function(){
+function allertToStatus(allert){
     status = "";
     color = "";
 
-    switch (this.valueOf()) {
+    switch (Number(allert)) {
         case 0:
-            status = "NORMALE";
+            status = "NORMAL";
             color = "primary";
             break;
         case 1:
-            status = "PRE-ALLARME";
+            status = "PRE-ALLARM";
             color = "warning";
             break;
         case 2:
-            status = "ALLARME";
+            status = "ALLARM";
             color = "danger";
             break;
         default:
@@ -70,111 +72,132 @@ Number.prototype.allertToStatus = function(){
     };
 }
 
-//! FOR TESTING
-Date.prototype.toXLabel = function() {
-    return String(this.getDate()).padStart(2, '0') + "/" 
-    + String(this.getMonth() + 1).padStart(2, '0') + "-" 
-    + String(this.getHours()) + ":"
-    + String(this.getMinutes()) + ":"
-    + String(this.getSeconds());    
+function idToContext(idContext){
+    context = "";
+    color = "";
+
+    switch (Number(idContext)) {
+        case 0:
+            context = "AUTOMATIC";
+            color = "success";
+            break;
+        case 1:
+            context = "MANUAL";
+            color = "warning";
+            break;
+
+        default:
+            context = "Errore";
+            color = "danger";
+            break;
+    }
+    
+    return {
+        context:context,
+        color:color
+    };
 }
-//!------------
 
 function findLvl(className) {
     return className.includes("lvl-");
 }
 
-
 $(function(){
-    //! FOR TESTING
-        
-        //! questi valori andranno presi da DS
-        let allertLevel = 0;
-        $("div#state").after('<button>Change status</button>');
-        $("button").on("click", function(){
-            allertLevel = Math.floor(Math.random()* 3);
-            
-            $("div.data").each(function() {
-                showLvl = $(this).attr("class").split(/\s+/).find(findLvl).split("-")[1];
-                if(showLvl > allertLevel){
-                    $(this).hide();
-                }else{
-                    $(this).show();
-                }
-             });
 
-            if(allertLevel == 0){
-                $("div#data-section").removeClass("col-md-5");
-            }else{
-                $("div#data-section").addClass("col-md-5");
-            }
-            
-            updateStatus();
-        });
-        let waterLevel = 0;
-        let damLevel = 100; 
-        let context = "Automatic";
-
-    //!------------
-
-    function updateStatus(){
-        const status = allertLevel.allertToStatus().status;
-        const color = allertLevel.allertToStatus().color;
+    function updateStatus(allert){
+        const status = allertToStatus(allert);
 
         // set values
-        $("div#state > p.value").html('<span class="text-'+color+'">' + status+'</span>');
+        $("div#state > p.value").html('<span class="text-'+status.color+'">' + status.status+'</span>');
     }
 
-    function updateWaterLevel(){
+    function updateWaterLevel(waterLevel){
         $("div#w-lvl > p.value").html("<span class='text-primary'>"+waterLevel +" %</span>");
     }
 
-    function updateDamLevel(){
+    function updateDamLevel(damLevel){
         $("div#d-lvl > p.value").html(damLevel +" %");
     }
 
-    function updateContext() {
-        $("div#context > p.value").html(context);
+    function updateContext(idContext) {
+        console.log(idContext);
+        const cont = idToContext(idContext);
+        console.log(cont);
+        $("div#context > p.value").html('<span class="text-'+cont.color+'">' + cont.context+'</span>');
     }
     
-    updateStatus();
-    updateWaterLevel();
-    updateDamLevel();
-    updateContext();
+    function addData(time, waterLevel){
+        chart.data.labels.push(time); // adds X
+        chart.data.datasets[0].data.push(waterLevel); // adds Y
 
-    $("div.data").each(function() {
-       showLvl = $(this).attr("class").split(/\s+/).find(findLvl).split("-")[1];
-       if(showLvl > allertLevel){
-           $(this).hide();
-       }else{
-           $(this).show();
-       }
-    });
+        if(chart.data.labels.length > nMeasurements){
+            chart.data.labels.shift(); // removes first X if over nRil
+        }  
+        
+        if(chart.data.datasets[0].data.length > nMeasurements){
+            chart.data.datasets[0].data.shift(); // removes first Y if over nRil
+        }
 
-    if(allertLevel == 0){
-        $("div#data-section").removeClass("col-md-5");
-    }else{
-        $("div#data-section").addClass("col-md-5");
+        //update UI
+        chart.update();
     }
-
-    //! FOR TESTING
-    for (let i = 0; i < 20; i++) {
-        data.labels.push(new Date().toXLabel()); // adds X    
-        waterLevel = Math.floor(Math.random()* 101);
-        updateWaterLevel();
-        data.datasets[0].data.push(waterLevel); // adds Y
-
-    }
-    //!------------
-
+    
     //canvas element
     var ctx = document.getElementById('chart').getContext('2d');
 
     // chart creation
-    var myChart = new Chart(ctx, {
+    const chart = new Chart(ctx, {
         type: 'line',
         data: data,
         options: options
     });
+
+    // unidirectional event listner for server
+    const eventSource = new EventSource(server);
+
+    eventSource.onmessage = function(e) {
+        let message = JSON.parse(e.data);
+
+        //* NORMAL
+        updateStatus(message.allertLevel);
+        
+        //filter what to show
+        $("div.data").each(function() {
+            //get the level of allert at which to show the div using the classes lvl-n
+            showLvl = $(this).attr("class").split(/\s+/).find(findLvl).split("-")[1];
+
+            if (showLvl > message.allertLevel) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+
+        //adjust text center
+        if (message.allertLevel == 0) {
+            $("div#data-section").removeClass("col-md-5");
+        } else {
+            $("div#data-section").addClass("col-md-5");
+        }
+
+        //? PRE-ALLARM
+        if(message.allertLevel > 0){
+            //update water level
+            updateWaterLevel(message.waterLevel);
+            
+            //update chart   
+            addData(message.time, message.waterLevel);
+
+            //! ALLARM
+            if(message.allertLevel > 1){
+                //update dam level
+                updateDamLevel(message.damLevel);
+
+                //update context
+                updateContext(message.context);
+            }
+        }
+
+    }
 });
 
