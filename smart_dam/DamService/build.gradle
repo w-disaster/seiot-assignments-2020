@@ -26,8 +26,7 @@ dependencies {
 	api 'io.vertx:vertx-web-client:4.0.2'
 	api 'io.vertx:vertx-mqtt:4.0.0.CR2'
 	
-	compile("io.vertx:vertx-codegen:4.0.0.CR2")
-
+	implementation 'com.google.code.gson:gson:2.8.6'
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:28.2-jre'
     implementation 'io.github.java-native:jssc:2.9.2'

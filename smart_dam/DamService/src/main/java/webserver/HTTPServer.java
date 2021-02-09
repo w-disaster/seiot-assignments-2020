@@ -8,6 +8,8 @@ public class HTTPServer {
 	
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
+		
+		/* Server for ESP8266 */
 		HttpServer server = vertx.createHttpServer();
 	
 		server.requestHandler(request -> {
@@ -28,5 +30,10 @@ public class HTTPServer {
 	
 		server.listen(8080);
 		System.out.println("DS ready");
+		
+		
+		/* Server for Dam Dashboard */
+		
+		
 	}
 }
