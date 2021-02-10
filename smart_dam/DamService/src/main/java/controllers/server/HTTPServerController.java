@@ -3,6 +3,7 @@ package controllers.server;
 import java.util.Date;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -38,13 +39,24 @@ public class HTTPServerController extends AbstractVerticle {
 		Router router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
 		router.post("/api/data").handler(this::handleAddNewData);
-		router.get("/api/data").handler(this::handleGetData);		
+		router.get("/api/data").handler(this::handleGetData);
+		router.get().handler(this::handleGet);
 		vertx
 			.createHttpServer()
 			.requestHandler(router)
 			.listen(port);
 
 		log("Service ready.");
+	}
+	
+	private void handleGet(RoutingContext routingContext) {
+		HttpServerRequest request = routingContext.request();
+		HttpServerResponse response = request.response();
+		response.putHeader("content-type", "text/html");
+		
+		// Write to the response and end it
+		String file = System.getProperty("user.dir") + "/src/main/java/controllers/server" + request.path();
+		response.sendFile(file);
 	}
 	
 	private void handleAddNewData(RoutingContext routingContext) {
@@ -100,6 +112,7 @@ public class HTTPServerController extends AbstractVerticle {
 	}
 	
 	private void handleGetData(RoutingContext routingContext) {
+		System.out.println(routingContext.normalizedPath());
 		/*JsonArray arr = new JsonArray();
 		for (DataPoint p: values) {
 			JsonObject data = new JsonObject();
