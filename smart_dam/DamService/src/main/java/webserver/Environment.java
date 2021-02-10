@@ -8,6 +8,6 @@ public interface Environment {
 	
 	void setState(State state);
 	
-	boolean setMode(Mode mode);
+	void setMode(Mode mode);
 		
 }

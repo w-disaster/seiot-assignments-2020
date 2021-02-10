@@ -27,22 +27,8 @@ public class EnvironmentImpl implements Environment {
 	}
 
 	@Override
-	public boolean setMode(Mode mode) {
-		switch(mode) {
-		case AUTO:
-			this.mode = mode;
-			return true;
-		case MANUAL:
-			switch(this.state) {
-			case ALARM:
-				this.mode = mode;
-				return true;
-			case NORMAL:
-			case PRE_ALARM:
-				return false;
-			}
-		}
-		return false;
+	public void setMode(Mode mode) {
+		this.mode = mode;
 	}
 	
 }
