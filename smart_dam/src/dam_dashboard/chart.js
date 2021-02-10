@@ -120,9 +120,8 @@ $(function(){
     }
 
     function updateContext(idContext) {
-        console.log(idContext);
         const cont = idToContext(idContext);
-        console.log(cont);
+
         $("div#context > p.value").html('<span class="text-'+cont.color+'">' + cont.context+'</span>');
     }
     
