@@ -76,17 +76,18 @@ public class DBMSControllerImpl implements DBMSController {
 	}
 
 	@Override
-	public boolean insertData(long timestamp, float waterLevel, String damMode, String state, String damOpening) {
+	public boolean insertData(long timestamp, float waterLevel, String damMode, String state, int damOpening) {
 		int result = 0;
 		try {
 			Statement statement = this.connection.createStatement();
 			String timestampAsString = new Timestamp(timestamp).toString();
+			/* MUST TEST */
 			result = statement.executeUpdate("INSERT INTO Data VALUES (" + 
 					"'" + timestampAsString + "', " +
 					waterLevel + ", " +
 					"'" + damMode + "', " +
 					"'" + state + "', " +
-					"'" + damOpening + "');");
+					damOpening + ");");
 		} catch (SQLException e) {
         	new Exception(e.getMessage());
             System.out.println("Error " + e.getMessage());
@@ -98,14 +99,15 @@ public class DBMSControllerImpl implements DBMSController {
 	}
 
 	@Override
-	public Map<String, String> getLastData() {
+	public Map<String, String> getDataFromTimestampOnwards(long timestamp) {
 		Map<String, String> lastRow = new HashMap<>();
-		String query = "SELECT MAX(Timestamp) AS Timestamp, WaterLevel, DamMode, State, DamOpening FROM Data";
+		/* MUST TEST */
+		String query = "SELECT * FROM Data  WHERE Timestamp >= '" + new Timestamp(timestamp).toString() + "'";
 	    try (Statement stmt = this.connection.createStatement()) {
 	      ResultSet rs = stmt.executeQuery(query);
 	      while (rs.next()) {
-	        String timestamp = rs.getString("Timestamp");
-	        lastRow.put("Timestamp", timestamp);
+	        String timestampAsString = rs.getString("Timestamp");
+	        lastRow.put("Timestamp", timestampAsString);
 	        
 	        String waterLevel = rs.getString("Waterlevel");
 	        lastRow.put("WaterLevel", waterLevel);

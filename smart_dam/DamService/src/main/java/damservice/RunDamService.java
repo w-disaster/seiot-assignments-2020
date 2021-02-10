@@ -3,6 +3,8 @@ package damservice;
 import controllers.serial.CommChannel;
 import controllers.serial.SerialCommChannel;
 import controllers.serial.SerialCommChannelControllerRunnable;
+import controllers.server.DBMSController;
+import controllers.server.DBMSControllerImpl;
 import controllers.server.HTTPServerController;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
@@ -22,9 +24,12 @@ public class RunDamService {
 		/* Environment Model*/
 		Model model = new ModelImpl(Mode.AUTO, State.ALARM);
 		
+		/* DBMS controller */
+		DBMSController dbmsController = new DBMSControllerImpl();
+		
 		/* Vertx Server */
 		Vertx vertx = Vertx.vertx();
-		HTTPServerController serverController = new HTTPServerController(8080);
+		HTTPServerController serverController = new HTTPServerController(8080, model, dbmsController);
 		vertx.deployVerticle(serverController);
 		
 		/* Dam controller communication */

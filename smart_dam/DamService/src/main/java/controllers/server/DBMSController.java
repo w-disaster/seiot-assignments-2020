@@ -9,9 +9,9 @@ import java.util.Map;
  */
 public interface DBMSController {
 
-	boolean insertData(long timestamp, float waterLevel, String damMode, String state, String damOpening);
+	boolean insertData(long timestamp, float waterLevel, String damMode, String state, int damOpening);
 	
-	Map<String, String> getLastData();
+	Map<String, String> getDataFromTimestampOnwards(long timestamp);
 	
 	/**
 	 * Gets the connection.

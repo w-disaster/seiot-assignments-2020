@@ -9,7 +9,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import model.Mode;
 import model.Model;
+import model.State;
 
 /*
  * Data Service as a vertx event-loop 
@@ -18,11 +20,17 @@ public class HTTPServerController extends AbstractVerticle {
 
 	private int port;
 	private Model model;
-	private static final int MAX_SIZE = 10;
+	private DBMSController dbmsController;
 	
-	public HTTPServerController(int port, Model model) {
+	private static final float D2_IN_M = 0.4f;
+	private static final float D1_IN_M = 1.0f;
+	private static final float DELTAD_IN_M = 0.04f;
+	private static final float RIVER_HEIGHT_IN_M = 5f;
+	
+	public HTTPServerController(int port, Model model, DBMSController dbmsController) {
 		this.port = port;
 		this.model = model;
+		this.dbmsController = dbmsController;
 	}
 
 	@Override
@@ -40,22 +48,55 @@ public class HTTPServerController extends AbstractVerticle {
 	}
 	
 	private void handleAddNewData(RoutingContext routingContext) {
-		/*HttpServerResponse response = routingContext.response();
+		HttpServerResponse response = routingContext.response();
 		// log("new msg "+routingContext.getBodyAsString());
 		JsonObject res = routingContext.getBodyAsJson();
 		if (res == null) {
 			sendError(400, response);
 		} else {
-			float value = res.getFloat("value");
-			String place = res.getString("place");
-			long time = System.currentTimeMillis();
+			/* We read the json */
+			State state = State.valueOf(res.getString("State"));
+			long timestamp = res.getLong("Timestamp");
+			float distance = res.getFloat("Distance");
 			
+			/* Dam open percentage */
+			int damOpening = this.getDamOpeningFromDistance(distance);
+			/* We obtain the Water Level from detected distance */
+			float waterLevel = this.getWaterLevelFromDistance(distance);
 			
+			/* Dam Mode checking : if new State isn't ALARM it can be MANUAL */
+			if(this.model.getMode().equals(Mode.MANUAL) && !state.equals("ALARM")) {
+				this.model.setMode(Mode.AUTO);
+			}
+			/* State setting */
+			this.model.setState(state);
 			
-			log("New value: " + value + " from " + place + " on " + new Date(time));
+			/* DBMS insert */
+			this.dbmsController.insertData(timestamp, waterLevel, this.model.getMode().toString(), state.toString(), damOpening);
+			
+			/* Msg back if success */
 			response.setStatusCode(200).end();
 		}
-		*/
+		
+	}
+	
+	private int getDamOpeningFromDistance(float distance) {
+		if(distance > D2_IN_M - DELTAD_IN_M && distance <= D2_IN_M) {
+			return 20;
+		} else if(distance > D2_IN_M - 2 * DELTAD_IN_M && distance < D2_IN_M - DELTAD_IN_M) {
+			return 40;
+		} else if(distance > D2_IN_M - 3 * DELTAD_IN_M && distance < D2_IN_M - 2 * DELTAD_IN_M) {
+			return 60;
+		} else if(distance > D2_IN_M - 4 * DELTAD_IN_M && distance < D2_IN_M - 3 * DELTAD_IN_M) {
+			return 80;
+		} else if(distance < D2_IN_M - 4 * DELTAD_IN_M) {
+			return 100;
+		}
+		return 0;
+	}
+	
+	private float getWaterLevelFromDistance(float distance) {
+		return RIVER_HEIGHT_IN_M - distance;
 	}
 	
 	private void handleGetData(RoutingContext routingContext) {
