@@ -27,13 +27,13 @@ public class RunDamService {
 		/* DBMS controller */
 		DBMSController dbmsController = new DBMSControllerImpl();
 		
+		/* Dam controller communication */
+		CommChannel channel = new SerialCommChannel("/dev/ttyACM0");
+		
 		/* Vertx Server */
 		Vertx vertx = Vertx.vertx();
-		HTTPServerController serverController = new HTTPServerController(8080, model, dbmsController);
+		HTTPServerController serverController = new HTTPServerController(8080, model, dbmsController, channel);
 		vertx.deployVerticle(serverController);
-		
-		/* Dam controller communication */
-		CommChannel channel = new SerialCommChannel("/dev/ttyACM0");	
 		
 		/* Waiting for Arduino reboot */
 		System.out.println("Waiting Arduino for rebooting...");		

@@ -2,6 +2,7 @@ package controllers.server;
 
 import java.util.Date;
 
+import controllers.serial.CommChannel;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -22,16 +23,18 @@ public class HTTPServerController extends AbstractVerticle {
 	private int port;
 	private Model model;
 	private DBMSController dbmsController;
+	private CommChannel channel;
 	
 	private static final float D2_IN_M = 0.4f;
 	private static final float D1_IN_M = 1.0f;
 	private static final float DELTAD_IN_M = 0.04f;
 	private static final float RIVER_HEIGHT_IN_M = 5f;
 	
-	public HTTPServerController(int port, Model model, DBMSController dbmsController) {
+	public HTTPServerController(int port, Model model, DBMSController dbmsController, CommChannel channel) {
 		this.port = port;
 		this.model = model;
 		this.dbmsController = dbmsController;
+		this.channel = channel;
 	}
 
 	@Override
@@ -88,6 +91,9 @@ public class HTTPServerController extends AbstractVerticle {
 			
 			/* Msg back if success */
 			response.setStatusCode(200).end();
+			
+			/* Forward message to Dam Controller (Arduino) */
+			this.channel.sendMsg(res.encodePrettily());
 		}
 		
 	}
