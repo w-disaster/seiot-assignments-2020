@@ -1,4 +1,4 @@
-package serialchannel;
+package controllers.serial;
 
 import jssc.SerialPort;
 

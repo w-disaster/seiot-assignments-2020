@@ -4,7 +4,7 @@ import java.time.LocalTime;
 
 import com.google.gson.Gson;
 
-import environment.State;
+import model.State;
 
 public class ModelImpl implements Model {
 	

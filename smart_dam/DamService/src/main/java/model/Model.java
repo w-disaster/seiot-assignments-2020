@@ -1,6 +1,6 @@
-package environment;
+package model;
 
-public interface Environment {
+public interface Model {
 	
 	State getState();
 	

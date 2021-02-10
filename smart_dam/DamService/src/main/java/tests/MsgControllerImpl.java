@@ -1,19 +1,19 @@
-package server;
+package tests;
 
 import java.time.LocalTime;
 
 import com.google.gson.Gson;
 
-import environment.Environment;
-import environment.State;
 import jssc.SerialPort;
+import model.Model;
+import model.State;
 
 public class MsgControllerImpl implements MsgController {
 	
-	private Environment environment;
+	private Model environment;
 	private SerialPort serialPort;
 
-	public MsgControllerImpl(Environment environment, SerialPort serialPort) {
+	public MsgControllerImpl(Model environment, SerialPort serialPort) {
 		super();
 		this.environment = environment;
 		this.serialPort = serialPort;

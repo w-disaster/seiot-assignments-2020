@@ -1,11 +1,11 @@
-package environment;
+package model;
 
-public class EnvironmentImpl implements Environment {
+public class ModelImpl implements Model {
 
 	private Mode mode;
 	private State state;
 	
-	public EnvironmentImpl(Mode mode, State state) {
+	public ModelImpl(Mode mode, State state) {
 		super();
 		this.mode = mode;
 		this.state = state;

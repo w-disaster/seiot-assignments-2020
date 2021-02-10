@@ -1,8 +1,9 @@
-package server;
+package controllers.server;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerResponse;
+import tests.MyHttpServerHandler;
 
 public class HTTPServer {
 	

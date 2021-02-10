@@ -1,20 +1,20 @@
-package serialchannel;
+package controllers.serial;
 
 import java.util.HashMap;
 import java.util.Map;
 import com.google.gson.Gson;
 
-import environment.Environment;
-import environment.Mode;
+import model.Model;
+import model.Mode;
 
 public class SerialCommChannelControllerRunnable implements Runnable {
 
-	private Environment environment;
+	private Model model;
 	private CommChannel channel;
 	
-	public SerialCommChannelControllerRunnable(Environment environment, CommChannel channel) {
+	public SerialCommChannelControllerRunnable(Model model, CommChannel channel) {
 		super();
-		this.environment = environment;
+		this.model = model;
 		this.channel = channel;
 	}
 	
@@ -29,8 +29,8 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 
 				/* We deserialize it as a Json */
 				Mode mode = this.getModeFromJson(msg);
-				/* We set the mode of the environment, if possible */
-				setEnvironmentMode(this.environment, mode);
+				/* We set the mode of the model, if possible */
+				setEnvironmentMode(this.model, mode);
 								
 				/* Json for response */
 				sendJson = this.getJsonFromCurrentModeAsString();
@@ -47,7 +47,7 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 	private String getJsonFromCurrentModeAsString() {
 		Gson gson = new Gson();
         Map<String, Mode> map = new HashMap<>();
-        map.put("Mode", this.environment.getMode());
+        map.put("Mode", this.model.getMode());
         
         return gson.toJson(map, Map.class);
 	}
@@ -62,16 +62,16 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 	}
 	
 	
-	public static void setEnvironmentMode(Environment environment, Mode mode) {
+	public static void setEnvironmentMode(Model model, Mode mode) {
         /* Always possible switch to AUTO mode, only when state == ALARM to MANUAL mode */
         switch(mode) {
 		case AUTO:
-			environment.setMode(mode);
+			model.setMode(mode);
 			break;
 		case MANUAL:
-			switch(environment.getState()) {
+			switch(model.getState()) {
 			case ALARM:
-				environment.setMode(mode);
+				model.setMode(mode);
 				break;
 			case NORMAL:
 			case PRE_ALARM:

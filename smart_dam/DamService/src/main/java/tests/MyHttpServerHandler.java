@@ -1,4 +1,4 @@
-package server;
+package tests;
 
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
@@ -6,6 +6,8 @@ import io.vertx.core.http.HttpServerResponse;
 
 public class MyHttpServerHandler implements Handler<HttpServerRequest> {
 
+	
+	
 	@Override
 	public void handle(HttpServerRequest request) {
 		if(request.method().toString().toUpperCase().equals("GET")){

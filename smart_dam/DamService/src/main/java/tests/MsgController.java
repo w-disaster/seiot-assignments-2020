@@ -1,8 +1,8 @@
-package server;
+package tests;
 
 import java.time.LocalTime;
 
-import environment.State;
+import model.State;
 
 public interface MsgController {
 	

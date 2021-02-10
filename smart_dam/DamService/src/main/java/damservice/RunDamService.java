@@ -1,32 +1,31 @@
 package damservice;
 
-import environment.Environment;
-import environment.EnvironmentImpl;
-import environment.Mode;
-import environment.State;
+import controllers.serial.CommChannel;
+import controllers.serial.SerialCommChannel;
+import controllers.serial.SerialCommChannelControllerRunnable;
+import controllers.server.HTTPServerController;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerResponse;
-import serialchannel.CommChannel;
-import serialchannel.SerialCommChannel;
-import serialchannel.SerialCommChannelControllerRunnable;
-import server.MsgController;
-import server.MsgControllerImpl;
-import server.MyHttpServerHandler;
+import model.Model;
+import model.ModelImpl;
+import model.Mode;
+import model.State;
+import tests.MsgController;
+import tests.MsgControllerImpl;
+import tests.MyHttpServerHandler;
 
 public class RunDamService {
 
 	public static void main(String[] args) throws InterruptedException {
 		
 		/* Environment Model*/
-		Environment environment = new EnvironmentImpl(Mode.AUTO, State.ALARM);
+		Model model = new ModelImpl(Mode.AUTO, State.ALARM);
 		
 		/* Vertx Server */
 		Vertx vertx = Vertx.vertx();
-		HttpServer server = vertx.createHttpServer();
-	
-		server.requestHandler(new MyHttpServerHandler());
-		server.listen(8080);
+		HTTPServerController serverController = new HTTPServerController(8080);
+		vertx.deployVerticle(serverController);
 		
 		/* Dam controller communication */
 		CommChannel channel = new SerialCommChannel("/dev/ttyACM0");	
@@ -37,12 +36,12 @@ public class RunDamService {
 		
 		
 		/* We start the thread in charge of managing communication channel with Dam Controller */
-		Runnable serialController = new SerialCommChannelControllerRunnable(environment, channel);
+		Runnable serialController = new SerialCommChannelControllerRunnable(model, channel);
 		Thread serialControllerThread = new Thread(serialController);
 		serialControllerThread.start();
 		
 		/* Message controller */
-		MsgController msgController = new MsgControllerImpl(environment, channel.getSerialPort());
+		MsgController msgController = new MsgControllerImpl(model, channel.getSerialPort());
 		
 		
 		
