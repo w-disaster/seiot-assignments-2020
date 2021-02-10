@@ -1,4 +1,4 @@
-package webserver;
+package environment;
 
 public interface Environment {
 	

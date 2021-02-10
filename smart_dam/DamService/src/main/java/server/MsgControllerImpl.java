@@ -1,9 +1,11 @@
-package webserver;
+package server;
 
 import java.time.LocalTime;
 
 import com.google.gson.Gson;
 
+import environment.Environment;
+import environment.State;
 import jssc.SerialPort;
 
 public class MsgControllerImpl implements MsgController {
@@ -15,7 +17,6 @@ public class MsgControllerImpl implements MsgController {
 		super();
 		this.environment = environment;
 		this.serialPort = serialPort;
-		System.out.println("MSG: " + this.environment.getMode().toString());
 	}
 
 	@Override

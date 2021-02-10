@@ -1,4 +1,4 @@
-package webserver;
+package environment;
 
 public class EnvironmentImpl implements Environment {
 
@@ -22,12 +22,12 @@ public class EnvironmentImpl implements Environment {
 	}
 
 	@Override
-	public void setState(State state) {
+	public synchronized void setState(State state) {
 		this.state = state;
 	}
 
 	@Override
-	public void setMode(Mode mode) {
+	public synchronized void setMode(Mode mode) {
 		this.mode = mode;
 	}
 	

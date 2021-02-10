@@ -1,4 +1,4 @@
-package webserver;
+package tests;
 
 public class Persona {
 	private String nome;

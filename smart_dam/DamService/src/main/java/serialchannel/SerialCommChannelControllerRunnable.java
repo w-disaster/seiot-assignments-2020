@@ -1,8 +1,11 @@
-package webserver;
+package serialchannel;
 
 import java.util.HashMap;
 import java.util.Map;
 import com.google.gson.Gson;
+
+import environment.Environment;
+import environment.Mode;
 
 public class SerialCommChannelControllerRunnable implements Runnable {
 
@@ -27,10 +30,8 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 				/* We deserialize it as a Json */
 				Mode mode = this.getModeFromJson(msg);
 				/* We set the mode of the environment, if possible */
-				this.setEnvironmentMode(mode);
-				
-				System.out.println("SERIAL: " + this.environment.getMode().toString());
-				
+				setEnvironmentMode(this.environment, mode);
+								
 				/* Json for response */
 				sendJson = this.getJsonFromCurrentModeAsString();
 				
@@ -61,16 +62,16 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 	}
 	
 	
-	private void setEnvironmentMode(Mode mode) {
+	public static void setEnvironmentMode(Environment environment, Mode mode) {
         /* Always possible switch to AUTO mode, only when state == ALARM to MANUAL mode */
         switch(mode) {
 		case AUTO:
-			this.environment.setMode(mode);
+			environment.setMode(mode);
 			break;
 		case MANUAL:
-			switch(this.environment.getState()) {
+			switch(environment.getState()) {
 			case ALARM:
-				this.environment.setMode(mode);
+				environment.setMode(mode);
 				break;
 			case NORMAL:
 			case PRE_ALARM:

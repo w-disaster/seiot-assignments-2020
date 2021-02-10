@@ -1,4 +1,4 @@
-package webserver;
+package serialchannel;
 
 import jssc.SerialPort;
 

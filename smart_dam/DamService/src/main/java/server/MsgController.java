@@ -1,6 +1,8 @@
-package webserver;
+package server;
 
 import java.time.LocalTime;
+
+import environment.State;
 
 public interface MsgController {
 	

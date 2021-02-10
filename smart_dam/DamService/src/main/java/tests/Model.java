@@ -1,6 +1,8 @@
-package webserver;
+package tests;
 
 import java.time.LocalTime;
+
+import environment.State;
 
 public interface Model {
 	

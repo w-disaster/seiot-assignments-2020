@@ -1,4 +1,4 @@
-package webserver;
+package serialchannel;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -18,7 +18,7 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 			this.queue = new ArrayBlockingQueue<String>(100);
 			this.serialPort.openPort();
 			
-		    this.serialPort.setParams(SerialPort.BAUDRATE_9600,
+		    this.serialPort.setParams(SerialPort.BAUDRATE_115200,
 		                         SerialPort.DATABITS_8,
 		                         SerialPort.STOPBITS_1,
 		                         SerialPort.PARITY_NONE);
