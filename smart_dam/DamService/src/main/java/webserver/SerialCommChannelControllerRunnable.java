@@ -21,26 +21,47 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 		while (true){
 			String sendJson;
 			try {
+				/* Incoming message */
 				String msg = this.channel.receiveMsg();
-				sendJson = this.setEnvironment(msg);
+
+				/* We deserialize it as a Json */
+				Mode mode = this.getModeFromJson(msg);
+				/* We set the mode of the environment, if possible */
+				this.setEnvironmentMode(mode);
+				
+				System.out.println("SERIAL: " + this.environment.getMode().toString());
+				
+				/* Json for response */
+				sendJson = this.getJsonFromCurrentModeAsString();
+				
 		        /* We send back the current Mode of the Environment that serves as an ACK/NAK */
                 channel.sendMsg(sendJson);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	private String setEnvironment(String json) {
+	/* This method will be called for send a message back to Dam Controller*/
+	private String getJsonFromCurrentModeAsString() {
+		Gson gson = new Gson();
+        Map<String, Mode> map = new HashMap<>();
+        map.put("Mode", this.environment.getMode());
+        
+        return gson.toJson(map, Map.class);
+	}
+	
+	private Mode getModeFromJson(String json) {
 		/* We read the Json file with the mode requested by Dam Controller */
 		Gson gson = new Gson();
         Map<String, String> jsonMap = gson.fromJson(json, Map.class);
         
         /* We get the Mode and we set it if it's possible */
-        
-        Mode mode = Mode.valueOf(jsonMap.get("Mode"));
-        
+        return Mode.valueOf(jsonMap.get("Mode"));
+	}
+	
+	
+	private void setEnvironmentMode(Mode mode) {
         /* Always possible switch to AUTO mode, only when state == ALARM to MANUAL mode */
         switch(mode) {
 		case AUTO:
@@ -56,13 +77,7 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 				break;
 			}
 			break;
-		}
-                
-        /* Return message to Dam Controller*/
-        Map<String, Mode> map = new HashMap<>();
-        map.put("Mode", this.environment.getMode());
-        
-        return gson.toJson(map, Map.class);
+		} 
 	}
 
 }

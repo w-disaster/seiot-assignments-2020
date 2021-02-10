@@ -31,7 +31,7 @@ void setup() {
 
   // Add values in the document
   //
-  sendJson["Mode"] = "AUTO";
+  sendJson["Mode"] = "MANUAL";
 
   // Generate the minified JSON and send it to the Serial port.
   //

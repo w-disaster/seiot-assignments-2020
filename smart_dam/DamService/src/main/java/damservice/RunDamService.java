@@ -14,12 +14,12 @@ public class RunDamService {
 
 	public static void main(String[] args) throws InterruptedException {
 		/* Environment Model*/
-		Environment environment = new EnvironmentImpl(Mode.AUTO, State.NORMAL);
+		Environment environment = new EnvironmentImpl(Mode.AUTO, State.ALARM);
 		
 		/* Dam controller communication */
 		CommChannel channel = new SerialCommChannel("/dev/ttyACM0");	
 		
-		/* attesa necessaria per fare in modo che Arduino completi il reboot */
+		/* Waiting for Arduino reboot */
 		System.out.println("Waiting Arduino for rebooting...");		
 		Thread.sleep(4000);
 		System.out.println("Ready.");	
@@ -29,8 +29,8 @@ public class RunDamService {
 		Thread serialControllerThread = new Thread(serialController);
 		serialControllerThread.start();
 		
-		
 		/* Message controller */
+		Thread.sleep(6000);
 		MsgController msgController = new MsgControllerImpl(environment, channel.getSerialPort());
 		
 	}

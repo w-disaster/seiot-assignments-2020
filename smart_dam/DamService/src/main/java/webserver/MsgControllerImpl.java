@@ -15,6 +15,7 @@ public class MsgControllerImpl implements MsgController {
 		super();
 		this.environment = environment;
 		this.serialPort = serialPort;
+		System.out.println("MSG: " + this.environment.getMode().toString());
 	}
 
 	@Override
