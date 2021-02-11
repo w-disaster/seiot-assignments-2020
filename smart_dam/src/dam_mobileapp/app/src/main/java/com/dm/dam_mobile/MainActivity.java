@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_main);
+
         //initialize Bluetooth connection
         final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if(btAdapter != null && !btAdapter.isEnabled()){
@@ -61,8 +63,6 @@ public class MainActivity extends AppCompatActivity {
         this.waterLevel = 50;
 
         this.context = ControlMode.AUTOMATIC;
-
-        setContentView(R.layout.activity_main);
 
         //context set up
         this.contextSwicth = (Switch)findViewById(R.id.contextSwitch);
@@ -85,21 +85,16 @@ public class MainActivity extends AppCompatActivity {
 
         // show state
         this.stateView = (TextView)findViewById(R.id.state);
-
         this.stateView.setText(this.damState.toString());
         this.stateView.setTextColor(Color.parseColor(this.damState.getColor()));
-
-        // show dam level
-        this.damLevelView = (TextView)findViewById(R.id.level);
-        this.damLevelView.setText(String.valueOf(this.damLevel));
-
-        // show water level
-        this.waterLevelView = (TextView)findViewById(R.id.water);
-        this.waterLevelView.setText(String.valueOf(this.waterLevel));
 
         //hide all until its sent by DS
         this.waterLevelView.setVisibility(View.GONE);
         this.damLevelView.setVisibility(View.GONE);
+
+        this.waterLevelLabel.setVisibility(View.GONE);
+        this.damLevelLabel.setVisibility(View.GONE);
+
         this.btnClose.setVisibility(View.GONE);
         this.btnOpen.setVisibility(View.GONE);
         this.contextSwicth.setVisibility(View.GONE);
@@ -163,6 +158,12 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        btChannel.close();
+    }
+
     public void openDam(View view) {
         moveDam(-1);
     }
@@ -195,8 +196,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void moveDam(final int verse){
         if(!operationOutOfBounds(verse)) {
+            String message = "";
+
             // aggiorno il livello diga
             this.damLevel = this.damLevel + DAM_STEP * verse;
+
+            //TODO: make jSON and send it to move the thing
+
+            // mando messaggio di muovere anche alla diga fisicamente
+            this.btChannel.sendMessage(message);
 
             // aggiorno i bottoni
             Button pressedButton;
