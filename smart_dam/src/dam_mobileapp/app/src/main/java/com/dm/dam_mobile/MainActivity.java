@@ -22,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
     private int waterLevel;
     private DamState damState;
 
+    private TextView damLevelLabel;
+    private TextView waterLevelLabel;
+
     private TextView stateView;
     private TextView damLevelView;
     private TextView waterLevelView;
@@ -56,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
         if(this.damLevel == DAM_LEVEL_MAX){
             disableButton(this.btnClose);
         }
+
+        // labels
+        this.damLevelLabel = (TextView)findViewById(R.id.levelLabel);
+        this.waterLevelLabel = (TextView)findViewById(R.id.waterLabel);
 
         // show state
         this.stateView = (TextView)findViewById(R.id.state);
