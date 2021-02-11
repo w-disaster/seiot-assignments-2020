@@ -120,6 +120,8 @@ public class DBMSControllerImpl implements DBMSController {
 	    	row.add(waterLevel);
 	    	Pair<String, String> damMode = new Pair<>("DamMode", rs.getString("DamMode"));
 	    	row.add(damMode);
+	    	Pair<String, String> state = new Pair<>("State", rs.getString("State"));
+	    	row.add(state);
 	    	Pair<String, String> damOpening = new Pair<>("DamOpening", rs.getString("DamOpening"));
 	    	row.add(damOpening);
 	       

@@ -124,9 +124,11 @@ public class HTTPServerController extends AbstractVerticle {
 	private void handleGetData(RoutingContext routingContext) {
 		HttpServerRequest request = routingContext.request();
 		
+		/* DB query : we'll get all data onwards a given t (timestamp) */
 		long timestamp = Long.parseLong(request.getParam("t"));
 		Map<Integer, List<Pair<String, String>>> data = this.dbmsController.getDataFromTimestampOnwards(timestamp);
 		
+		/* We build a json array from collected data */
 		JsonArray arr = new JsonArray();
 		for(Entry<Integer, List<Pair<String, String>>> e : data.entrySet()) {
 			JsonObject json = new JsonObject();
@@ -136,29 +138,10 @@ public class HTTPServerController extends AbstractVerticle {
 			arr.add(json);
 		}
 		
-		System.out.println(arr);
-		
+		/* Response to DamDashboard with a json file */
 		routingContext.response()
 			.putHeader("content-type", "application/json")
 			.end(arr.encodePrettily());
-		
-		// Write to the response and end it
-		
-		/*String file = "";
-		response.sendFile(file);*/
-		
-		/*JsonArray arr = new JsonArray();
-		for (DataPoint p: values) {
-			JsonObject data = new JsonObject();
-			data.put("time", p.getTime());
-			data.put("value", p.getValue());
-			data.put("place", p.getPlace());
-			arr.add(data);
-		}
-		routingContext.response()
-			.putHeader("content-type", "application/json")
-			.end(arr.encodePrettily());
-		*/
 	}
 	
 	private void sendError(int statusCode, HttpServerResponse response) {
