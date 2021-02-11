@@ -1,4 +1,4 @@
-package unibo.btlib;
+package btlib;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -6,7 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import java.util.Set;
 import java.util.UUID;
 
-import unibo.btlib.exceptions.BluetoothDeviceNotFound;
+import btlib.exceptions.BluetoothDeviceNotFound;
 
 public class BluetoothUtils {
 

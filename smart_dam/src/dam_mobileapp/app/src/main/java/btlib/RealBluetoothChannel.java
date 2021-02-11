@@ -1,4 +1,4 @@
-package unibo.btlib;
+package btlib;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Message;
@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import unibo.btlib.utils.C;
+import btlib.utils.C;
 
 public final class RealBluetoothChannel extends BluetoothChannel {
 

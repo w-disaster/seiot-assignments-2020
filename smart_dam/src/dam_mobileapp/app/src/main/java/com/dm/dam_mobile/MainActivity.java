@@ -10,6 +10,13 @@ import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import android.bluetooth.BluetoothAdapter;
+
+import android.content.Intent;
+import btlib.BluetoothChannel;
+import btlib.utils.C;
+
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int DAM_LEVEL_MAX = 100;
@@ -33,9 +40,18 @@ public class MainActivity extends AppCompatActivity {
     private Switch contextSwicth;
     private Button btnOpen;
     private Button btnClose;
+
+    private BluetoothChannel btChannel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //initialize Bluetooth connection
+        final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(btAdapter != null && !btAdapter.isEnabled()){
+            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), C.bluetooth.ENABLE_BT_REQUEST);
+        }
 
         //later the dam state will be received by DS
         this.damState = DamState.CONNECTING;

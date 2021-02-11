@@ -1,4 +1,4 @@
-package unibo.btlib;
+package btlib;
 
 public interface CommChannel {
     void close();

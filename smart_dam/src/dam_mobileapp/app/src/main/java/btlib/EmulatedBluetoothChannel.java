@@ -1,4 +1,4 @@
-package unibo.btlib;
+package btlib;
 
 import android.os.Message;
 import android.util.Log;
@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 
-import unibo.btlib.utils.C;
+import btlib.utils.C;
 
 public final class EmulatedBluetoothChannel extends BluetoothChannel {
 

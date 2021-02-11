@@ -1,4 +1,4 @@
-package unibo.btlib;
+package btlib;
 
 import java.io.IOException;
 import java.net.InetAddress;

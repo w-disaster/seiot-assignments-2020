@@ -1,4 +1,4 @@
-package unibo.btlib;
+package btlib;
 
 import android.os.AsyncTask;
 

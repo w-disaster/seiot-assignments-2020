@@ -1,4 +1,4 @@
-package unibo.btlib;
+package btlib;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;

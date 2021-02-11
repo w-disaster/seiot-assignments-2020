@@ -1,3 +1,3 @@
-package unibo.btlib.exceptions;
+package btlib.exceptions;
 
 public class BluetoothDeviceNotFound extends Exception { }
