@@ -7,8 +7,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import model.Pair;
+
 import java.sql.Timestamp;
 
 // TODO: Auto-generated Javadoc
@@ -99,33 +104,32 @@ public class DBMSControllerImpl implements DBMSController {
 	}
 
 	@Override
-	public Map<String, String> getDataFromTimestampOnwards(long timestamp) {
-		Map<String, String> lastRow = new HashMap<>();
+	public Map<Integer, List<Pair<String, String>>> getDataFromTimestampOnwards(long timestamp) {
+		Map<Integer, List<Pair<String, String>>> data = new HashMap<>();
 		/* MUST TEST */
 		String query = "SELECT * FROM Data  WHERE Timestamp >= '" + new Timestamp(timestamp).toString() + "'";
 	    try (Statement stmt = this.connection.createStatement()) {
 	      ResultSet rs = stmt.executeQuery(query);
+	      System.out.println(rs);
 	      while (rs.next()) {
-	        String timestampAsString = rs.getString("Timestamp");
-	        lastRow.put("Timestamp", timestampAsString);
-	        
-	        String waterLevel = rs.getString("Waterlevel");
-	        lastRow.put("WaterLevel", waterLevel);
-	        
-	        String damMode = rs.getString("DamMode");
-	        lastRow.put("DamMode", damMode);
-	        
-	        String state = rs.getString("State");
-	        lastRow.put("State", state);
-	        
-	        String damOpening = rs.getString("DamOpening");
-	        lastRow.put("DamOpening", damOpening);
+	    	List<Pair<String, String>> row = new ArrayList<>();
+	    	
+	    	Pair<String, String> time = new Pair<>("Timestamp", rs.getString("Timestamp"));
+	    	row.add(time);
+	    	Pair<String, String> waterLevel = new Pair<>("WaterLevel", rs.getString("WaterLevel"));
+	    	row.add(waterLevel);
+	    	Pair<String, String> damMode = new Pair<>("DamMode", rs.getString("DamMode"));
+	    	row.add(damMode);
+	    	Pair<String, String> damOpening = new Pair<>("DamOpening", rs.getString("DamOpening"));
+	    	row.add(damOpening);
+	       
+	    	data.put(rs.getRow(), row);
 	      }
 	    } catch (SQLException e) {
 	    	new Exception(e.getMessage());
             System.out.println("Error " + e.getMessage());
 	    }
-		return lastRow;
+		return data;
 	}
 
 	@Override

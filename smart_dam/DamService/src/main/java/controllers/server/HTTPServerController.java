@@ -1,6 +1,9 @@
 package controllers.server;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import controllers.serial.CommChannel;
 import io.vertx.core.AbstractVerticle;
@@ -13,6 +16,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import model.Mode;
 import model.Model;
+import model.Pair;
 import model.State;
 
 /*
@@ -118,7 +122,31 @@ public class HTTPServerController extends AbstractVerticle {
 	}
 	
 	private void handleGetData(RoutingContext routingContext) {
-		System.out.println(routingContext.normalizedPath());
+		HttpServerRequest request = routingContext.request();
+		
+		long timestamp = Long.parseLong(request.getParam("t"));
+		Map<Integer, List<Pair<String, String>>> data = this.dbmsController.getDataFromTimestampOnwards(timestamp);
+		
+		JsonArray arr = new JsonArray();
+		for(Entry<Integer, List<Pair<String, String>>> e : data.entrySet()) {
+			JsonObject json = new JsonObject();
+			for(Pair<String, String> p : e.getValue()) {
+				json.put(p.getX(), p.getY());
+			}
+			arr.add(json);
+		}
+		
+		System.out.println(arr);
+		
+		routingContext.response()
+			.putHeader("content-type", "application/json")
+			.end(arr.encodePrettily());
+		
+		// Write to the response and end it
+		
+		/*String file = "";
+		response.sendFile(file);*/
+		
 		/*JsonArray arr = new JsonArray();
 		for (DataPoint p: values) {
 			JsonObject data = new JsonObject();
