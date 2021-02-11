@@ -1,8 +1,8 @@
 package com.dm.dam_mobile;
 
 public enum ControlMode {
-    MANUAL("Manual", "#5c5c5c", 0),
-    AUTOMATIC("Automatic","#00c400", 1);
+    MANUAL("Modalità Manuale", "#5c5c5c", 0),
+    AUTOMATIC("Modalità Automatica","#00c400", 1);
 
     private final String text;
     private final String color;

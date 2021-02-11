@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private int damLevel;
     private int waterLevel;
     private DamState damState;
+    private ControlMode context;
 
     private TextView damLevelLabel;
     private TextView waterLevelLabel;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         this.damLevel = DAM_LEVEL_MAX;
         //water level will also be received by DS
         this.waterLevel = 50;
+
+        this.context = ControlMode.AUTOMATIC;
 
         setContentView(R.layout.activity_main);
 
@@ -122,11 +125,16 @@ public class MainActivity extends AppCompatActivity {
                 this.btnClose.setVisibility(View.VISIBLE);
                 this.btnOpen.setVisibility(View.VISIBLE);
 
-                if(this.damLevel == DAM_LEVEL_MIN){
-                    disableButton(this.btnOpen);
-                }
+                if(context.getCode() > 0){
+                    if(this.damLevel == DAM_LEVEL_MIN){
+                        disableButton(this.btnOpen);
+                    }
 
-                if(this.damLevel == DAM_LEVEL_MAX){
+                    if(this.damLevel == DAM_LEVEL_MAX){
+                        disableButton(this.btnClose);
+                    }
+                }else{
+                    disableButton(this.btnOpen);
                     disableButton(this.btnClose);
                 }
             }
@@ -145,6 +153,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void closeDam(View view){
         moveDam(1);
+    }
+
+    public void switchControlMode(View view){
+        //TODO: send request to DS to context witch
+
+        if(this.contextSwicth.isChecked()){
+
+            this.context = ControlMode.MANUAL;
+
+            if(!operationOutOfBounds(1)){
+                enableButton(btnClose);
+            }
+            if(!operationOutOfBounds(-1)) {
+                enableButton(btnOpen);
+            }
+        }else{
+            this.context = ControlMode.AUTOMATIC;
+            disableButton(btnClose);
+            disableButton(btnOpen);
+        }
+
+        this.contextSwicth.setText(this.context.toString());
     }
 
     private void moveDam(final int verse){
