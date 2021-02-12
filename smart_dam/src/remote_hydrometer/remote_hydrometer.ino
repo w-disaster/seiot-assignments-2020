@@ -1,5 +1,3 @@
-#include "DataImpl.h"
-
 #if !defined(ESP8266)
   #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
 #endif
@@ -11,6 +9,7 @@
 #define _TIMERINTERRUPT_LOGLEVEL_     0
 
 #include "ESP8266TimerInterrupt.h"
+#include "lib.h"
 
 #define BUILTIN_LED     2       // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 
@@ -28,25 +27,6 @@ char* ssidName = "iPhone di Luca";
 char* pwd = "lucafabri1";
 /* service IP address */ 
 
-Data* data;
-
-void send(){
-  HTTPClient http;
-  http.begin("/api/data");      
-  http.addHeader("Content-Type", "application/json"); 
-  String value = "";
-  String place = "";    
-  String msg = String(data->getDistance()) + 
-  String("{ \"value\": ") + String(value) + 
-  ", \"place\": \"" + place +"\" }";
-  int retCode = http.POST(msg);   
-  http.end();  
-    
-  // String payload = http.getString();  
-  // Serial.println(payload);     
-}
-       
-
 void setup() { 
   Serial.begin(115200);                                
   WiFi.begin(ssidName, pwd);
@@ -57,10 +37,8 @@ void setup() {
   } 
   Serial.println("Connected: \n local IP: " + WiFi.localIP());
 
-  data = new DataImpl("http://495ac13698c7.ngrok.io");
-
   // Interval in microsecs
-  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, send)) {
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, readDistanceAndSend)) {
     lastMillis = millis();
     Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(lastMillis);
   } else {
