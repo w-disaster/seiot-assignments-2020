@@ -1,10 +1,10 @@
 #include "RiverStateImpl.h"
 #include "Arduino.h"
 
-void RiverState::setState(RiverState::State state) {
+void RiverStateImpl::setState(RiverState::State state) {
     RiverState::setState(state);
 }
 
-RiverState::State RiverState::getState() {
+RiverState::State RiverStateImpl::getState() {
     return RiverState::getState();
 }

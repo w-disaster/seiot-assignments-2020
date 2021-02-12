@@ -9,5 +9,9 @@ public interface Model {
 	void setState(State state);
 	
 	void setMode(Mode mode);
+	
+	void setDamOpening(int damOpening);
+	
+	int getDamOpening();
 		
 }

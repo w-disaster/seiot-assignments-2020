@@ -1,46 +1,93 @@
-#define ECHO_PIN D0
-#define TRIG_PIN D1
-#define LED_PIN D2
+#include "DataImpl.h"
 
-#include "Scheduler.h"
+#if !defined(ESP8266)
+  #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
+#endif
 
-const float vs = 331.45 + 0.62*20;
+// These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
+// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
+// Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
+#define TIMER_INTERRUPT_DEBUG         1
+#define _TIMERINTERRUPT_LOGLEVEL_     0
 
-void setup()
-{
-  Serial.begin(9600);
+#include "ESP8266TimerInterrupt.h"
 
-  Scheduler* scheduler = new Scheduler();
-  scheduler->init(50);
+#define BUILTIN_LED     2       // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT); 
-  pinMode(LED_PIN, OUTPUT); 
-}
+volatile bool statusLed = false;
+volatile uint32_t lastMillis = 0;
 
-float getDistance()
-{
-    /* invio impulso */
-    digitalWrite(TRIG_PIN,LOW);
-    delayMicroseconds(3);
-    digitalWrite(TRIG_PIN,HIGH);
-    delayMicroseconds(5);
-    digitalWrite(TRIG_PIN,LOW);
+#define TIMER_INTERVAL_MS       1000
+
+// Init ESP8266 timer 0
+ESP8266Timer ITimer;
+
+/* wifi network name */
+char* ssidName = "iPhone di Luca";
+/* WPA2 PSK password */
+char* pwd = "lucafabri1";
+/* service IP address */ 
+
+Data* data;
+
+void send(){
+  HTTPClient http;
+  http.begin("/api/data");      
+  http.addHeader("Content-Type", "application/json"); 
+  String value = "";
+  String place = "";    
+  String msg = String(data->getDistance()) + 
+  String("{ \"value\": ") + String(value) + 
+  ", \"place\": \"" + place +"\" }";
+  int retCode = http.POST(msg);   
+  http.end();  
     
-    /* ricevi l’eco */
-    float tUS = pulseIn(ECHO_PIN, HIGH);
-    float t = tUS / 1000.0 / 1000.0 / 2;
-    float d = t*vs;
-    return d;
+  // String payload = http.getString();  
+  // Serial.println(payload);     
+}
+       
+
+void setup() { 
+  Serial.begin(115200);                                
+  WiFi.begin(ssidName, pwd);
+  Serial.print("Connecting...");
+  while (WiFi.status() != WL_CONNECTED) {  
+    delay(500);
+    Serial.print(".");
+  } 
+  Serial.println("Connected: \n local IP: " + WiFi.localIP());
+
+  data = new DataImpl("http://495ac13698c7.ngrok.io");
+
+  // Interval in microsecs
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, send)) {
+    lastMillis = millis();
+    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(lastMillis);
+  } else {
+    Serial.println(F("Can't set ITimer correctly. Select another freq. or interval"));
+  }
 }
 
-void loop()
-{
-  digitalWrite(LED_PIN, HIGH);
-  float d = getDistance();
-  Serial.println(d);
-  delay(200);
-  digitalWrite(LED_PIN, LOW);
-  delay(200);
+void loop() { 
+ if (WiFi.status()== WL_CONNECTED){   
 
+   /* read sensor */
+   float value = (float) analogRead(A0) / 1023.0;
+   
+   /* send data */
+   Serial.print("sending "+String(value)+"...");    
+   //int code = sendData(address, value, "home");
+   int code = 0;
+   /* log result */
+   if (code == 200){
+     Serial.println("ok");   
+   } else {
+     Serial.println("error");
+   }
+ } else { 
+   Serial.println("Error in WiFi connection");   
+ }
+ 
+ delay(5000);  
+ 
 }

@@ -9,12 +9,16 @@
                 "/home/luca/Downloads/arduino-1.8.13/hardware/tools/**",
                 "/home/luca/Downloads/arduino-1.8.13/libraries/**",
                 "/home/luca/Arduino/libraries/**",
-                "/home/luca/.arduino15/packages/esp8266/hardware/esp8266/2.7.4/**"
+                "/home/luca/.arduino15/packages/esp8266/hardware/esp8266/2.7.4/**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
+                "C:\\Program Files (x86)\\Arduino\\libraries\\**",
+                "C:\\Users\\gigio\\OneDrive\\Documenti\\Arduino\\libraries\\**",
+                "C:\\Program Files (x86)\\Arduino\\tools\\**"
             ],
             "defines": [
                 "USBCON"
             ],
-            "intelliSenseMode": "linux-gcc-x64",
             "browse": {
                 "limitSymbolsToIncludedHeaders": false,
                 "path": [
@@ -25,8 +29,9 @@
                 ]
             },
             "compilerPath": "/usr/bin/gcc",
-            "cStandard": "gnu11",
-            "cppStandard": "gnu++14",
+            "cStandard": "${default}",
+            "cppStandard": "${default}",
+            "intelliSenseMode": "${default}",
             "forcedInclude": [
                 "/home/luca/Downloads/arduino-1.8.13/hardware/arduino/avr/cores/arduino/Arduino.h",
                 "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"

@@ -75,11 +75,13 @@ public class HTTPServerController extends AbstractVerticle {
 		} else {
 			/* We read the json */
 			State state = State.valueOf(res.getString("State"));
+			
+			//NEED TO CHECK STATE
+			
 			long timestamp = res.getLong("Timestamp");
 			float distance = res.getFloat("Distance");
 			
-			/* Dam open percentage */
-			int damOpening = this.getDamOpeningFromDistance(distance);
+			
 			/* We obtain the Water Level from detected distance */
 			float waterLevel = this.getWaterLevelFromDistance(distance);
 			
@@ -90,8 +92,14 @@ public class HTTPServerController extends AbstractVerticle {
 			/* State setting */
 			this.model.setState(state);
 			
+			/* If AUTO we determine the Dam open percentage */
+			if(this.model.getMode().equals(Mode.AUTO)) {
+				this.model.setDamOpening(this.getDamOpeningFromDistance(distance));
+			}
+			
 			/* DBMS insert */
-			this.dbmsController.insertData(timestamp, waterLevel, this.model.getMode().toString(), state.toString(), damOpening);
+			this.dbmsController.insertData(timestamp, waterLevel, this.model.getMode().toString(), 
+					state.toString(), this.model.getDamOpening());
 			
 			/* Msg back if success */
 			response.setStatusCode(200).end();
@@ -127,9 +135,8 @@ public class HTTPServerController extends AbstractVerticle {
 		/* DB query : we'll get all data onwards a given t (timestamp) */
 		Long timestamp = Long.parseLong(request.getParam("t"));
 		
-		Map<Integer, List<Pair<String, String>>> data = this.dbmsController.getDataFromTimestampOnwards(timestamp);
+		/*Map<Integer, List<Pair<String, String>>> data = this.dbmsController.getDataFromTimestampOnwards(timestamp);
 		
-		/* We build a json array from collected data */
 		JsonArray arr = new JsonArray();
 		for(Entry<Integer, List<Pair<String, String>>> e : data.entrySet()) {
 			JsonObject json = new JsonObject();
@@ -137,12 +144,18 @@ public class HTTPServerController extends AbstractVerticle {
 				json.put(p.getX(), p.getY());
 			}
 			arr.add(json);
+		}*/
+		
+		Map<String, String> data = this.dbmsController.getLastData();
+		JsonObject json = new JsonObject();
+		for(Entry<String, String> e : data.entrySet()) {
+			json.put(e.getKey(), e.getValue());
 		}
 		
 		/* Response to DamDashboard with a json file */
 		routingContext.response()
 			.putHeader("content-type", "application/json")
-			.end(arr.encodePrettily());
+			.end(json.encodePrettily());
 	}
 	
 	private void sendError(int statusCode, HttpServerResponse response) {

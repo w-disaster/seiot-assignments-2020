@@ -18,7 +18,7 @@ public class RunDamService {
 	public static void main(String[] args) throws InterruptedException {
 		
 		/* Environment Model*/
-		Model model = new ModelImpl(Mode.AUTO, State.ALARM);
+		Model model = new ModelImpl(Mode.AUTO, State.ALARM, 0);
 		
 		/* DBMS controller */
 		DBMSController dbmsController = new DBMSControllerImpl();

@@ -4,8 +4,9 @@ public class ModelImpl implements Model {
 
 	private Mode mode;
 	private State state;
+	private int damOpening;
 	
-	public ModelImpl(Mode mode, State state) {
+	public ModelImpl(Mode mode, State state, int damOpening) {
 		super();
 		this.mode = mode;
 		this.state = state;
@@ -29,6 +30,16 @@ public class ModelImpl implements Model {
 	@Override
 	public synchronized void setMode(Mode mode) {
 		this.mode = mode;
+	}
+	
+	@Override
+	public synchronized void setDamOpening(int damOpening) {
+		this.damOpening = damOpening;
+	}
+	
+	@Override
+	public int getDamOpening() {
+		return this.damOpening;
 	}
 	
 }

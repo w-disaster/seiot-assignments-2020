@@ -6,20 +6,20 @@ class Measurement {
     float distance;
 
 public:
-    virtual void setTimestamp(long timestamp){
-        this->timestamp = timestamp;
+    virtual void setTimestamp(long t){
+        timestamp = t;
     }
 
-    virtual void setDistance(float distance){
-        this->distance = distance;
+    virtual void setDistance(float d){
+        distance = d;
     }
 
     virtual long getTimestamp() { 
-      return this->timestamp; 
+      return timestamp; 
     }
 
     virtual float getDistance() {
-        return this->distance;
+        return distance;
     }
 };
 

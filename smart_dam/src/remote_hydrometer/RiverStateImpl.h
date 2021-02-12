@@ -1,12 +1,12 @@
-#ifndef __RIVER_STATE__
-#define __RIVER_STATE__
+#ifndef __RIVER_STATE_IMPL__
+#define __RIVER_STATE_IMPL__
 
 #include "RiverState.h"
 
-class RiverStateImpl : public RiverState{
+class RiverStateImpl : public RiverState {
     public:
-        virtual void setState(State riverState);
-        virtual State getState();
+        void setState(RiverState::State riverState);
+        RiverState::State getState();
 };
 
 #endif

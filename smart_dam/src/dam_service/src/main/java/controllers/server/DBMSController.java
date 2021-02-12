@@ -16,6 +16,8 @@ public interface DBMSController {
 	
 	Map<Integer, List<Pair<String, String>>> getDataFromTimestampOnwards(long timestamp);
 	
+	Map<String, String> getLastData();
+	
 	/**
 	 * Gets the connection.
 	 *

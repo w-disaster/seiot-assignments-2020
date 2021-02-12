@@ -5,8 +5,8 @@
 
 class MeasurementImpl : public Measurement {
     public:
-        void setTimestamp(long timestamp);
-        void setDistance(float distance);
+        void setTimestamp(long t);
+        void setDistance(float d);
         long getTimestamp();
         float getDistance();
 };

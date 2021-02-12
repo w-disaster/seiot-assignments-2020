@@ -1,18 +1,18 @@
 #include "MeasurementImpl.h"
 #include "Arduino.h"
 
-void setTimestamp(long timestamp){
-    Measurement::setTimestamp(timestamp);
+void MeasurementImpl::setTimestamp(long t){
+    MeasurementImpl::setTimestamp(t);
 }
 
-void setDistance(float distance){
-    Measurement::setDistance(distance);
+void MeasurementImpl::setDistance(float d){
+    MeasurementImpl::setDistance(d);
 }
 
-long getTimestamp() { 
-    return Measurement::getTimestamp();
+long MeasurementImpl::getTimestamp() { 
+    return MeasurementImpl::getTimestamp();
 }
 
-float getDistance() {
-    return Measurement::getDistance();
+float MeasurementImpl::getDistance() {
+    return MeasurementImpl::getDistance();
 }

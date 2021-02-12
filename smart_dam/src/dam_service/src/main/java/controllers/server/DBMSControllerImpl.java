@@ -132,6 +132,36 @@ public class DBMSControllerImpl implements DBMSController {
 	    }
 		return data;
 	}
+	
+	@Override
+	public Map<String, String> getLastData() {
+		Map<String, String> lastRow = new HashMap<>();
+		/* MUST TEST */
+		String query = "SELECT MAX(Timestamp) AS Timestamp, WaterLevel, DamMode, State, DamOpening FROM Data";
+	    try (Statement stmt = this.connection.createStatement()) {
+	      ResultSet rs = stmt.executeQuery(query);
+	      while (rs.next()) {
+	        String timestampAsString = rs.getString("Timestamp");
+	        lastRow.put("Timestamp", timestampAsString);
+	        
+	        String waterLevel = rs.getString("Waterlevel");
+	        lastRow.put("WaterLevel", waterLevel);
+	        
+	        String damMode = rs.getString("DamMode");
+	        lastRow.put("DamMode", damMode);
+	        
+	        String state = rs.getString("State");
+	        lastRow.put("State", state);
+	        
+	        String damOpening = rs.getString("DamOpening");
+	        lastRow.put("DamOpening", damOpening);
+	      }
+	    } catch (SQLException e) {
+	    	new Exception(e.getMessage());
+            System.out.println("Error " + e.getMessage());
+	    }
+		return lastRow;
+	}
 
 	@Override
 	public Connection getConnection() {
