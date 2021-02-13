@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView damLevelView;
     private TextView waterLevelView;
 
-    private Switch contextSwicth;
+    private Switch contextSwitch;
     private Button btnOpen;
     private Button btnClose;
 
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
     public void switchControlMode(View view){
         //TODO: send request to DS to context witch
 
-        if(this.contextSwicth.isChecked()){
+        if(this.contextSwitch.isChecked()){
 
             this.context = ControlMode.MANUAL;
 
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
             disableButton(btnOpen);
         }
 
-        this.contextSwicth.setText(this.context.toString());
+        this.contextSwitch.setText(this.context.toString());
     }
 
     /**
@@ -149,25 +149,25 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initUI(){
         //context set up
-        this.contextSwicth = (Switch)findViewById(R.id.contextSwitch);
+        this.contextSwitch = findViewById(R.id.contextSwitch);
 
         //buttons SetUp
-        this.btnClose = (Button)findViewById(R.id.buttonClose);
-        this.btnOpen = (Button)findViewById(R.id.buttonOpen);
+        this.btnClose = findViewById(R.id.buttonClose);
+        this.btnOpen = findViewById(R.id.buttonOpen);
 
         // labels
-        this.damLevelLabel = (TextView)findViewById(R.id.levelLabel);
-        this.waterLevelLabel = (TextView)findViewById(R.id.waterLabel);
+        this.damLevelLabel = findViewById(R.id.levelLabel);
+        this.waterLevelLabel = findViewById(R.id.waterLabel);
 
         // state
-        this.stateView = (TextView)findViewById(R.id.state);
+        this.stateView = findViewById(R.id.state);
 
         // water
-        this.waterLevelView = (TextView)findViewById(R.id.water);
+        this.waterLevelView = findViewById(R.id.water);
         this.stateView.setTextColor(Color.parseColor(WATER_COLOR));
 
         // dam level
-        this.damLevelView = (TextView)findViewById(R.id.level);
+        this.damLevelView = findViewById(R.id.level);
     }
 
     /**
@@ -181,20 +181,22 @@ public class MainActivity extends AppCompatActivity {
         // Pre Alarm and over
         if(this.damState.getAlertLevel() > DamState.NORMAL.getAlertLevel()){
 
+            this.waterLevelLabel.setVisibility(View.GONE);
             this.waterLevelView.setVisibility(View.VISIBLE);
             this.waterLevelView.setText(this.waterLevel);
 
             // Alarm and over
             if(this.damState.getAlertLevel() > DamState.PRE_ALARM.getAlertLevel()){
 
+                this.damLevelLabel.setVisibility(View.GONE);
                 this.damLevelView.setVisibility(View.VISIBLE);
-                this.contextSwicth.setVisibility(View.VISIBLE);
+                this.contextSwitch.setVisibility(View.VISIBLE);
                 this.btnClose.setVisibility(View.VISIBLE);
                 this.btnOpen.setVisibility(View.VISIBLE);
 
                 this.damLevelView.setText(this.damLevel);
-                this.contextSwicth.setText(this.context.toString());
-                this.contextSwicth.setTextColor(Color.parseColor(this.context.getColor()));
+                this.contextSwitch.setText(this.context.toString());
+                this.contextSwitch.setTextColor(Color.parseColor(this.context.getColor()));
 
                 if(context.getCode() > 0){
                     if(this.damLevel == DAM_LEVEL_MIN){
@@ -210,19 +212,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             }else{
                 //hide the rest
+                this.damLevelLabel.setVisibility(View.GONE);
                 this.damLevelView.setVisibility(View.GONE);
+
                 this.btnClose.setVisibility(View.GONE);
                 this.btnOpen.setVisibility(View.GONE);
-                this.contextSwicth.setVisibility(View.GONE);
+                this.contextSwitch.setVisibility(View.GONE);
             }
 
         }else{
             // hide the rest
+            this.waterLevelLabel.setVisibility(View.GONE);
+            this.damLevelLabel.setVisibility(View.GONE);
             this.waterLevelView.setVisibility(View.GONE);
             this.damLevelView.setVisibility(View.GONE);
+
             this.btnClose.setVisibility(View.GONE);
             this.btnOpen.setVisibility(View.GONE);
-            this.contextSwicth.setVisibility(View.GONE);
+            this.contextSwitch.setVisibility(View.GONE);
         }
 
     }
@@ -260,11 +267,9 @@ public class MainActivity extends AppCompatActivity {
             if(operationOutOfBounds(verse)) {
                 //disable button
                 disableButton(pressedButton);
-                //enable other button
-                enableButton(otherButton);
-            }else{
-                enableButton(otherButton);
             }
+            //enable other button
+            enableButton(otherButton);
 
             //update view
             this.damLevelView.setText(String.valueOf(this.damLevel));
