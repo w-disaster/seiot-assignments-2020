@@ -7,6 +7,7 @@ import controllers.server.DBMSController;
 import controllers.server.DBMSControllerImpl;
 import controllers.server.HTTPServerController;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import jssc.SerialPortList;
 import model.Model;
 import model.ModelImpl;
@@ -25,7 +26,7 @@ public class RunDamService {
 		
 		/* Dam controller communication */
 		final String[] ports = SerialPortList.getPortNames();
-		CommChannel channel = new SerialCommChannel(ports[0]);
+		CommChannel channel = new SerialCommChannel("/dev/ttyACM0");
 		
 		/* Waiting for Arduino reboot */
 		System.out.println("Waiting Dam Controller for rebooting...");		
@@ -33,14 +34,27 @@ public class RunDamService {
 		System.out.println("Ready");
 		
 		/* Vertx Server */
-		Vertx vertx = Vertx.vertx();
+		VertxOptions options = new VertxOptions();
+		options.setBlockedThreadCheckInterval(15000 * 1000);
+		
+		Vertx vertx = Vertx.vertx(options);
 		HTTPServerController serverController = new HTTPServerController(8080, model, dbmsController, channel);
 		vertx.deployVerticle(serverController);
 		
-		/* We start the thread in charge of managing communication channel with Dam Controller */
+		/*
+		
+		// We start the thread in charge of managing communication channel with Dam Controller 
 		Runnable serialController = new SerialCommChannelControllerRunnable(model, channel);
 		Thread serialControllerThread = new Thread(serialController);
 		serialControllerThread.start();
+		
+		*/
+		
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+		    public void run() {
+		    	vertx.close();
+		    }
+		});
 	}
 
 }
