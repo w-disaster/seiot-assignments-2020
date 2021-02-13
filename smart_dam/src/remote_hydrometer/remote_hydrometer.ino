@@ -2,21 +2,16 @@
   #error This code is designed to run on ESP8266 and ESP8266-based boards! Please check your Tools->Board setting.
 #endif
 
-// These define's must be placed at the beginning before #include "ESP8266TimerInterrupt.h"
-// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
-// Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
-#define TIMER_INTERRUPT_DEBUG         1
-#define _TIMERINTERRUPT_LOGLEVEL_     0
-
 #include "lib.h"
-
-#define BUILTIN_LED 2 // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
-
-#define TIMER_INTERVAL_MS 2000 
 
 /* NTP client to fetch timestamp */
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 0);
+Ticker blinker;
+Ticker dataReader;
+Ticker senderController;
+
+boolean mustDetach;
 
 void sendData(){
   DynamicJsonDocument data(100);
@@ -24,25 +19,24 @@ void sendData(){
   http.begin(address + "/api/data");      
   http.addHeader("Content-Type", "application/json"); 
 
-  /*float distance = measurement->getDistance();
-  long timestamp = measurement->getTimestamp();
-  */
-  data["State"] = state;
-
   timeClient.update();
   timestamp = timeClient.getEpochTime();
 
-  if(state != "NORMAL"){
+  noInterrupts();
+  data["State"] = state;
+
+  if(state != State::NORMAL){
     data["Distance"] = distance;
     data["Timestamp"] = timestamp;
   } else {
     data["Distance"] = "";
     data["Timestamp"] = "";
   }
-
+  interrupts();
+  
   String json = "";
   serializeJson(data, json);
-  Serial.println(json);
+  //Serial.println(json);
   
   http.POST(json);   
   http.end();
@@ -56,7 +50,6 @@ void setup() {
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);  
 
-                              
   WiFi.begin(ssidName, pwd);
   Serial.print("Connecting...");
   while (WiFi.status() != WL_CONNECTED) {  
@@ -65,25 +58,63 @@ void setup() {
   } 
   Serial.println("Connected: \n local IP: " + WiFi.localIP());
 
-  // Interval in microsecs
-  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, readDistanceAndSetState)) {
-    lastMillis = millis();
-    Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(lastMillis);
-  } else {
-    Serial.println(F("Can't set ITimer correctly. Select another freq. or interval"));
+  /* We determine the state of the river */
+  precState = State::IDLE;
+  readDistanceAndSetState();
+  /* We attach an interrupt that reads distance and sets state every second */
+  dataReader.attach(1, readDistanceAndSetState);
+
+  /* If state sampled is NORMAL then we cannot detach the Timer that 
+   *  sends data to the server
+   */
+  mustDetach = false;
+  if(state != State::NORMAL){
+    mustDetach = true;
   }
 
+  /* Client start to fetch current timestamp */
   timeClient.begin();
 }
 
 void loop() { 
- if (WiFi.status()== WL_CONNECTED){   
-  if(msgReady){
-    sendData();
-  }
+  if (WiFi.status() == WL_CONNECTED){ 
+    noInterrupts();
+    switch(state){
+      case State::NORMAL:
+        /* At state change we always send the data, even in the other cases */
+        if(isStateChanged){
+          /* As said before, we detach the interrupt if we're coming from
+           *  PRE_ALARM or ALARM state
+           */
+          if(mustDetach){
+            senderController.detach();
+          }
+          Serial.println(String("Sending ") + (char)state);
+          sendData();
+        }
+        break;
+      case State::PRE_ALARM:
+      case State::ALARM:
+        /* If the state is different from the previous sampled by dataReader ISR,
+         *  we attach the one to senderController, that sets the msg ready to be sent
+         *  every T seconds, depending on the state
+         */
+        if(isStateChanged){
+          senderController.attach(state == State::ALARM ? 5 : 10, setMsgReady);
+          mustDetach = true;
+        }
+        /* We send data at state change and when senderController tells us */
+        if(msgReady || isStateChanged){
+          Serial.println(String("Sending ") + (char)state);
+          sendData();
+        }
+        break;
+    }
+    interrupts();
+    
  } else { 
    Serial.println("Error in WiFi connection");   
  }
  
- delay(2500);  
+ delay(1000);  
 }

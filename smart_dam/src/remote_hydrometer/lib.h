@@ -7,30 +7,35 @@
 #define D1_IN_M 1
 #define D2_IN_M 0.4
 
-#include "MeasurementImpl.h"
-#include "RiverStateImpl.h"
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
-#include "ESP8266TimerInterrupt.h"
+#include <Ticker.h>  //Ticker Library
 #include <TimeLib.h>
 #include <ArduinoJson.h>
 
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-extern volatile Measurement* measurement;
-extern volatile RiverState* riverState;
 extern const double vs;
 extern volatile boolean statusLed;
 extern volatile uint32_t lastMillis;
 
-extern  String state;
-extern volatile float distance;
+extern float distance;
 extern unsigned long timestamp;
-extern volatile boolean msgReady;
+extern boolean msgReady;
+extern boolean isStateChanged; 
 
-// Init ESP8266 timer 0
-extern ESP8266Timer ITimer;
+enum State{
+  IDLE = 'I',
+  NORMAL = 'N',
+  PRE_ALARM = 'P',
+  ALARM = 'A'
+};
+
+extern State state;
+extern State precState;
+
+extern Ticker blinker;
 
 /* wifi network name */
 extern char* ssidName;
@@ -39,10 +44,11 @@ extern char* pwd;
 /* service IP address */
 extern String address;
 
-
 void sendData();
 
-void ICACHE_RAM_ATTR readDistanceAndSetState();
+void readDistanceAndSetState();
+
+void setMsgReady();
 
 void ICACHE_RAM_ATTR blinkLed();
 
