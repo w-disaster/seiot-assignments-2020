@@ -1,12 +1,9 @@
 package com.dm.dam_mobile;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -22,13 +19,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.UUID;
 
 import btlib.BluetoothChannel;
+import btlib.BluetoothUtils;
+import btlib.ConnectToBluetoothServerTask;
+import btlib.ConnectionTask;
+import btlib.RealBluetoothChannel;
+import btlib.exceptions.BluetoothDeviceNotFound;
 import btlib.utils.C;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,13 +70,14 @@ public class MainActivity extends AppCompatActivity {
         }
         */
 
-        //later the dam state will be received by DS
+        // default
         this.damState = DamState.CONNECTING;
+
         //level will also be received by DS
         this.damLevel = DAM_LEVEL_MAX;
         //water level will also be received by DS
         this.waterLevel = 50;
-
+        // later from message
         this.context = ControlMode.AUTOMATIC;
 
         initUI();
@@ -333,5 +334,46 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return message;
+    }
+
+    /**
+     * Sets connection with bluetooth device.
+     * @throws BluetoothDeviceNotFound
+     */
+    private void connectToBTServer() throws BluetoothDeviceNotFound {
+        final BluetoothDevice serverDevice = BluetoothUtils.getPairedDeviceByName(C.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME);
+
+        //final UUID uuid = BluetoothUtils.getEmbeddedDeviceDefaultUuid();
+        final UUID uuid = BluetoothUtils.generateUuidFromString(C.bluetooth.BT_SERVER_UUID);
+
+        new ConnectToBluetoothServerTask(serverDevice, uuid, new ConnectionTask.EventListener() {
+            @Override
+            public void onConnectionActive(final BluetoothChannel channel) {
+
+                btChannel = channel;
+                btChannel.registerListener(new RealBluetoothChannel.Listener() {
+                    @Override
+                    public void onMessageReceived(String receivedMessage) {
+                        //TODO: process message
+
+                        //TODO: update fields accordingly
+
+                        // update UI
+                        updateUI();
+                    }
+
+                    @Override
+                    public void onMessageSent(String sentMessage) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onConnectionCanceled() {
+               damState = DamState.CONNECTING;
+               updateUI();
+            }
+        }).execute();
     }
 }
