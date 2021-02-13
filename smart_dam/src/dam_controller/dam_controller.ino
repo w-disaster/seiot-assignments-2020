@@ -20,6 +20,7 @@ void setup()
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 
+  /* message service */
   MsgService.init();
   //while (!Serial) continue;
 
@@ -55,7 +56,7 @@ void setup()
   btService.init();
 
   /* initialize scheduler */
-  scheduler.init(N_TASKS);
+  scheduler.init(BASE_PERIOD);
 }
 
 void loop()

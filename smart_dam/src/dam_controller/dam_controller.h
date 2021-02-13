@@ -11,6 +11,6 @@
 #define LED 13
 #define SERVO_MOTOR 7
 
-#define N_TASKS 10
+#define BASE_PERIOD 10
 
 #endif
