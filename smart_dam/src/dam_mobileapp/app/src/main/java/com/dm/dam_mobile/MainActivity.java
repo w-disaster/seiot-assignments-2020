@@ -18,7 +18,11 @@ import android.content.Intent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,8 +39,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int DAM_LEVEL_MAX = 100;
     private static final int DAM_LEVEL_MIN = 0;
     private static final int DAM_STEP = 20;
+
     private static final String BTN_DISABLED = "#5c5c5c";
     private static final String BTN_ENABLED = "#009688";
+
+    /* jSON accepted keys */
+    private static final List<String> JSON_KEYS = new ArrayList<>(Arrays.asList("foo", "bar"));
 
     private int damLevel;
     private int waterLevel;
@@ -353,19 +361,28 @@ public class MainActivity extends AppCompatActivity {
                 btChannel = channel;
                 btChannel.registerListener(new RealBluetoothChannel.Listener() {
                     @Override
-                    public void onMessageReceived(String receivedMessage) {
-                        //TODO: process message
+                    public void onMessageReceived(final String receivedMessage) {
+                        // parse the json message
+                        try {
+                            JSONObject jsonMessage = new JSONObject(receivedMessage);
 
-                        //TODO: update fields accordingly
+                            // check all accepted keys and update the global fields
+                            for (final String key : JSON_KEYS){
+                                if(jsonMessage.has(key)) {
+                                    updateValueFromKey(key, Integer.parseInt(String.valueOf(jsonMessage.get(key))));
+                                }
+                            }
+
+                        } catch (JSONException exception){
+                            exception.printStackTrace();
+                        }
 
                         // update UI
                         updateUI();
                     }
 
                     @Override
-                    public void onMessageSent(String sentMessage) {
-
-                    }
+                    public void onMessageSent(String sentMessage) {}
                 });
             }
 
@@ -375,5 +392,49 @@ public class MainActivity extends AppCompatActivity {
                updateUI();
             }
         }).execute();
+    }
+
+    /**
+     * Updates the value of a parameter based on the key given.
+     * @param key
+     * The parameter to update.
+     */
+    private void updateValueFromKey(final String key, final int value){
+        switch (key){
+            case "context":
+                switch (value) {
+                    case 0:
+                        this.context = ControlMode.AUTOMATIC;
+                        break;
+                    case 1:
+                        this.context = ControlMode.MANUAL;
+                        break;
+                    default:break;
+                }
+                break;
+            case "state":
+                switch (value) {
+                    case 0:
+                        this.damState = DamState.NORMAL;
+                        break;
+                    case 1:
+                        this.damState = DamState.PRE_ALARM;
+                        break;
+                    case 2:
+                        this.damState = DamState.ALARM;
+                        break;
+                    default:
+                        this.damState = DamState.CONNECTING;
+                        break;
+                }
+                break;
+            case "water":
+                this.waterLevel = value;
+                break;
+            case "level":
+                this.damLevel = value;
+                break;
+            default:break;
+        }
     }
 }
