@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +56,7 @@ public class Test {
 	    }
 
 	    // close reader
-	    reader.close();*/
+	    reader.close();
 		
 		Gson gson = new Gson();
 		
@@ -64,7 +66,11 @@ public class Test {
 		nomi.add("giovanni");
 		String json = gson.toJson(nomi);
 		System.out.println(json);
-	    
+	    */
+	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+	    long time = System.currentTimeMillis();
+		Timestamp t = new Timestamp(time);
+		System.out.println(time);
 	}
 	
 }

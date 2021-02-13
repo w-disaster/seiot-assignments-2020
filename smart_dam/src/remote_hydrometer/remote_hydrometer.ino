@@ -8,27 +8,55 @@
 #define TIMER_INTERRUPT_DEBUG         1
 #define _TIMERINTERRUPT_LOGLEVEL_     0
 
-#include "ESP8266TimerInterrupt.h"
 #include "lib.h"
 
-#define BUILTIN_LED     2       // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
+#define BUILTIN_LED 2 // Pin D4 mapped to pin GPIO2/TXD1 of ESP8266, NodeMCU and WeMoS, control on-board LED
 
-volatile bool statusLed = false;
-volatile uint32_t lastMillis = 0;
+#define TIMER_INTERVAL_MS 2000 
 
-#define TIMER_INTERVAL_MS       1000
+/* NTP client to fetch timestamp */
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 0);
 
-// Init ESP8266 timer 0
-ESP8266Timer ITimer;
+void sendData(){
+  DynamicJsonDocument data(100);
+  HTTPClient http;
+  http.begin(address + "/api/data");      
+  http.addHeader("Content-Type", "application/json"); 
 
-/* wifi network name */
-char* ssidName = "iPhone di Luca";
-/* WPA2 PSK password */
-char* pwd = "lucafabri1";
-/* service IP address */ 
+  /*float distance = measurement->getDistance();
+  long timestamp = measurement->getTimestamp();
+  */
+  data["State"] = state;
+
+  timeClient.update();
+  timestamp = timeClient.getEpochTime();
+
+  if(state != "NORMAL"){
+    data["Distance"] = distance;
+    data["Timestamp"] = timestamp;
+  } else {
+    data["Distance"] = "";
+    data["Timestamp"] = "";
+  }
+
+  String json = "";
+  serializeJson(data, json);
+  Serial.println(json);
+  
+  http.POST(json);   
+  http.end();
+  
+  msgReady = false;
+}
 
 void setup() { 
-  Serial.begin(115200);                                
+  Serial.begin(115200);    
+
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);  
+
+                              
   WiFi.begin(ssidName, pwd);
   Serial.print("Connecting...");
   while (WiFi.status() != WL_CONNECTED) {  
@@ -38,34 +66,24 @@ void setup() {
   Serial.println("Connected: \n local IP: " + WiFi.localIP());
 
   // Interval in microsecs
-  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, readDistanceAndSend)) {
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, readDistanceAndSetState)) {
     lastMillis = millis();
     Serial.print(F("Starting ITimer OK, millis() = ")); Serial.println(lastMillis);
   } else {
     Serial.println(F("Can't set ITimer correctly. Select another freq. or interval"));
   }
+
+  timeClient.begin();
 }
 
 void loop() { 
  if (WiFi.status()== WL_CONNECTED){   
-
-   /* read sensor */
-   float value = (float) analogRead(A0) / 1023.0;
-   
-   /* send data */
-   Serial.print("sending "+String(value)+"...");    
-   //int code = sendData(address, value, "home");
-   int code = 0;
-   /* log result */
-   if (code == 200){
-     Serial.println("ok");   
-   } else {
-     Serial.println("error");
-   }
+  if(msgReady){
+    sendData();
+  }
  } else { 
    Serial.println("Error in WiFi connection");   
  }
  
- delay(5000);  
- 
+ delay(2500);  
 }

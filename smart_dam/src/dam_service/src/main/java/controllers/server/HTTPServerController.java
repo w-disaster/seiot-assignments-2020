@@ -1,5 +1,6 @@
 package controllers.server;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map.Entry;
 
 import controllers.serial.CommChannel;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonArray;
@@ -51,10 +53,15 @@ public class HTTPServerController extends AbstractVerticle {
 		vertx
 			.createHttpServer()
 			.requestHandler(router)
-			.listen(port);
+			.listen(this.port);
 
 		log("ready");
 	}
+	
+	@Override
+    public void stop() throws Exception {
+        System.out.println("MyVerticle stopped!");
+    }
 	
 	private void handleGet(RoutingContext routingContext) {
 		HttpServerRequest request = routingContext.request();
@@ -68,7 +75,7 @@ public class HTTPServerController extends AbstractVerticle {
 	
 	private void handleAddNewData(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
-		// log("new msg "+routingContext.getBodyAsString());
+		log("new msg " + routingContext.getBodyAsString());
 		JsonObject res = routingContext.getBodyAsJson();
 		if (res == null) {
 			sendError(400, response);
@@ -76,36 +83,38 @@ public class HTTPServerController extends AbstractVerticle {
 			/* We read the json */
 			State state = State.valueOf(res.getString("State"));
 			
-			//NEED TO CHECK STATE
-			
-			long timestamp = res.getLong("Timestamp");
-			float distance = res.getFloat("Distance");
-			
-			
-			/* We obtain the Water Level from detected distance */
-			float waterLevel = this.getWaterLevelFromDistance(distance);
-			
-			/* Dam Mode checking : if new State isn't ALARM it can be MANUAL */
+			/* Dam Mode checking : if new State isn't ALARM it can't be MANUAL */
 			if(this.model.getMode().equals(Mode.MANUAL) && !state.equals(State.ALARM)) {
 				this.model.setMode(Mode.AUTO);
 			}
 			/* State setting */
 			this.model.setState(state);
 			
-			/* If AUTO we determine the Dam open percentage */
-			if(this.model.getMode().equals(Mode.AUTO)) {
-				this.model.setDamOpening(this.getDamOpeningFromDistance(distance));
-			}
 			
-			/* DBMS insert */
-			this.dbmsController.insertData(timestamp, waterLevel, this.model.getMode().toString(), 
-					state.toString(), this.model.getDamOpening());
+			//NEED TO CHECK STATE
+			if(!state.equals(State.NORMAL)) {
+				//long timestamp = res.getLong("Timestamp");
+				float distance = res.getFloat("Distance");
+				long timestamp = res.getLong("Timestamp") * 1000;
+				
+				/* We obtain the Water Level from detected distance */
+				float waterLevel = this.getWaterLevelFromDistance(distance);
+			
+				/* If AUTO we determine the Dam open percentage */
+				if(this.model.getMode().equals(Mode.AUTO)) {
+					this.model.setDamOpening(this.getDamOpeningFromDistance(distance));
+				}
+				
+				/* DBMS insert */
+				this.dbmsController.insertData(timestamp, waterLevel, this.model.getMode().toString(), 
+						state.toString(), this.model.getDamOpening());
+			}
 			
 			/* Msg back if success */
 			response.setStatusCode(200).end();
 			
 			/* Forward message to Dam Controller (Arduino) */
-			this.channel.sendMsg(res.encodePrettily());
+			//this.channel.sendMsg(res.encodePrettily());
 		}
 		
 	}
