@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -115,37 +116,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Changes the control mode from MANUAL to AUTOMATIC and vice versa
-     * @param view
-     */
-    public void switchControlMode(View view){
-        //TODO: send request to DS to context witch
-
-        if(this.contextSwitch.isChecked()){
-
-            this.context = ControlMode.MANUAL;
-
-            if(!operationOutOfBounds(1)){
-                enableButton(btnClose);
-            }
-            if(!operationOutOfBounds(-1)) {
-                enableButton(btnOpen);
-            }
-            
-        }else{
-            this.context = ControlMode.AUTOMATIC;
-            disableButton(btnClose);
-            disableButton(btnOpen);
-        }
-        this.contextSwitch.setText(this.context.toString());
-    }
-
-    /**
      * Initialize UI getting components
      */
     private void initUI(){
         //context set up
         this.contextSwitch = findViewById(R.id.contextSwitch);
+        this.contextSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //TODO: send request to DS to context witch
+
+                if(isChecked){
+                    //update control mode
+                    context = ControlMode.MANUAL;
+
+                    //enable usable buttons
+                    if(!operationOutOfBounds(1)){
+                        enableButton(btnClose);
+                    }
+                    if(!operationOutOfBounds(-1)) {
+                        enableButton(btnOpen);
+                    }
+                }else{
+                    //update control mode
+                    context = ControlMode.AUTOMATIC;
+
+                    //disable buttons
+                    disableButton(btnClose);
+                    disableButton(btnOpen);
+                }
+                //update text
+                contextSwitch.setText(context.toString());
+            }
+        });
 
         //buttons SetUp
         this.btnClose = findViewById(R.id.buttonClose);
