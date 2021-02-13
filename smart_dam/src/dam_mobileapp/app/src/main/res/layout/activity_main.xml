@@ -60,7 +60,7 @@
         app:layout_constraintTop_toBottomOf="@+id/stateLabel"
 
         app:layout_constraintVertical_bias="0.02"
-        android:textSize="25sp"
+        android:textSize="35sp"
         android:text="@string/placeholder"/>
 
     <TextView
@@ -87,7 +87,7 @@
         app:layout_constraintTop_toBottomOf="@+id/levelLabel"
 
         app:layout_constraintVertical_bias="0.02"
-        android:textSize="25sp"
+        android:textSize="35sp"
         android:text="@string/placeholder"/>
 
     <TextView
@@ -115,7 +115,7 @@
         android:textColor="@color/water"
 
         app:layout_constraintVertical_bias="0.02"
-        android:textSize="25sp"
+        android:textSize="35sp"
         android:text="@string/placeholder"/>
 
     <Switch

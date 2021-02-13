@@ -21,6 +21,7 @@ import android.content.Intent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView damLevelView;
     private TextView waterLevelView;
 
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch contextSwitch;
     private Button btnOpen;
     private Button btnClose;
@@ -62,11 +62,13 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        /*!COMMENT FOR TESTING UI
         //initialize Bluetooth connection
         final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if(btAdapter != null && !btAdapter.isEnabled()){
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), C.bluetooth.ENABLE_BT_REQUEST);
         }
+        */
 
         //later the dam state will be received by DS
         this.damState = DamState.CONNECTING;
@@ -101,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
      * Opens the dam by decreasing the dam level by DAM_STEP
      * @param view
      */
-    @RequiresApi(api = Build.VERSION_CODES.R)
     public void openDam(View view) {
         moveDam(-1);
     }
@@ -110,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
      * Close the dam by raising the dam level by DAM_STEP
      * @param view
      */
-    @RequiresApi(api = Build.VERSION_CODES.R)
     public void closeDam(View view){
         moveDam(1);
     }
@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 //update text
                 contextSwitch.setText(context.toString());
+                contextSwitch.setTextColor(Color.parseColor(context.getColor()));
             }
         });
 
@@ -166,6 +167,10 @@ public class MainActivity extends AppCompatActivity {
 
         // dam level
         this.damLevelView = findViewById(R.id.level);
+
+        // disable buttons
+        disableButton(this.btnOpen);
+        disableButton(this.btnClose);
     }
 
     /**
@@ -179,20 +184,20 @@ public class MainActivity extends AppCompatActivity {
         // Pre Alarm and over
         if(this.damState.getAlertLevel() > DamState.NORMAL.getAlertLevel()){
 
-            this.waterLevelLabel.setVisibility(View.GONE);
+            this.waterLevelLabel.setVisibility(View.VISIBLE);
             this.waterLevelView.setVisibility(View.VISIBLE);
-            this.waterLevelView.setText(this.waterLevel);
+            this.waterLevelView.setText(String.valueOf(this.waterLevel));
 
             // Alarm and over
             if(this.damState.getAlertLevel() > DamState.PRE_ALARM.getAlertLevel()){
 
-                this.damLevelLabel.setVisibility(View.GONE);
+                this.damLevelLabel.setVisibility(View.VISIBLE);
                 this.damLevelView.setVisibility(View.VISIBLE);
                 this.contextSwitch.setVisibility(View.VISIBLE);
                 this.btnClose.setVisibility(View.VISIBLE);
                 this.btnOpen.setVisibility(View.VISIBLE);
 
-                this.damLevelView.setText(this.damLevel);
+                this.damLevelView.setText(String.valueOf(this.damLevel));
                 this.contextSwitch.setText(this.context.toString());
                 this.contextSwitch.setTextColor(Color.parseColor(this.context.getColor()));
 
@@ -200,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
                     if(this.damLevel == DAM_LEVEL_MIN){
                         disableButton(this.btnOpen);
                     }
-
                     if(this.damLevel == DAM_LEVEL_MAX){
                         disableButton(this.btnClose);
                     }
@@ -238,27 +242,29 @@ public class MainActivity extends AppCompatActivity {
      * @param verse
      * The verse of the opration (1: close, -1:open).
      */
-    @RequiresApi(api = Build.VERSION_CODES.R)
     private void moveDam(final int verse) {
         if(!operationOutOfBounds(verse)) {
-            // aggiorno il livello diga
+            // update dam level
             this.damLevel = this.damLevel + DAM_STEP * verse;
 
-            // accoppio i valori
-            Map<String, Object> message = Map.of("level", this.damLevel);
+            // pair the values in a map
+            Map<String, Object> message = new HashMap<>();
+            message.put("level", this.damLevel);
 
-            // mando messaggio di muovere anche alla diga fisicamente
+            /*!COMMENT FOR TESTING UI
+            // send message to DC
             this.btChannel.sendMessage(setMessage(message));
+            */
 
-            // aggiorno i bottoni
+            // update buttons
             Button pressedButton;
             Button otherButton;
             if(verse > 0){
-                //la diga è stata chiusa
+                // dam was closed
                 pressedButton = this.btnClose;
                 otherButton = this.btnOpen;
             }else{
-                // la diga è stata aperta
+                // dam was opened
                 pressedButton = this.btnOpen;
                 otherButton = this.btnClose;
             }
@@ -323,7 +329,6 @@ public class MainActivity extends AppCompatActivity {
             }
             message = json.toString();
         } catch (JSONException exception){
-            System.out.println("Errore nel creare il JSON");
             exception.printStackTrace();
         }
 
