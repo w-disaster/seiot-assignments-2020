@@ -7,12 +7,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
-
 import android.bluetooth.BluetoothAdapter;
-
 import android.content.Intent;
 
 import org.json.JSONException;
@@ -20,7 +17,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,34 +66,37 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        /*!COMMENT FOR TESTING UI
         //initialize Bluetooth connection
         final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if(btAdapter != null && !btAdapter.isEnabled()){
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), C.bluetooth.ENABLE_BT_REQUEST);
         }
-        */
 
         // default
         this.damState = DamState.CONNECTING;
 
-        //level will also be received by DS
-        this.damLevel = DAM_LEVEL_MAX;
-        //water level will also be received by DS
-        this.waterLevel = 50;
-        // later from message
-        this.context = ControlMode.AUTOMATIC;
+        // connect to DC via bluetooth
+        try {
+            connectToBTServer();
+        } catch (BluetoothDeviceNotFound bluetoothDeviceNotFound) {
+            bluetoothDeviceNotFound.printStackTrace();
+        }
 
         initUI();
         updateUI();
     }
 
+    /**
+     * FOR TESTING
+     */
     @Override
     protected void onStart() {
         super.onStart();
 
-        //later the dam state will be received by DS
         this.damState = DamState.ALARM;
+        this.damLevel = DAM_LEVEL_MIN;
+        this.waterLevel = 0;
+        this.context = ControlMode.AUTOMATIC;
 
         updateUI();
     }
@@ -130,34 +129,31 @@ public class MainActivity extends AppCompatActivity {
     private void initUI(){
         //context set up
         this.contextSwitch = findViewById(R.id.contextSwitch);
-        this.contextSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                //TODO: send request to DS to context witch
+        this.contextSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            //TODO: send request to DS to context witch
 
-                if(isChecked){
-                    //update control mode
-                    context = ControlMode.MANUAL;
+            if(isChecked){
+                //update control mode
+                context = ControlMode.MANUAL;
 
-                    //enable usable buttons
-                    if(!operationOutOfBounds(1)){
-                        enableButton(btnClose);
-                    }
-                    if(!operationOutOfBounds(-1)) {
-                        enableButton(btnOpen);
-                    }
-                }else{
-                    //update control mode
-                    context = ControlMode.AUTOMATIC;
-
-                    //disable buttons
-                    disableButton(btnClose);
-                    disableButton(btnOpen);
+                //enable usable buttons
+                if(!operationOutOfBounds(1)){
+                    enableButton(btnClose);
                 }
-                //update text
-                contextSwitch.setText(context.toString());
-                contextSwitch.setTextColor(Color.parseColor(context.getColor()));
+                if(!operationOutOfBounds(-1)) {
+                    enableButton(btnOpen);
+                }
+            }else{
+                //update control mode
+                context = ControlMode.AUTOMATIC;
+
+                //disable buttons
+                disableButton(btnClose);
+                disableButton(btnOpen);
             }
+            //update text
+            contextSwitch.setText(context.toString());
+            contextSwitch.setTextColor(Color.parseColor(context.getColor()));
         });
 
         //buttons SetUp
@@ -260,10 +256,8 @@ public class MainActivity extends AppCompatActivity {
             Map<String, Object> message = new HashMap<>();
             message.put("level", this.damLevel);
 
-            /*!COMMENT FOR TESTING UI
             // send message to DC
             this.btChannel.sendMessage(setMessage(message));
-            */
 
             // update buttons
             Button pressedButton;
