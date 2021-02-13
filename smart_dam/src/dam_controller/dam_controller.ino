@@ -7,7 +7,10 @@ StaticJsonDocument<24> receivedJson;
 bool connectionEstabilished;
 
 /* btService */
-MsgServiceBT btService;
+MsgServiceBT btService(2, 3);
+
+/* scheduler */
+Scheduler scheduler;
 
 void setup()
 {
@@ -47,10 +50,18 @@ void setup()
   //     2.302038
   //   ]
   // }
+
+  /* initialize bluetooth service */
+  btService.init();
+
+  /* initialize scheduler */
+  scheduler.init(N_TASKS);
 }
 
 void loop()
 {
+  scheduler.schedule();
+
   if (MsgService.isMsgAvailable())
   {
     Msg *msg = MsgService.receiveMsg();
