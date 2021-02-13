@@ -112,6 +112,7 @@
         app:layout_constraintRight_toRightOf="parent"
 
         app:layout_constraintTop_toBottomOf="@+id/waterLabel"
+        android:textColor="@color/water"
 
         app:layout_constraintVertical_bias="0.02"
         android:textSize="25sp"
@@ -123,10 +124,9 @@
         android:layout_height="53dp"
 
         android:text="@string/mode"
-        android:textOff="@string/auto_mode"
-        android:textOn="@string/manual_mode"
         android:textSize="25sp"
 
+        android:checked="false"
         android:onClick="switchControlMode"
 
         app:layout_constraintBottom_toBottomOf="parent"

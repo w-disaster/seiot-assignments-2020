@@ -7,6 +7,4 @@
     <string name="waterLabel" translatable="true">Livello acqua:</string>
     <string name="placeholder">placeholder</string>
     <string name="mode">Modalità Automatica</string>
-    <string name="auto_mode">Modalità Automatica</string>
-    <string name="manual_mode">Modalità Manuale</string>
 </resources>

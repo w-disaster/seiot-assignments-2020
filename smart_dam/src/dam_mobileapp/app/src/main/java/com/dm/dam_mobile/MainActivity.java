@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int DAM_STEP = 20;
     private static final String BTN_DISABLED = "#5c5c5c";
     private static final String BTN_ENABLED = "#009688";
-    private static final String WATER_COLOR = "#0080ff";
 
     private int damLevel;
     private int waterLevel;
@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView damLevelView;
     private TextView waterLevelView;
 
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch contextSwitch;
     private Button btnOpen;
     private Button btnClose;
@@ -77,21 +78,16 @@ public class MainActivity extends AppCompatActivity {
 
         initUI();
         updateUI();
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
         //later the dam state will be received by DS
         this.damState = DamState.ALARM;
 
         updateUI();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -135,12 +131,12 @@ public class MainActivity extends AppCompatActivity {
             if(!operationOutOfBounds(-1)) {
                 enableButton(btnOpen);
             }
+            
         }else{
             this.context = ControlMode.AUTOMATIC;
             disableButton(btnClose);
             disableButton(btnOpen);
         }
-
         this.contextSwitch.setText(this.context.toString());
     }
 
@@ -164,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
 
         // water
         this.waterLevelView = findViewById(R.id.water);
-        this.stateView.setTextColor(Color.parseColor(WATER_COLOR));
 
         // dam level
         this.damLevelView = findViewById(R.id.level);
@@ -207,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
                         disableButton(this.btnClose);
                     }
                 }else{
+                    this.contextSwitch.setChecked(false);
                     disableButton(this.btnOpen);
                     disableButton(this.btnClose);
                 }
