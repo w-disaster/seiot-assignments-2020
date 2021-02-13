@@ -12,10 +12,15 @@ MsgServiceBT btService(2, 3);
 /* scheduler */
 Scheduler scheduler;
 
+/* led */
+Led *led;
+
 void setup()
 {
   // Initialize Serial port
   connectionEstabilished = false;
+
+  led = new Led(LED);
 
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
@@ -57,6 +62,12 @@ void setup()
 
   /* initialize scheduler */
   scheduler.init(BASE_PERIOD);
+
+  /* initialize tasks */
+  Task *blinkingTask = new BlinkingTask(led);
+
+  /* add tasks to the scheduler */
+  schedule.addTask(blinkingTask);
 }
 
 void loop()
