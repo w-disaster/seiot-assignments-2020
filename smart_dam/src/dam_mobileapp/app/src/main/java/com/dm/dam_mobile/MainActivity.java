@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        btChannel.close();
+        this.btChannel.close();
     }
 
     public void openDam(View view) {
