@@ -13,7 +13,7 @@ MsgServiceBT btService(2, 3);
 Scheduler scheduler;
 
 /* led */
-Led *led;
+Light *led;
 
 void setup()
 {

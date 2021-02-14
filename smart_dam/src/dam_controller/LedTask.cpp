@@ -3,13 +3,14 @@
 
 LedTask::LedTask(RiverData *riverData, Led *led)
 {
-  this->riverData = RiverData;
+  this->riverData = riverData;
   this->led = led;
 }
 
 void LedTask::init(int period)
 {
   state = BL0;
+  currentMode = riverData->getMode();
   Task::init(period);
 }
 
@@ -22,22 +23,32 @@ bool LedTask::updateTimeAndCheckEvent(int basePeriod)
 
   switch (state)
   {
-  case BL0: //led sempre spento
-    if (riverState == RiverData::RiverState::ALARM_AUTOMATIC)
+  case L0: //led rimane costante a meno che non cambi lo stato
+    if (currentMode != mode)
     {
-      nextState = BL1;
+      if (riverState == RiverData::RiverState::ALARM)
+      {
+        // è in allarme si accende
+        nextState = BL1;
+      }
+      else
+      {
+        // non è in allarme si spegne
+        nextState = L2;
+      }
+      currentMode = mode;
       result = true;
       Task::init(getPeriod());
-      break;
     }
     break;
 
-  case BL1: // led acceso
+  case L1: // led acceso
     if (mode == RiverData::Mode::AUTOMATIC)
     {
+      // blink
       if (updateAndCheckTime(basePeriod))
       {
-        nextState = BL0;
+        nextState = L2;
         result = true;
         break;
       }
@@ -45,17 +56,19 @@ bool LedTask::updateTimeAndCheckEvent(int basePeriod)
     }
     else
     {
-      nextState = BL0;
+      // sempre acceso
+      nextState = L0;
       result = true;
       break;
     }
 
-  case BL2:
-    if (state == RiverData::RiverState::ALARM_AUTOMATIC)
+  case L2:
+    if (riverState == RiverData::RiverState::ALARM)
     {
+      // blink
       if (updateAndCheckTime(basePeriod))
       {
-        nextState = BL1;
+        nextState = L1;
         result = true;
         break;
       }
@@ -63,7 +76,8 @@ bool LedTask::updateTimeAndCheckEvent(int basePeriod)
     }
     else
     {
-      nextState = BL0;
+      // sempre spento
+      nextState = L0;
       result = true;
       break;
     }
@@ -76,12 +90,12 @@ void LedTask::tick()
 {
   switch (state)
   {
-  case BL0:
-  case BL2:
+  case L0:
+  case L2:
     this->led->switchOff();
     break;
 
-  case BL1:
+  case L1:
     this->led->switchOn();
     break;
   }

@@ -6,15 +6,16 @@
 
 class LedTask : public Task
 {
-  RiverData *RiverData;
+  RiverData *riverData;
   Light *led;
   enum State
   {
-    BL0,
-    BL1,
-    BL2
+    L0,
+    L1,
+    L2
   };
   State state;
+  RiverData::Mode currentMode;
 
 public:
   LedTask(RiverData *riverData, Led *led);

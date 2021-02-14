@@ -24,5 +24,5 @@ void RiverDataImpl::setMode(RiverDataImpl::Mode mode)
 
 RiverDataImpl::Mode RiverDataImpl::getMode()
 {
-    return RiverData::getState();
+    return RiverData::getMode();
 }
