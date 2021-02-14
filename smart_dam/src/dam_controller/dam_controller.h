@@ -6,7 +6,7 @@
 #include "MsgService.h"
 #include "MsgServiceBT.h"
 #include "Scheduler.h"
-#include "BlinkingTask.h"
+#include "LedTask.h"
 
 /* defines */
 #define LED 13

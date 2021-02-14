@@ -64,10 +64,10 @@ void setup()
   scheduler.init(BASE_PERIOD);
 
   /* initialize tasks */
-  Task *blinkingTask = new BlinkingTask(led);
+  Task *ledTask = new LedTask(led);
 
   /* add tasks to the scheduler */
-  schedule.addTask(blinkingTask);
+  schedule.addTask(ledTask);
 }
 
 void loop()
