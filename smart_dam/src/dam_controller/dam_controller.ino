@@ -1,12 +1,10 @@
 #include "dam_controller.h"
 
-/*//!TEST
 #define LED_PIN 2
 
 StaticJsonDocument<24> sendJson;
-StaticJsonDocument<24> receivedJson;
+StaticJsonDocument<150> receivedJson;
 bool connectionEstabilished;
-*/
 
 /* btService */
 MsgServiceBT btService(2, 3);
@@ -15,24 +13,23 @@ MsgServiceBT btService(2, 3);
 Scheduler scheduler;
 
 /* led */
-Led *led;
-
-/* river data */
-RiverData *riverData;
+Light *led;
 
 void setup()
 {
-
-  /*//!TEST 
+  pinMode(2, OUTPUT);
+  digitalWrite(2, LOW);
+  /*Msg* message = new MsgImpl("ciao");
   // Initialize Serial port
   connectionEstabilished = false;
+
+  led = new Led(LED);
 
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 
   /* message service */
-  /*//!TEST
-  MsgService.init();
+  //MsgService.init();
   //while (!Serial) continue;
 
   // Allocate the JSON document
@@ -63,70 +60,41 @@ void setup()
   //   ]
   // }
 
-  */
-
-  /* initialize river data */
-  riverData = new RiverDataImpl(RiverData::RiverState::NORMAL);
-
-  /* initialize led */
-  led = new Led(LED);
-
-  /* initialize message service */
-  MsgService.init();
-
   /* initialize bluetooth service */
   btService.init();
 
   /* initialize scheduler */
   scheduler.init(BASE_PERIOD);
 
+  Task* damServiceCommTask = new DamServiceCommTask();
+  damServiceCommTask->init(200);
+  scheduler.addTask(damServiceCommTask);
+  
   /* initialize tasks */
-  Task *ledTask = new LedTask(riverData, led);
+  //Task *blinkingTask = new BlinkingTask(led);
 
   /* add tasks to the scheduler */
-  scheduler.addTask(ledTask);
+  //schedule.addTask(blinkingTask);
 }
 
 void loop()
 {
-  scheduler.schedule();
+  //scheduler.schedule();
+  if (MsgService.isMsgAvailable()) {
+        Msg *msg = MsgService.receiveMsg();
+        
+        DeserializationError error = deserializeJson(receivedJson, msg->getContent());
 
-  /*//!TEST
-  if (MsgService.isMsgAvailable())
-  {
-    Msg *msg = MsgService.receiveMsg();
-    if (msg->getContent() == "ready" && !connectionEstabilished)
-    {
-      delay(500);
-      connectionEstabilished = true;
-    }
-    else
-    {
-      DeserializationError error = deserializeJson(receivedJson, msg->getContent());
-
-      // Test if parsing succeeds.
-      if (!error)
-      {
-        if (receivedJson["Mode"] == sendJson["Mode"])
-        {
-          digitalWrite(LED_PIN, HIGH);
-          delay(1000);
-          digitalWrite(LED_PIN, LOW);
+        // Test if parsing succeeds.
+        if (!error) {   
+            
+            digitalWrite(2, HIGH);
+            delay(1000);
+            digitalWrite(2, LOW);
         }
-      }
+        
+        
+        /* NOT TO FORGET: message deallocation */
+        delete msg;
     }
-    /* NOT TO FORGET: message deallocation */
-  /*
-  delete msg;
-}
-
-if (connectionEstabilished)
-{
-  serializeJson(sendJson, Serial);
-  Serial.println("");
-}
-// The above line prints:
-delay(2000);
-
-*/
 }

@@ -114,7 +114,7 @@ public class HTTPServerController extends AbstractVerticle {
 			response.setStatusCode(200).end();
 			
 			/* Forward message to Dam Controller (Arduino) */
-			//this.channel.sendMsg(res.encodePrettily());
+			this.channel.sendMsg(res.encodePrettily());
 		}
 		
 	}

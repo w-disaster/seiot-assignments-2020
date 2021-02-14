@@ -41,20 +41,12 @@ public class RunDamService {
 		HTTPServerController serverController = new HTTPServerController(8080, model, dbmsController, channel);
 		vertx.deployVerticle(serverController);
 		
-		/*
 		
 		// We start the thread in charge of managing communication channel with Dam Controller 
 		Runnable serialController = new SerialCommChannelControllerRunnable(model, channel);
 		Thread serialControllerThread = new Thread(serialController);
 		serialControllerThread.start();
 		
-		*/
-		
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-		    public void run() {
-		    	vertx.close();
-		    }
-		});
 	}
 
 }

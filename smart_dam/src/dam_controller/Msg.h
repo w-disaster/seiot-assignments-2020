@@ -1,15 +1,13 @@
 #ifndef __MSG__
-#define __MSG___
+#define __MSG__
 
-#include "Arduino.h"
 
-class Msg
-{
-private:
-    String content;
+class Msg{
 
-public:
-    Msg(const String &content);
+  String content;
+  
+  public:
+    Msg(String content);
     String getContent();
 };
 

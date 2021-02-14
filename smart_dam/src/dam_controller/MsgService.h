@@ -1,32 +1,32 @@
 #ifndef __MSGSERVICE__
 #define __MSGSERVICE__
 
+#include "Arduino.h"
 #include "Msg.h"
 
-class Pattern
-{
+class Pattern {
 public:
-  virtual boolean match(const Msg &m) = 0;
+  virtual boolean match(const Msg& m) = 0;  
 };
 
-class MsgServiceClass
-{
-
-public:
-  Msg *currentMsg;
+class MsgServiceClass {
+    
+public: 
+  
+  Msg* currentMsg;
   bool msgAvailable;
 
-  void init();
+  void init();  
 
   bool isMsgAvailable();
-  Msg *receiveMsg();
+  Msg* receiveMsg();
 
-  bool isMsgAvailable(Pattern &pattern);
+  bool isMsgAvailable(Pattern& pattern);
 
   /* note: message deallocation is responsibility of the client */
-  Msg *receiveMsg(Pattern &pattern);
-
-  void sendMsg(const String &msg);
+  Msg* receiveMsg(Pattern& pattern);
+  
+  void sendMsg(const String& msg);
 };
 
 extern MsgServiceClass MsgService;
