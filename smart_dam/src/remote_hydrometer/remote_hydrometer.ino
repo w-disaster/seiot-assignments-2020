@@ -23,7 +23,17 @@ void sendData(){
   timestamp = timeClient.getEpochTime();
 
   noInterrupts();
-  data["State"] = state;
+  switch(state){
+    case State::NORMAL:
+        data["State"] = "NORMAL";
+        break;
+      case State::PRE_ALARM:
+        data["State"] = "PRE_ALARM";
+        break;
+      case State::ALARM:
+        data["State"] = "ALARM";
+        break;
+  }
 
   if(state != State::NORMAL){
     data["Distance"] = distance;
@@ -48,7 +58,8 @@ void setup() {
   Serial.begin(115200);    
 
   pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);  
+  pinMode(ECHO_PIN, INPUT); 
+  pinMode(LED_PIN, OUTPUT); 
 
   WiFi.begin(ssidName, pwd);
   Serial.print("Connecting...");
@@ -63,7 +74,7 @@ void setup() {
   readDistanceAndSetState();
   /* We attach an interrupt that reads distance and sets state every second */
   dataReader.attach(1, readDistanceAndSetState);
-
+  
   /* If state sampled is NORMAL then we cannot detach the Timer that 
    *  sends data to the server
    */
@@ -72,8 +83,32 @@ void setup() {
     mustDetach = true;
   }
 
+  mustDetachLedISR = false;
+
   /* Client start to fetch current timestamp */
   timeClient.begin();
+}
+
+void setLedBehaviour(State state){
+  noInterrupts();
+  switch(state){
+    case State::NORMAL:
+        if(mustDetachLedISR){
+          blinker.detach();
+        }
+        digitalWrite(LED_PIN, LOW);
+        break;
+      case State::PRE_ALARM:
+        blinker.attach_ms(200, blinkLed);
+        break;
+      case State::ALARM:
+        if(mustDetachLedISR){
+          blinker.detach();
+        }
+        digitalWrite(LED_PIN, HIGH);
+        break;
+  }
+  interrupts();
 }
 
 void loop() { 
@@ -89,6 +124,7 @@ void loop() {
           if(mustDetach){
             senderController.detach();
           }
+          setLedBehaviour(state);
           Serial.println(String("Sending ") + (char)state);
           sendData();
         }
@@ -102,6 +138,7 @@ void loop() {
         if(isStateChanged){
           senderController.attach(state == State::ALARM ? 5 : 10, setMsgReady);
           mustDetach = true;
+          setLedBehaviour(state);
         }
         /* We send data at state change and when senderController tells us */
         if(msgReady || isStateChanged){

@@ -6,6 +6,7 @@
 
 #define D1_IN_M 1
 #define D2_IN_M 0.4
+#define LED_PIN D2
 
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
@@ -24,6 +25,7 @@ extern float distance;
 extern unsigned long timestamp;
 extern boolean msgReady;
 extern boolean isStateChanged; 
+extern boolean mustDetachLedISR;
 
 enum State{
   IDLE = 'I',
@@ -50,7 +52,7 @@ void readDistanceAndSetState();
 
 void setMsgReady();
 
-void ICACHE_RAM_ATTR blinkLed();
+void blinkLed();
 
 float getDistance();
 

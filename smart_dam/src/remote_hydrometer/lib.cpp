@@ -10,6 +10,7 @@ float distance;
 unsigned long timestamp;
 boolean msgReady = false;
 boolean isStateChanged; 
+boolean mustDetachLedISR;
 
 State state;
 State precState;
@@ -30,11 +31,20 @@ void readDistanceAndSetState(){
   } else {
     state = State::ALARM;
   }
+    
   if(precState != state){
+    mustDetachLedISR = false;
+    if(precState == State::PRE_ALARM){
+      mustDetachLedISR = true;
+    }
     isStateChanged = true;
   } else {
+    mustDetachLedISR = false;
     isStateChanged = false;
   }
+
+  
+  
   precState = state;
 }
 
@@ -60,15 +70,15 @@ float getDistance(){
     return d;
 }
 
-void ICACHE_RAM_ATTR blinkLed() {
+void blinkLed() {
   static bool started = false;
 
   if (!started)
   {
     started = true;
-    pinMode(BUILTIN_LED, OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
   }
 
-  digitalWrite(BUILTIN_LED, statusLed);  //Toggle LED Pin
+  digitalWrite(LED_PIN, statusLed);  //Toggle LED Pin
   statusLed = !statusLed;
 }
