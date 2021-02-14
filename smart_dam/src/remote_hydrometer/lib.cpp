@@ -15,6 +15,10 @@ boolean mustDetachLedISR;
 State state;
 State precState;
 
+/* NTP client to fetch timestamp */
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 0);
+
 char* ssidName = "Vodafonefabri";
 char* pwd = "3Com2007";
 String address = "http://192.168.1.5:8080";
@@ -33,9 +37,13 @@ void readDistanceAndSetState(){
   }
     
   if(precState != state){
-    mustDetachLedISR = false;
+    /* If the state is changed and the previous was PRE_ALARM then
+     *  we must detach the interrupt
+     */
     if(precState == State::PRE_ALARM){
       mustDetachLedISR = true;
+    } else {
+      mustDetachLedISR = false;
     }
     isStateChanged = true;
   } else {
@@ -43,9 +51,50 @@ void readDistanceAndSetState(){
     isStateChanged = false;
   }
 
-  
-  
   precState = state;
+}
+
+void sendData(){
+  DynamicJsonDocument data(100);
+  HTTPClient http;
+  http.begin(address + "/api/data");      
+  http.addHeader("Content-Type", "application/json"); 
+
+  timeClient.update();
+  timestamp = timeClient.getEpochTime();
+
+  noInterrupts();
+  /* We determine the strint to send */
+  switch(state){
+    case State::NORMAL:
+        data["State"] = "NORMAL";
+        break;
+      case State::PRE_ALARM:
+        data["State"] = "PRE_ALARM";
+        break;
+      case State::ALARM:
+        data["State"] = "ALARM";
+        break;
+  }
+
+  /* At NORMAL state we mustn't send river data */
+  if(state != State::NORMAL){
+    data["Distance"] = distance;
+    data["Timestamp"] = timestamp;
+  } else {
+    data["Distance"] = "";
+    data["Timestamp"] = "";
+  }
+  interrupts();
+  
+  String json = "";
+  serializeJson(data, json);
+  //Serial.println(json);
+  
+  http.POST(json);   
+  http.end();
+  
+  msgReady = false;
 }
 
 void setMsgReady(){

@@ -28,16 +28,20 @@ extern boolean isStateChanged;
 extern boolean mustDetachLedISR;
 
 enum State{
-  IDLE = 'I',
-  NORMAL = 'N',
-  PRE_ALARM = 'P',
-  ALARM = 'A'
+  IDLE,
+  NORMAL,
+  PRE_ALARM,
+  ALARM
 };
 
 extern State state;
 extern State precState;
 
 extern Ticker blinker;
+
+/* NTP client to fetch timestamp */
+extern WiFiUDP ntpUDP;
+extern NTPClient timeClient;
 
 /* wifi network name */
 extern char* ssidName;
