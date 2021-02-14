@@ -1,28 +1,28 @@
 #include "RiverDataImpl.h"
 #include "Arduino.h"
 
-RiverDataImpl::RiverDataImpl(RiverDataImpl::RiverState initialState)
+RiverDataImpl::RiverDataImpl(RiverData::RiverState initialState)
 {
-    getState(initialState);
+    setState(initialState);
     setMode(AUTOMATIC);
 }
 
-void RiverDataImpl::setState(RiverDataImpl::RiverState state)
+void RiverDataImpl::setState(RiverData::RiverState state)
 {
     RiverData::setState(state);
 }
 
-RiverDataImpl::Step RiverDataImpl::getState()
+RiverData::RiverState RiverDataImpl::getState()
 {
     return RiverData::getState();
 }
 
-void RiverDataImpl::setMode(RiverDataImpl::Mode mode)
+void RiverDataImpl::setMode(RiverData::Mode mode)
 {
     RiverData::setMode(mode);
 }
 
-RiverDataImpl::Mode RiverDataImpl::getMode()
+RiverData::Mode RiverDataImpl::getMode()
 {
     return RiverData::getMode();
 }

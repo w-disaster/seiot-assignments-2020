@@ -1,10 +1,12 @@
 #include "dam_controller.h"
 
+/*//!TEST
 #define LED_PIN 2
 
 StaticJsonDocument<24> sendJson;
 StaticJsonDocument<24> receivedJson;
 bool connectionEstabilished;
+*/
 
 /* btService */
 MsgServiceBT btService(2, 3);
@@ -13,19 +15,23 @@ MsgServiceBT btService(2, 3);
 Scheduler scheduler;
 
 /* led */
-Light *led;
+Led *led;
+
+/* river data */
+RiverData *riverData;
 
 void setup()
 {
+
+  /*//!TEST 
   // Initialize Serial port
   connectionEstabilished = false;
-
-  led = new Led(LED);
 
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 
   /* message service */
+  /*//!TEST
   MsgService.init();
   //while (!Serial) continue;
 
@@ -57,6 +63,17 @@ void setup()
   //   ]
   // }
 
+  */
+
+  /* initialize river data */
+  riverData = new RiverDataImpl(RiverData::RiverState::NORMAL);
+
+  /* initialize led */
+  led = new Led(LED);
+
+  /* initialize message service */
+  MsgService.init();
+
   /* initialize bluetooth service */
   btService.init();
 
@@ -64,16 +81,17 @@ void setup()
   scheduler.init(BASE_PERIOD);
 
   /* initialize tasks */
-  Task *ledTask = new LedTask(led);
+  Task *ledTask = new LedTask(riverData, led);
 
   /* add tasks to the scheduler */
-  schedule.addTask(ledTask);
+  scheduler.addTask(ledTask);
 }
 
 void loop()
 {
   scheduler.schedule();
 
+  /*//!TEST
   if (MsgService.isMsgAvailable())
   {
     Msg *msg = MsgService.receiveMsg();
@@ -98,14 +116,17 @@ void loop()
       }
     }
     /* NOT TO FORGET: message deallocation */
-    delete msg;
-  }
+  /*
+  delete msg;
+}
 
-  if (connectionEstabilished)
-  {
-    serializeJson(sendJson, Serial);
-    Serial.println("");
-  }
-  // The above line prints:
-  delay(2000);
+if (connectionEstabilished)
+{
+  serializeJson(sendJson, Serial);
+  Serial.println("");
+}
+// The above line prints:
+delay(2000);
+
+*/
 }

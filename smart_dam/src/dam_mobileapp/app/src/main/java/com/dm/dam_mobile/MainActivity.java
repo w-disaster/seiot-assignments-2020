@@ -35,12 +35,13 @@ public class MainActivity extends AppCompatActivity {
     private static final int DAM_LEVEL_MAX = 100;
     private static final int DAM_LEVEL_MIN = 0;
     private static final int DAM_STEP = 20;
+    private static final int DEFAULT_MANUAL = 80;
 
     private static final String BTN_DISABLED = "#5c5c5c";
     private static final String BTN_ENABLED = "#009688";
 
     /* jSON accepted keys */
-    private static final List<String> JSON_KEYS = new ArrayList<>(Arrays.asList("foo", "bar"));
+    private static final List<String> JSON_KEYS = new ArrayList<>(Arrays.asList("mode", "level", "water", "state"));
 
     private int damLevel;
     private int waterLevel;
@@ -151,6 +152,15 @@ public class MainActivity extends AppCompatActivity {
                 disableButton(btnClose);
                 disableButton(btnOpen);
             }
+
+            // pair the values in a map
+            Map<String, Object> message = new HashMap<>();
+            message.put("level", DEFAULT_MANUAL);
+            message.put("context", this.context);
+
+            // send message to DC
+            this.btChannel.sendMessage(setMessage(message));
+
             //update text
             contextSwitch.setText(context.toString());
             contextSwitch.setTextColor(Color.parseColor(context.getColor()));
@@ -363,18 +373,16 @@ public class MainActivity extends AppCompatActivity {
                             // check all accepted keys and update the global fields
                             for (final String key : JSON_KEYS){
                                 if(jsonMessage.has(key)) {
-                                    updateValueFromKey(key, Integer.parseInt(String.valueOf(jsonMessage.get(key))));
+                                    updateValueFromKey(key, String.valueOf(jsonMessage.get(key)));
                                 }
                             }
 
                         } catch (JSONException exception){
                             exception.printStackTrace();
                         }
-
                         // update UI
                         updateUI();
                     }
-
                     @Override
                     public void onMessageSent(String sentMessage) {}
                 });
@@ -393,14 +401,14 @@ public class MainActivity extends AppCompatActivity {
      * @param key
      * The parameter to update.
      */
-    private void updateValueFromKey(final String key, final int value){
+    private void updateValueFromKey(final String key, final String value){
         switch (key){
-            case "context":
+            case "mode":
                 switch (value) {
-                    case 0:
+                    case "automatica":
                         this.context = ControlMode.AUTOMATIC;
                         break;
-                    case 1:
+                    case "manuale":
                         this.context = ControlMode.MANUAL;
                         break;
                     default:break;
@@ -408,13 +416,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "state":
                 switch (value) {
-                    case 0:
+                    case "normale":
                         this.damState = DamState.NORMAL;
                         break;
-                    case 1:
+                    case "pre_allarme":
                         this.damState = DamState.PRE_ALARM;
                         break;
-                    case 2:
+                    case "allarme":
                         this.damState = DamState.ALARM;
                         break;
                     default:
@@ -423,10 +431,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case "water":
-                this.waterLevel = value;
+                this.waterLevel = Integer.parseInt(value);
                 break;
             case "level":
-                this.damLevel = value;
+                this.damLevel = Integer.parseInt(value);
                 break;
             default:break;
         }

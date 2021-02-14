@@ -9,7 +9,7 @@ LedTask::LedTask(RiverData *riverData, Led *led)
 
 void LedTask::init(int period)
 {
-  state = BL0;
+  state = L0;
   currentMode = riverData->getMode();
   Task::init(period);
 }
@@ -29,7 +29,7 @@ bool LedTask::updateTimeAndCheckEvent(int basePeriod)
       if (riverState == RiverData::RiverState::ALARM)
       {
         // è in allarme si accende
-        nextState = BL1;
+        nextState = L1;
       }
       else
       {
