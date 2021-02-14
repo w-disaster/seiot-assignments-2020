@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
@@ -84,21 +85,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         initUI();
-        updateUI();
-    }
-
-    /**
-     * FOR TESTING
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        this.damState = DamState.ALARM;
-        this.damLevel = DAM_LEVEL_MIN;
-        this.waterLevel = 0;
-        this.context = ControlMode.AUTOMATIC;
-
         updateUI();
     }
 
@@ -355,8 +341,8 @@ public class MainActivity extends AppCompatActivity {
     private void connectToBTServer() throws BluetoothDeviceNotFound {
         final BluetoothDevice serverDevice = BluetoothUtils.getPairedDeviceByName(C.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME);
 
-        //final UUID uuid = BluetoothUtils.getEmbeddedDeviceDefaultUuid();
-        final UUID uuid = BluetoothUtils.generateUuidFromString(C.bluetooth.BT_SERVER_UUID);
+        final UUID uuid = BluetoothUtils.getEmbeddedDeviceDefaultUuid();
+        //final UUID uuid = BluetoothUtils.generateUuidFromString(C.bluetooth.BT_SERVER_UUID);
 
         new ConnectToBluetoothServerTask(serverDevice, uuid, new ConnectionTask.EventListener() {
             @Override
@@ -419,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                     case "normale":
                         this.damState = DamState.NORMAL;
                         break;
-                    case "pre_allarme":
+                    case "pre-allarme":
                         this.damState = DamState.PRE_ALARM;
                         break;
                     case "allarme":
