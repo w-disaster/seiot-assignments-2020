@@ -4,55 +4,12 @@
 
 #include "lib.h"
 
-/* NTP client to fetch timestamp */
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org", 0);
+
 Ticker blinker;
 Ticker dataReader;
 Ticker senderController;
 
 boolean mustDetach;
-
-void sendData(){
-  DynamicJsonDocument data(100);
-  HTTPClient http;
-  http.begin(address + "/api/data");      
-  http.addHeader("Content-Type", "application/json"); 
-
-  timeClient.update();
-  timestamp = timeClient.getEpochTime();
-
-  noInterrupts();
-  switch(state){
-    case State::NORMAL:
-        data["State"] = "NORMAL";
-        break;
-      case State::PRE_ALARM:
-        data["State"] = "PRE_ALARM";
-        break;
-      case State::ALARM:
-        data["State"] = "ALARM";
-        break;
-  }
-
-  if(state != State::NORMAL){
-    data["Distance"] = distance;
-    data["Timestamp"] = timestamp;
-  } else {
-    data["Distance"] = "";
-    data["Timestamp"] = "";
-  }
-  interrupts();
-  
-  String json = "";
-  serializeJson(data, json);
-  //Serial.println(json);
-  
-  http.POST(json);   
-  http.end();
-  
-  msgReady = false;
-}
 
 void setup() { 
   Serial.begin(115200);    
@@ -93,18 +50,24 @@ void setLedBehaviour(State state){
   noInterrupts();
   switch(state){
     case State::NORMAL:
+        /* BlinkLed interrupt detach if senderController tells us */
         if(mustDetachLedISR){
           blinker.detach();
         }
+        /* At NORMAL state the Led is off */ 
         digitalWrite(LED_PIN, LOW);
         break;
       case State::PRE_ALARM:
+        /* If the new state is PRE_ALARM then we attach the interrupt
+         *  that every 200ms switchs on or off the led
+         */
         blinker.attach_ms(200, blinkLed);
         break;
       case State::ALARM:
         if(mustDetachLedISR){
           blinker.detach();
         }
+        /* At ALARM state the Led is steady on */
         digitalWrite(LED_PIN, HIGH);
         break;
   }
@@ -124,8 +87,9 @@ void loop() {
           if(mustDetach){
             senderController.detach();
           }
+
+          /* If state is changed, we must edit the Led behaviour */
           setLedBehaviour(state);
-          Serial.println(String("Sending ") + (char)state);
           sendData();
         }
         break;
@@ -138,6 +102,7 @@ void loop() {
         if(isStateChanged){
           senderController.attach(state == State::ALARM ? 5 : 10, setMsgReady);
           mustDetach = true;
+          /* If state is changed, we must edit the Led behaviour */
           setLedBehaviour(state);
         }
         /* We send data at state change and when senderController tells us */
