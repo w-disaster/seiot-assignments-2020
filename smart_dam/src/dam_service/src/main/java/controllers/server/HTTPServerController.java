@@ -75,7 +75,6 @@ public class HTTPServerController extends AbstractVerticle {
 	
 	private void handleAddNewData(RoutingContext routingContext) {
 		HttpServerResponse response = routingContext.response();
-		log("new msg " + routingContext.getBodyAsString());
 		JsonObject res = routingContext.getBodyAsJson();
 		if (res == null) {
 			sendError(400, response);
@@ -90,12 +89,13 @@ public class HTTPServerController extends AbstractVerticle {
 			/* State setting */
 			this.model.setState(state);
 			
+			log("new msg " + routingContext.getBodyAsString());
+
 			
 			//NEED TO CHECK STATE
 			if(!state.equals(State.NORMAL)) {
-				//long timestamp = res.getLong("Timestamp");
-				float distance = res.getFloat("Distance");
 				long timestamp = res.getLong("Timestamp") * 1000;
+				float distance = res.getFloat("Distance");
 				
 				/* We obtain the Water Level from detected distance */
 				float waterLevel = this.getWaterLevelFromDistance(distance);
@@ -114,7 +114,7 @@ public class HTTPServerController extends AbstractVerticle {
 			response.setStatusCode(200).end();
 			
 			/* Forward message to Dam Controller (Arduino) */
-			this.channel.sendMsg(res.encodePrettily());
+			this.channel.sendMsg(res.encode());
 		}
 		
 	}

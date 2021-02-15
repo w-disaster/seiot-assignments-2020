@@ -26,17 +26,19 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 			try {
 				/* Incoming message */
 				String msg = this.channel.receiveMsg();
-
+				
+				System.out.println(msg);
+				
 				/* We deserialize it as a Json */
-				Mode mode = this.getModeFromJson(msg);
+				//Mode mode = this.getModeFromJson(msg);
 				/* We set the mode of the model, if possible */
-				setEnvironmentMode(this.model, mode);
+				//setEnvironmentMode(this.model, mode);
 								
 				/* Json for response */
-				sendJson = this.getJsonFromCurrentModeAsString();
+				//sendJson = this.getJsonFromCurrentModeAsString();
 				
 		        /* We send back the current Mode of the Environment that serves as an ACK/NAK */
-                channel.sendMsg(sendJson);
+                //channel.sendMsg(sendJson);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

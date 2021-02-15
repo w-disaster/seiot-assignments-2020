@@ -81,9 +81,6 @@ void sendData(){
   if(state != State::NORMAL){
     data["Distance"] = distance;
     data["Timestamp"] = timestamp;
-  } else {
-    data["Distance"] = "";
-    data["Timestamp"] = "";
   }
   interrupts();
   

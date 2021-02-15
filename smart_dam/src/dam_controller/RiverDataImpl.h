@@ -11,6 +11,13 @@ public:
     RiverState getState();
     void setMode(Mode controlMode);
     Mode getMode();
+    void setDistance(float d);
+    float getDistance();
+    void setTimestamp(long t);
+    long getTimestamp();
+
+    void setMsgReady(bool flag);
+    bool isMsgReady();
 };
 
 #endif

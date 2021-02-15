@@ -9,11 +9,11 @@
 #include "LedTask.h"
 #include "Led.h"
 #include "DamServiceCommTask.h"
+#include "RiverDataImpl.h"
 
 /* defines */
 #define LED 13
 #define SERVO_MOTOR 7
-
 #define BASE_PERIOD 50
 
 #endif

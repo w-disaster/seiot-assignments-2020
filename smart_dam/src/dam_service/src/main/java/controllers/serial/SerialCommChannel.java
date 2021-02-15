@@ -36,7 +36,7 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 	}
 
 	@Override
-	public void sendMsg(String msg) {
+	public synchronized void sendMsg(String msg) {
 		char[] array = (msg+"\n").toCharArray();
 		byte[] bytes = new byte[array.length];
 		for (int i = 0; i < array.length; i++){
