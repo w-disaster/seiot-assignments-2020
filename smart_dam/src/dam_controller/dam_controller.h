@@ -10,6 +10,7 @@
 #include "Led.h"
 #include "DamServiceCommTask.h"
 #include "RiverDataImpl.h"
+#include "CommMsg.h"
 
 /* defines */
 #define LED 13

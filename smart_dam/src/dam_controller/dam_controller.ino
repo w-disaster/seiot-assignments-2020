@@ -28,6 +28,10 @@ void setup() {
   damServiceCommTask->init(200);
   scheduler.addTask(damServiceCommTask);
   
+
+  CommMsg* commMsg = new CommMsg("prova");
+  Serial.println(commMsg->getContent());
+
   /* initialize tasks */
   //Task *blinkingTask = new BlinkingTask(led);
 
