@@ -15,7 +15,7 @@ class LedTask : public Task
     L2
   };
   State state;
-  RiverData::Mode currentMode;
+  RiverData::DamMode currentMode;
 
 public:
   LedTask(RiverData *riverData, Led *led);

@@ -2,15 +2,16 @@
 #define __DAM_SERVICE_COMM_TASK__
 
 #include "Task.h"
-#include "MsgService.h"
-#include "ArduinoJson.h"
+#include "MsgServiceClass.h"
+#include "MsgServiceBT.h"
 #include "RiverData.h"
+#include "ArduinoJson.h"
 
+class SerialCommTask : public Task{
 
-class DamServiceCommTask : public Task{
-
-    StaticJsonDocument<100> receivedJson;
+    MsgServiceBT* btService;
     RiverData* riverData;
+    StaticJsonDocument<100> receivedJson;
 
     enum State {
         C0,
@@ -19,7 +20,7 @@ class DamServiceCommTask : public Task{
     State state;
 
     public:
-        DamServiceCommTask(RiverData* riverData);
+        SerialCommTask(RiverData* riverData, MsgServiceBT* btService);
         void init(int period);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();

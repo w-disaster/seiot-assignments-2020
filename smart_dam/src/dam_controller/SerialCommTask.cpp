@@ -1,16 +1,16 @@
 #include "Arduino.h"
-#include "DamServiceCommTask.h"
+#include "SerialCommTask.h"
 
-DamServiceCommTask::DamServiceCommTask(RiverData* riverData){
+SerialCommTask::SerialCommTask(RiverData* riverData, MsgServiceBT* btService){
     this->riverData = riverData;
+    this->btService = btService;
 }
 
-void DamServiceCommTask::init(int period){
-    MsgService.init();
+void SerialCommTask::init(int period){
     Task::init(period);
 }
 
-bool DamServiceCommTask::updateTimeAndCheckEvent(int basePeriod){
+bool SerialCommTask::updateTimeAndCheckEvent(int basePeriod){
     if(Task::updateAndCheckTime(basePeriod)){
         if(MsgService.isMsgAvailable()){
             this->state = C1;
@@ -22,28 +22,25 @@ bool DamServiceCommTask::updateTimeAndCheckEvent(int basePeriod){
     return false;
 }
 
-void DamServiceCommTask::tick(){  
+void SerialCommTask::tick(){  
     switch(this->state){
         case C0:
             break;
         case C1:
             Msg *msg = MsgService.receiveMsg();
 
-            DeserializationError error = deserializeJson(receivedJson, msg->getContent());
+            DeserializationError error = deserializeJson(this->receivedJson, msg->getContent());
 
-            // Test if parsing succeeds.
             if (!error) {   
-                
-                this->riverData->setState(receivedJson["State"]);
+                // we write river data coming from Dam Service to a shared object
+                this->riverData->setRiverState(receivedJson["State"]);
+                this->riverData->setDamMode(receivedJson["Mode"]);
                 this->riverData->setDistance(receivedJson["Distance"]);
-                this->riverData->setTimestamp(receivedJson["Timestamp"]);
-                this->riverData->setMsgReady(true);
-
+                
                 digitalWrite(2, HIGH);
                 delay(200);
                 digitalWrite(2, LOW);
             }
-            /* NOT TO FORGET: message deallocation */
             delete msg;
             break;
     }

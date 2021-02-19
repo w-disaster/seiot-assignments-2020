@@ -1,8 +1,7 @@
 #include "Arduino.h"
-#include "MsgService.h"
+#include "MsgServiceClass.h"
 
 String content;
-
 MsgServiceClass MsgService;
 
 bool MsgServiceClass::isMsgAvailable(){

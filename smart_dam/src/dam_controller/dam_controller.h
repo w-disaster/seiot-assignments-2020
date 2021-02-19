@@ -3,14 +3,13 @@
 
 /* includes */
 #include <ArduinoJson.h>
-#include "MsgService.h"
+#include "MsgServiceClass.h"
 #include "MsgServiceBT.h"
 #include "Scheduler.h"
 #include "LedTask.h"
 #include "Led.h"
-#include "DamServiceCommTask.h"
-#include "RiverDataImpl.h"
-#include "CommMsg.h"
+#include "SerialCommTask.h"
+#include "RiverData.h"
 
 /* defines */
 #define LED 13

@@ -1,0 +1,6 @@
+{
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true,
+    "files.associations": {
+        "iterator": "cpp"
+    }
+}

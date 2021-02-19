@@ -10,7 +10,7 @@ LedTask::LedTask(RiverData *riverData, Led *led)
 void LedTask::init(int period)
 {
   state = L0;
-  currentMode = riverData->getMode();
+  currentMode = riverData->getDamMode();
   Task::init(period);
 }
 
@@ -18,8 +18,8 @@ bool LedTask::updateTimeAndCheckEvent(int basePeriod)
 {
   State nextState = state;
   bool result = false;
-  RiverData::RiverState riverState = this->riverData->getState();
-  RiverData::Mode mode = this->riverData->getMode();
+  RiverData::RiverState riverState = this->riverData->getRiverState();
+  RiverData::DamMode mode = this->riverData->getDamMode();
 
   switch (state)
   {
@@ -43,7 +43,7 @@ bool LedTask::updateTimeAndCheckEvent(int basePeriod)
     break;
 
   case L1: // led acceso
-    if (mode == RiverData::Mode::AUTOMATIC)
+    if (mode == RiverData::DamMode::AUTO)
     {
       // blink
       if (updateAndCheckTime(basePeriod))
