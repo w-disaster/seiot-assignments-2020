@@ -37,10 +37,13 @@ void setup() {
     scheduler->addTask(servoMotorTask);
     
     /* initialize tasks */
-    //Task *blinkingTask = new BlinkingTask(led);
+    Task *ledTask = new LedTask(riverData, led);
     
     /* add tasks to the scheduler */
-    //schedule.addTask(blinkingTask);
+    scheduler->addTask(ledTask);
+
+    /*//!------------TESTING-----------------
+    *///!------------------------------------ 
 }
 
 void loop() {

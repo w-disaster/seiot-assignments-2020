@@ -2,7 +2,7 @@
 #define __BLINK_LED_TASK__
 
 #include "Task.h"
-#include "Led.h"
+#include "Light.h"
 
 class LedTask : public Task
 {
@@ -18,7 +18,7 @@ class LedTask : public Task
   RiverData::DamMode currentMode;
 
 public:
-  LedTask(RiverData *riverData, Led *led);
+  LedTask(RiverData *riverData, Light *led);
   void init(int period);
   bool updateTimeAndCheckEvent(int basePeriod);
   void tick();
