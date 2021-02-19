@@ -16,7 +16,9 @@ class SerialCommTask : public Task{
 
     enum State {
         C0,
-        C1
+        C1,
+        C2,
+        C3
     };
     State state;
 
@@ -25,6 +27,8 @@ class SerialCommTask : public Task{
         void init(int period);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();
+    private:
+        void saveDataAndSetMsgReady(Msg* msg);
 };
 
 #endif
