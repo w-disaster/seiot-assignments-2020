@@ -1,6 +1,12 @@
 #include "RiverData.h"
 #include "Arduino.h"
 
+RiverData::RiverData(){
+    this->riverState = NORMAL;
+    this->damMode = AUTO;
+    this->distance = 5.0;
+}
+
 void RiverData::setRiverState(RiverData::RiverState riverState){
     this->riverState = riverState;
 }

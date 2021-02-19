@@ -9,13 +9,13 @@ public:
         PRE_ALARM,
         ALARM
     };
-    RiverState riverState;
 
     enum DamMode{
         AUTO,
         MANUAL
     };
 
+    RiverData();
     void setRiverState(RiverState riverState);
 
     RiverState getRiverState();
@@ -29,6 +29,7 @@ public:
     float getDistance();
 
 private:
+    RiverState riverState;
     DamMode damMode;
     float distance;
 

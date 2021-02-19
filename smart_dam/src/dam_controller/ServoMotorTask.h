@@ -12,15 +12,15 @@ class ServoMotorTask : public Task{
 
     RiverData* riverData;
     ServoMotor* servoMotor;
-    
-    float lastDistance;
 
     enum State {
-        SM0,
-        SM1
+        S0,
+        S1
     };
     State state;
     
+    float lastDistance;
+
     public:
         ServoMotorTask(RiverData* riverData);
         void init(int period);

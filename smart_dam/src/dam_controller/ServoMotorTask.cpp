@@ -10,19 +10,25 @@ ServoMotorTask::ServoMotorTask(RiverData* riverData){
 
 void ServoMotorTask::init(int period){
     Task::init(period);
-    this->state = SM0;
+    this->state = S0;
     this->servoMotor->on();
 }
 
 bool ServoMotorTask::updateTimeAndCheckEvent(int basePeriod){
     if(Task::updateAndCheckTime(basePeriod)){
         float distance = this->riverData->getDistance();
+        /* If the distance is different from the previous, new one has been sampled
+         *  then we change State to SM1 to move the servo motor
+         */
         if(this->lastDistance != distance){
             this->lastDistance = distance;
-            this->state = SM1;
+            this->state = S1;
             return true;
         }
-        this->state = SM0;
+        /* In other cases we can move the servo motor anyway but we don't, in 
+         *  order not to overload it of writes
+         */
+        this->state = S0;
     }
     return false;
 }
@@ -32,7 +38,8 @@ void ServoMotorTask::tick(){
         case SM0:
             break;
         case SM1:
-            int angle = map(this->distance, 0, MAX_DISTANCE_IN_M, 0, 180);
+            /* We calculate the value in grades in order to write it */ 
+            int angle = map(this->lastDistance, 0, MAX_DISTANCE_IN_M, 0, 180);
             this->servoMotor->setPosition(angle);
             break;
     }

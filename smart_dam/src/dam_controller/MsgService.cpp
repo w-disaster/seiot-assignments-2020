@@ -1,7 +1,8 @@
 #include "Arduino.h"
-#include "MsgServiceClass.h"
+#include "MsgService.h"
 
 String content;
+
 MsgServiceClass MsgService;
 
 bool MsgServiceClass::isMsgAvailable(){
@@ -30,6 +31,10 @@ void MsgServiceClass::init(){
 
 void MsgServiceClass::sendMsg(const String& msg){
   Serial.println(msg);  
+}
+
+void MsgServiceClass::sendMsg(const Msg& msg){
+  Serial.println(msg.getContent());  
 }
 
 void serialEvent() {

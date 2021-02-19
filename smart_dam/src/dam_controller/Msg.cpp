@@ -2,9 +2,18 @@
 #include "Msg.h"
 
 Msg::Msg(String content){
-  this->content = content;
+    this->content = content;
+    setMsgReady(true);
 }
   
 String Msg::getContent(){
-  return this->content;
+    return this->content;
+}
+
+void Msg::setMsgReady(bool flag){
+    this->isReady = flag;
+}
+    
+bool Msg::isMsgReady(){
+    return this->isReady;
 }

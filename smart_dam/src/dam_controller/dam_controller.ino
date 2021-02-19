@@ -2,32 +2,35 @@
 
 #define LED_PIN 2
 
-/* btService */
-MsgServiceBT* btService;
 
+RiverData* riverData = new RiverData();
 /* scheduler */
-Scheduler* scheduler;
+Scheduler* scheduler = new Scheduler();
 
 /* led */
 Light *led;
 
 void setup() {
-    pinMode(2, OUTPUT);
-    digitalWrite(2, LOW);
-    
-    btService = new MsgServiceBT(2, 3);
+    pinMode(4, OUTPUT);
+    digitalWrite(4, LOW);
+
     /* initialize bluetooth service */
-    btService->init();
     MsgService.init();
-    
+   
+
     /* initialize scheduler */
     scheduler->init(BASE_PERIOD);
+
+    Msg* serialMsg;
+    Msg* btMsg;
     
-    RiverData* riverData = new RiverData();
-    
-    Task* serialCommTask = new SerialCommTask(riverData, btService);
-    serialCommTask->init(200);
+    Task* serialCommTask = new SerialCommTask(btMsg, serialMsg, riverData);
+    serialCommTask->init(BASE_PERIOD);
     scheduler->addTask(serialCommTask);
+
+    Task* servoMotorTask = new ServoMotorTask(riverData);
+    servoMotorTask->init(200);
+    scheduler->addTask(servoMotorTask);
     
     /* initialize tasks */
     //Task *blinkingTask = new BlinkingTask(led);
