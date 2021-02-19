@@ -1,7 +1,7 @@
 // constants
 const chartColor = '0, 149, 255';
 const nMeasurements = 20;
-const server = 'TEST_SERVER.php';
+const server = 'http://localhost:8080';
 
 //data sets ( labels -> x | data -> y )
 var data = {
@@ -151,11 +151,10 @@ $(function(){
         options: options
     });
 
-    //TODO: get new event source
-    // unidirectional event listner for server
-    const eventSource = new EventSource(server);
-
-    eventSource.onmessage = function(e) {
+    // SockJS websocket to connect to server on localhost:8080
+    const sock = new SockJS(server);
+    
+    sock.onmessage = function(e) {
         let message = JSON.parse(e.data);
 
         //* NORMAL
