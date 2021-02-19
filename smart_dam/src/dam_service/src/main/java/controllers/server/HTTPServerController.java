@@ -36,6 +36,8 @@ public class HTTPServerController extends AbstractVerticle {
 	private static final float DELTAD_IN_M = 0.04f;
 	private static final float RIVER_HEIGHT_IN_M = 5f;
 	
+	private static final String DAM_DASHBOARD_PATH = System.getProperty("file.separator") + "dam_dashboard" + System.getProperty("file.separator");
+	
 	public HTTPServerController(int port, Model model, DBMSController dbmsController, CommChannel channel) {
 		this.port = port;
 		this.model = model;
@@ -69,7 +71,9 @@ public class HTTPServerController extends AbstractVerticle {
 		response.putHeader("content-type", "text/html");
 		
 		// Write to the response and end it
-		String file = System.getProperty("user.dir") + "/src/main/java/view/" + request.path();
+		String file = System.getProperty("user.dir").substring(0,System.getProperty("user.dir").lastIndexOf(System.getProperty("file.separator"))) 
+				+ DAM_DASHBOARD_PATH + request.path().substring(1, request.path().length());
+		//String file = System.getProperty("user.dir") + "/src/main/java/view/" + request.path();
 		response.sendFile(file);
 	}
 	

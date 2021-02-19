@@ -26,7 +26,8 @@ public class RunDamService {
 		
 		/* Dam controller communication */
 		final String[] ports = SerialPortList.getPortNames();
-		CommChannel channel = new SerialCommChannel("/dev/ttyACM0");
+		CommChannel channel = new SerialCommChannel(ports[0]);
+		//! FOR TESTING GIGIO: CommChannel channel = new SerialCommChannel("/dev/ttyACM0");
 		
 		/* Waiting for Arduino reboot */
 		System.out.println("Waiting Dam Controller for rebooting...");		
