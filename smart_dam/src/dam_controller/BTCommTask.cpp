@@ -41,12 +41,14 @@ void BTCommTask::tick(){
     switch(this->state){
         case BT1:
             this->btService->sendMsg(*this->serialMsg);
+            this->serialMsg->setMsgReady(false);
             break;
         case BT2:
             this->btMsg = this->btService->receiveMsg();
             break;
         case BT3:
             this->btService->sendMsg(*this->serialMsg);
+            this->serialMsg->setMsgReady(false);
             this->btMsg = this->btService->receiveMsg();
             break;
     }

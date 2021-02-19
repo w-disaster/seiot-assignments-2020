@@ -28,6 +28,10 @@ void setup() {
     serialCommTask->init(BASE_PERIOD);
     scheduler->addTask(serialCommTask);
 
+    Task* btCommTask = new BTCommTask(serialMsg, btMsg);
+    btCommTask->init(BASE_PERIOD);
+    scheduler->addTask(btCommTask);
+
     Task* servoMotorTask = new ServoMotorTask(riverData);
     servoMotorTask->init(200);
     scheduler->addTask(servoMotorTask);

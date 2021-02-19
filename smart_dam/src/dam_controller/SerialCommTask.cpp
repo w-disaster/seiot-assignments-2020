@@ -13,14 +13,17 @@ void SerialCommTask::init(int period){
 
 bool SerialCommTask::updateTimeAndCheckEvent(int basePeriod){
     if(Task::updateAndCheckTime(basePeriod)){
+        /* If a message is arrived from Serial */
         if(MsgService.isMsgAvailable()){
+            /* If a message also is arrived from bluetooth */
             if(this->btMsg->isMsgReady()){
                 this->state = C3;
-            } else {
+            } else { /* the message arrives only from Serial */
                 this->state = C1;
             }
             return true;
         }
+        /* If a message only arrives from bluetooth */
         if(this->btMsg->isMsgReady()){
             this->state = C2;
             return true;
@@ -34,18 +37,33 @@ void SerialCommTask::tick(){
         case C0:
             break;
         case C1:
+            /* If a message arrives from Serial we save it in the RiverData
+             *  shared object and we set the msg ready to be sent
+             */
             saveDataAndSetMsgReady(MsgService.receiveMsg());
             break;
         case C2:
+            /* If BTCommTask received a message from bluetooth we must
+             *  forward it to Serial channel
+             */
             MsgService.sendMsg(this->btMsg->getContent());
+            this->btMsg->setMsgReady(false);
             break;
         case C3:
+            /* We do both activities: we set the message ready
+             *  to be sent through bluetooth and we forward 
+             *  Dam Mobile msg Serial channel 
+             */
             saveDataAndSetMsgReady(MsgService.receiveMsg());
             MsgService.sendMsg(this->btMsg->getContent());
+            this->btMsg->setMsgReady(false);
             break;        
     }
 }
 
+/* This method minimize repetitions. It sets RiverData fields and the new message 
+ *  to be sent from BTCommTask
+ */
 void SerialCommTask::saveDataAndSetMsgReady(Msg* msg){
     this->serialMsg = msg;
     DeserializationError error = deserializeJson(this->receivedJson, this->serialMsg->getContent());

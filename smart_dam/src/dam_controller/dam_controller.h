@@ -11,6 +11,7 @@
 #include "SerialCommTask.h"
 #include "RiverData.h"
 #include "ServoMotorTask.h"
+#include "BTCommTask.h"
 
 /* defines */
 #define LED 13
