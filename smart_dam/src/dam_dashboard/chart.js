@@ -151,6 +151,7 @@ $(function(){
         options: options
     });
 
+    //TODO: get new event source
     // unidirectional event listner for server
     const eventSource = new EventSource(server);
 
