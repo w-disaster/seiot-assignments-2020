@@ -201,13 +201,13 @@ $(function(){
 
         //? PRE-ALLARM
         if(alert > 0){
+            
             //update water level
             updateWaterLevel(message.waterLevel);
+        
+            //update chart
+            addData(message.Timestamp, message.waterLevel);
             
-            //update chart 
-            for(let i = 0; i < message.measurments.length; i++){
-                addData(message.measurments.time, message.measurments.waterLevel);
-            }
 
             // update request interval on alert level basis
             requestTimeInterval = PRE_ALARM_REQUEST_TIME;
@@ -237,10 +237,15 @@ $(function(){
             url: SERVER,
             dataType: "json",
             data: messageToServer,
-            success: function(data) {
-                let message = JSON.parse(data.data);
-                processJSON(message);
-                lastMesurmentReceived = data.Timestamp;
+            success: function(json) {
+                let message = JSON.parse(json.data);
+
+                // for all measurments in the json we process
+                for(let i = 0; i < message.data.length; i++){
+                    processJSON(message.data[i]);
+                }
+
+                lastMesurmentReceived = message.Timestamp;
             },
             error: function(error) {
                 console.log("ERROR: " + error);
