@@ -65,8 +65,10 @@ void SerialCommTask::tick(){
  *  to be sent from BTCommTask
  */
 void SerialCommTask::saveDataAndSetMsgReady(Msg* msg){
+    delete(this->serialMsg);
     this->serialMsg = msg;
     DeserializationError error = deserializeJson(this->receivedJson, this->serialMsg->getContent());
+    Serial.println(this->serialMsg->getContent());
 
     if (!error) { 
         // we write river data coming from Dam Service to a shared object
@@ -78,8 +80,8 @@ void SerialCommTask::saveDataAndSetMsgReady(Msg* msg){
          */
         if(stateFromJson == "NORMAL"){
             riverState = RiverData::RiverState::NORMAL;
-        } else if(stateFromJson == "PRE_ALARM"){
-            riverState = RiverData::RiverState::PRE_ALARM;
+        } else if(stateFromJson == "PREALARM"){
+            riverState = RiverData::RiverState::PREALARM;
         } else{
             riverState = RiverData::RiverState::ALARM;
         }
@@ -88,17 +90,18 @@ void SerialCommTask::saveDataAndSetMsgReady(Msg* msg){
         String modeFromJson = this->receivedJson["Mode"];
         RiverData::DamMode damMode;
     
-        if(modeFromJson == "AUTO"){
+        /*if(modeFromJson == "AUTO"){
             damMode = RiverData::DamMode::AUTO;
         }else {
             damMode = RiverData::DamMode::MANUAL;
-        }
+        }*/
     
         /* Shared object value set, ready to be read by ServoMotorTask and LedTask */
         this->riverData->setRiverState(riverState);
         this->riverData->setDamMode(damMode);
         this->riverData->setDistance(this->receivedJson["Distance"]);
-      
+        float t = this->receivedJson["Distance"];
+        Serial.println(String("t") + t);
         
         digitalWrite(4, HIGH);
         delay(200);

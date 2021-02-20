@@ -94,7 +94,7 @@ public class HTTPServerController extends AbstractVerticle {
 			/* State setting */
 			this.model.setState(state);
 			
-			log("new msg " + routingContext.getBodyAsString());
+			//log("new msg " + routingContext.getBodyAsString());
 
 			
 			//NEED TO CHECK STATE
@@ -119,6 +119,7 @@ public class HTTPServerController extends AbstractVerticle {
 			response.setStatusCode(200).end();
 			
 			/* Forward message to Dam Controller (Arduino) */
+			System.out.println("Msg: " + res.encode());
 			this.channel.sendMsg(res.encode());
 		}
 		

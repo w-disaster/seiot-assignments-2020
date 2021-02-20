@@ -20,7 +20,6 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 	
 	@Override
 	public void run() {
-		this.channel.sendMsg("ready");
 		while (true){
 			String sendJson;
 			try {
@@ -76,7 +75,7 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 				model.setMode(mode);
 				break;
 			case NORMAL:
-			case PRE_ALARM:
+			case PREALARM:
 				break;
 			}
 			break;

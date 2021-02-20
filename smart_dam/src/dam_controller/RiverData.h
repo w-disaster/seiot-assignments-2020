@@ -6,7 +6,7 @@ class RiverData {
 public:
     enum RiverState{
         NORMAL,
-        PRE_ALARM,
+        PREALARM,
         ALARM
     };
 

@@ -4,7 +4,7 @@
 #define TRIG_PIN D1
 #define ECHO_PIN D0
 
-#define D1_IN_M 1
+#define D1_IN_M 1.0
 #define D2_IN_M 0.4
 #define LED_PIN D2
 
@@ -16,6 +16,9 @@
 
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+
+extern double d1_in_m;
+extern double d2_in_m;
 
 extern const double vs;
 extern volatile boolean statusLed;
@@ -30,7 +33,7 @@ extern boolean mustDetachLedISR;
 enum State{
   IDLE,
   NORMAL,
-  PRE_ALARM,
+  PREALARM,
   ALARM
 };
 

@@ -4,7 +4,6 @@
 
 #include "lib.h"
 
-
 Ticker blinker;
 Ticker dataReader;
 Ticker senderController;
@@ -57,7 +56,7 @@ void setLedBehaviour(State state){
         /* At NORMAL state the Led is off */ 
         digitalWrite(LED_PIN, LOW);
         break;
-      case State::PRE_ALARM:
+      case State::PREALARM:
         /* If the new state is PRE_ALARM then we attach the interrupt
          *  that every 200ms switchs on or off the led
          */
@@ -93,14 +92,30 @@ void loop() {
           sendData();
         }
         break;
-      case State::PRE_ALARM:
+      case State::PREALARM:
+        /* If the state is different from the previous sampled by dataReader ISR,
+         *  we attach the one to senderController, that sets the msg ready to be sent
+         *  every T seconds, depending on the state
+         */
+        if(isStateChanged){
+          senderController.attach(10, setMsgReady);
+          mustDetach = true;
+          /* If state is changed, we must edit the Led behaviour */
+          setLedBehaviour(state);
+        }
+        /* We send data at state change and when senderController tells us */
+        if(msgReady || isStateChanged){
+          Serial.println(String("Sending ") + (char)state);
+          sendData();
+        }
+        break;
       case State::ALARM:
         /* If the state is different from the previous sampled by dataReader ISR,
          *  we attach the one to senderController, that sets the msg ready to be sent
          *  every T seconds, depending on the state
          */
         if(isStateChanged){
-          senderController.attach(state == State::ALARM ? 5 : 10, setMsgReady);
+          senderController.attach(5, setMsgReady);
           mustDetach = true;
           /* If state is changed, we must edit the Led behaviour */
           setLedBehaviour(state);

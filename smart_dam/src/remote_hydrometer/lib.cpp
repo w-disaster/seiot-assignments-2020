@@ -12,6 +12,9 @@ boolean msgReady = false;
 boolean isStateChanged; 
 boolean mustDetachLedISR;
 
+double d1_in_m = 1.0;
+double d2_in_m = 0.4;
+
 State state;
 State precState;
 
@@ -28,10 +31,10 @@ void readDistanceAndSetState(){
   distance = getDistance();
   Serial.println(String("distance: ") + distance);
   /* We determine the State by the distance sampled */
-  if(distance > D1_IN_M){
+  if(distance > d1_in_m){
     state = State::NORMAL;
-  } else if(distance >= D2_IN_M && distance <= D1_IN_M){
-    state = State::PRE_ALARM;
+  } else if(distance >= d2_in_m && distance <= d1_in_m){
+    state = State::PREALARM;
   } else {
     state = State::ALARM;
   }
@@ -40,7 +43,7 @@ void readDistanceAndSetState(){
     /* If the state is changed and the previous was PRE_ALARM then
      *  we must detach the interrupt
      */
-    if(precState == State::PRE_ALARM){
+    if(precState == State::PREALARM){
       mustDetachLedISR = true;
     } else {
       mustDetachLedISR = false;
@@ -55,7 +58,7 @@ void readDistanceAndSetState(){
 }
 
 void sendData(){
-  DynamicJsonDocument data(100);
+  DynamicJsonDocument data(200);
   HTTPClient http;
   http.begin(address + "/api/data");      
   http.addHeader("Content-Type", "application/json"); 
@@ -69,8 +72,8 @@ void sendData(){
     case State::NORMAL:
         data["State"] = "NORMAL";
         break;
-      case State::PRE_ALARM:
-        data["State"] = "PRE_ALARM";
+      case State::PREALARM:
+        data["State"] = "PREALARM";
         break;
       case State::ALARM:
         data["State"] = "ALARM";
@@ -88,9 +91,11 @@ void sendData(){
   serializeJson(data, json);
   //Serial.println(json);
   
-  http.POST(json);   
-  http.end();
+  int responce = http.POST(json);  
   
+  Serial.println(String("responce") + responce);
+  
+  http.end();
   msgReady = false;
 }
 
