@@ -2,15 +2,16 @@
 const CHART_COLOR = '0, 149, 255';
 const N_MEASURMENTS = 20;
 const SERVER = 'http://localhost:8080/api/data';
-const ALARM_REQUEST_TIME = 5000;
-const PRE_ALARM_REQUEST_TIME = 10000;
+const REQUEST_TIME = 5000;
 const CONNECTING_REQUEST_TIME = 500;
 const DAM_INFO = $("div.data");
 
 // global variables
-let requestTimeInterval = PRE_ALARM_REQUEST_TIME;
-//let lastMesurmentReceived  = Date.now(); 
-let lastMesurmentReceived = 0;
+let requestTimeInterval = CONNECTING_REQUEST_TIME;
+
+// set up to last X measurments before now
+let lastMesurmentReceived  = Date.now() - N_MEASURMENTS * CONNECTING_REQUEST_TIME; 
+
 // timer for ajax requests
 let timer;
 
@@ -132,6 +133,21 @@ function findLvl(className) {
     return className.includes("lvl-");
 }
 
+function checkAndGetTimestamp(date){
+    
+    // full timestamp format
+    if(date.includes(" ") 
+    || date.includes("-") 
+    || date.includes(":")){
+        return Date.parse(date);
+    }
+    return date;
+}
+
+function messageIsNew(timestamp){
+    return lastMesurmentReceived < checkAndGetTimestamp(timestamp);
+}
+
 $(function(){
 
     initUI();
@@ -216,47 +232,43 @@ $(function(){
 
     function processJSON(message){
 
-        // alert level from message
-        alert = getAlertLevel(message.State);
-        
-        // tells what to show before setting data
-        updateUI(alert);
-        
-        //* NORMAL
-        updateStatus(alert);    
+        if(messageIsNew(message.Timestamp)){
+            // alert level from message
+            alert = getAlertLevel(message.State);
+            
+            // tells what to show before setting data
+            updateUI(alert);
+            
+            //* NORMAL
+            updateStatus(alert);    
 
-        //? PRE-ALLARM
-        if(alert > 0){
+            //? PRE-ALLARM
+            if(alert > 0){
+                
+                //update water level
+                updateWaterLevel(message.WaterLevel);
             
-            //update water level
-            updateWaterLevel(message.WaterLevel);
-        
-            //update chart
-            addData(message.Timestamp, message.WaterLevel);
-            
-            if(requestTimeInterval != PRE_ALARM_REQUEST_TIME){
-                // update request interval on alert level basis
-                requestTimeInterval = PRE_ALARM_REQUEST_TIME;
-                setRequestTimer();
-            }
-            
-            //! ALLARM
-            if(alert > 1){
-                //update dam level
-                updateDamLevel(message.DamOpening);
-
-                //update context
-                updateControlMode(message.DamMode);
-            
-                if(requestTimeInterval != ALARM_REQUEST_TIME){
+                //update chart
+                addData(message.Timestamp, message.WaterLevel);
+                
+                if(requestTimeInterval != REQUEST_TIME){
                     // update request interval on alert level basis
-                    requestTimeInterval = ALARM_REQUEST_TIME;
+                    requestTimeInterval = REQUEST_TIME;
                     setRequestTimer();
                 }
-            }
-        }
+                
+                //! ALLARM
+                if(alert > 1){
+                    //update dam level
+                    updateDamLevel(message.DamOpening);
 
-        lastMesurmentReceived = message.Timestamp;
+                    //update context
+                    updateControlMode(message.DamMode);
+                }
+            }
+
+            lastMesurmentReceived = checkAndGetTimestamp(message.Timestamp);
+        }
     } 
     
     function setRequestTimer() {
@@ -277,20 +289,17 @@ $(function(){
                 data: messageToServer,
                 success: function(json) {
                     let message = json;
-                    console.log(message);
-                    // for all measurments in the json we process
-                    for(let i = 0; i < message.length; i++){
-                        processJSON(message[i]);
+                    
+                    // only if we have items on the list
+                    if(message.length){
+                        // for all measurments in the json we process
+                        for(let i = 0; i < message.length; i++){
+                            processJSON(message[i]);
+                        }
                     }
-                    //!for testing
-                    if (message.length == undefined){
-                        processJSON(message);
-                    }
-                    //!-------------
                 },
                 error: function(error) {
                     initUI();
-                    console.log("ERROR: " + error);
                 }
             });
         }, requestTimeInterval);
