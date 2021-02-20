@@ -4,10 +4,15 @@ const N_MEASURMENTS = 20;
 const SERVER = 'http://localhost:8080/api/data';
 const ALARM_REQUEST_TIME = 5000;
 const PRE_ALARM_REQUEST_TIME = 10000;
+const CONNECTING_REQUEST_TIME = 500;
+const DAM_INFO = $("div.data");
 
 // global variables
-let requestTimeInterval = 5000;
-let lastMesurmentReceived  = Date.now(); 
+let requestTimeInterval = PRE_ALARM_REQUEST_TIME;
+//let lastMesurmentReceived  = Date.now(); 
+let lastMesurmentReceived = 0;
+// timer for ajax requests
+let timer;
 
 //data sets ( labels -> x | data -> y )
 var data = {
@@ -56,7 +61,7 @@ function getAlertLevel(statusName){
             return 0;
         case "PRE-ALLARM":
             return 1;
-        case "ALLARM":
+        case "Allarme":
             return 2;
         default:
             break;
@@ -69,6 +74,10 @@ function alertToStatus(alert){
     color = "";
 
     switch (Number(alert)) {
+        case -1:
+            status = "CONNECTING...";
+            color = "dark";
+            break;
         case 0:
             status = "NORMAL";
             color = "primary";
@@ -98,11 +107,11 @@ function stringToMode(mode){
     color = "";
 
     switch (mode) {
-        case "AUTOMATIC":
+        case "Automatic":
             context = "AUTOMATIC";
             color = "success";
             break;
-        case "MANUAL":
+        case "Manual":
             context = "MANUAL";
             color = "warning";
             break;
@@ -124,6 +133,8 @@ function findLvl(className) {
 }
 
 $(function(){
+
+    initUI();
 
     function updateStatus(alert){
         const status = alertToStatus(alert);
@@ -172,16 +183,19 @@ $(function(){
         options: options
     });
 
-    function processJSON(message){
+    function initUI() {
+        // reset the timer for ajax
+        requestTimeInterval = CONNECTING_REQUEST_TIME;
+        setRequestTimer();
+        // reset to connecting status
+        updateStatus(-1);
+        //update UI shown info
+        updateUI(0);
+    }
 
-        // alert level from message
-        alert = getAlertLevel(message.damState);
-
-        //* NORMAL
-        updateStatus(alert);
-        
+    function updateUI(alert){
         //filter what to show
-        $("div.data").each(function() {
+        DAM_INFO.each(function() {
             //get the level of alert at which to show the div using the classes lvl-n
             showLvl = $(this).attr("class").split(/\s+/).find(findLvl).split("-")[1];
 
@@ -193,64 +207,94 @@ $(function(){
         });
 
         //adjust text center
-        if (alert == 0) {
+        if (alert < 1) {
             $("div#data-section").removeClass("col-md-5");
         } else {
             $("div#data-section").addClass("col-md-5");
         }
+    }
+
+    function processJSON(message){
+
+        // alert level from message
+        alert = getAlertLevel(message.State);
+        
+        // tells what to show before setting data
+        updateUI(alert);
+        
+        //* NORMAL
+        updateStatus(alert);    
 
         //? PRE-ALLARM
         if(alert > 0){
             
             //update water level
-            updateWaterLevel(message.waterLevel);
+            updateWaterLevel(message.WaterLevel);
         
             //update chart
-            addData(message.Timestamp, message.waterLevel);
+            addData(message.Timestamp, message.WaterLevel);
             
-
-            // update request interval on alert level basis
-            requestTimeInterval = PRE_ALARM_REQUEST_TIME;
-
+            if(requestTimeInterval != PRE_ALARM_REQUEST_TIME){
+                // update request interval on alert level basis
+                requestTimeInterval = PRE_ALARM_REQUEST_TIME;
+                setRequestTimer();
+            }
+            
             //! ALLARM
             if(alert > 1){
                 //update dam level
-                updateDamLevel(message.damLevel);
+                updateDamLevel(message.DamOpening);
 
                 //update context
-                updateControlMode(message.mode);
+                updateControlMode(message.DamMode);
             
-                // update request interval on alert level basis
-                requestTimeInterval = ALARM_REQUEST_TIME;
-
+                if(requestTimeInterval != ALARM_REQUEST_TIME){
+                    // update request interval on alert level basis
+                    requestTimeInterval = ALARM_REQUEST_TIME;
+                    setRequestTimer();
+                }
             }
         }
-    }
 
-    setInterval(function(){
-        // request last timestamp and
-        var messageToServer = { Timestamp : lastMesurmentReceived };
+        lastMesurmentReceived = message.Timestamp;
+    } 
+    
+    function setRequestTimer() {
 
-        $.ajax({
-            type: "GET",
-            async: true,
-            url: SERVER,
-            dataType: "json",
-            data: messageToServer,
-            success: function(json) {
-                let message = json;
-                
-                // for all measurments in the json we process
-                for(let i = 0; i < message.data.length; i++){
-                    processJSON(message.data[i]);
+        if(timer != undefined){
+            clearInterval(timer);
+        }
+
+        timer = setInterval(function(){
+            // request last timestamp and
+            var messageToServer = { Timestamp : lastMesurmentReceived };
+
+            $.ajax({
+                type: "GET",
+                async: true,
+                url: SERVER,
+                dataType: "json",
+                data: messageToServer,
+                success: function(json) {
+                    let message = json;
+                    console.log(message);
+                    // for all measurments in the json we process
+                    for(let i = 0; i < message.length; i++){
+                        processJSON(message[i]);
+                    }
+                    //!for testing
+                    if (message.length == undefined){
+                        processJSON(message);
+                    }
+                    //!-------------
+                },
+                error: function(error) {
+                    initUI();
+                    console.log("ERROR: " + error);
                 }
-
-                lastMesurmentReceived = message.Timestamp;
-            },
-            error: function(error) {
-                console.log("ERROR: " + error);
-            }
-          });
-    }, requestTimeInterval);
+            });
+        }, requestTimeInterval);
+    }
+    
 });
 
