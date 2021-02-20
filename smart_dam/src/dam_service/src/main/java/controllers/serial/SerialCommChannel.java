@@ -15,7 +15,7 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 		try {
 			this.currentMsg = new StringBuffer("");
 			this.serialPort = new SerialPort(portName);
-			this.queue = new ArrayBlockingQueue<String>(100);
+			this.queue = new ArrayBlockingQueue<String>(200);
 			this.serialPort.openPort();
 			
 		    this.serialPort.setParams(SerialPort.BAUDRATE_115200,

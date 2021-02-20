@@ -17,10 +17,12 @@ void ServoMotorTask::init(int period){
 bool ServoMotorTask::updateTimeAndCheckEvent(int basePeriod){
     if(Task::updateAndCheckTime(basePeriod)){
         float distance = this->riverData->getDistance();
+        
         /* If the distance is different from the previous, new one has been sampled
          *  then we change State to SM1 to move the servo motor
          */
         if(this->lastDistance != distance){
+            Serial.println(distance);
             this->lastDistance = distance;
             this->state = S1;
             return true;

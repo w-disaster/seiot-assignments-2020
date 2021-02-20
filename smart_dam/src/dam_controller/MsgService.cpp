@@ -23,6 +23,7 @@ Msg* MsgServiceClass::receiveMsg(){
 
 void MsgServiceClass::init(){
   Serial.begin(115200);
+  Serial.setTimeout(10000); 
   content.reserve(256);
   content = "";
   currentMsg = NULL;
@@ -41,8 +42,8 @@ void serialEvent() {
   /* reading the content */
   while (Serial.available()) {
     char ch = (char) Serial.read();
-    if (ch == '\n'){
-      MsgService.currentMsg = new Msg(content);
+    if (ch == '}'){
+      MsgService.currentMsg = new Msg(content + ch);
       MsgService.msgAvailable = true;      
     } else {
       content += ch;      
