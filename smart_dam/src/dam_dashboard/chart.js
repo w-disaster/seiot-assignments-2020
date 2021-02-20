@@ -1,7 +1,13 @@
 // constants
-const chartColor = '0, 149, 255';
-const nMeasurements = 20;
-const server = 'TEST_SERVER.php';
+const CHART_COLOR = '0, 149, 255';
+const N_MEASURMENTS = 20;
+const SERVER = 'http://localhost:8080/api/data';
+const ALARM_REQUEST_TIME = 5000;
+const PRE_ALARM_REQUEST_TIME = 10000;
+
+// global variables
+let requestTimeInterval = 5000;
+let lastMesurmentReceived  = Date.now(); 
 
 //data sets ( labels -> x | data -> y )
 var data = {
@@ -10,8 +16,8 @@ var data = {
         label: 'Level of Water',
         lineTension: 0,
         data: [],
-        backgroundColor: 'rgba('+chartColor+', 0.2)',
-        borderColor: 'rgba('+chartColor+', 1)',
+        backgroundColor: 'rgba('+ CHART_COLOR +', 0.2)',
+        borderColor: 'rgba('+ CHART_COLOR +', 1)',
         borderWidth: 1,
         pointHoverRadius: 10,
     }],
@@ -43,11 +49,26 @@ var options = {
     }
 };
 
-function allertToStatus(allert){
+function getAlertLevel(statusName){
+
+    switch (statusName) {
+        case "NORMAL":
+            return 0;
+        case "PRE-ALLARM":
+            return 1;
+        case "ALLARM":
+            return 2;
+        default:
+            break;
+    }
+}
+
+// sets from number to string
+function alertToStatus(alert){
     status = "";
     color = "";
 
-    switch (Number(allert)) {
+    switch (Number(alert)) {
         case 0:
             status = "NORMAL";
             color = "primary";
@@ -72,16 +93,16 @@ function allertToStatus(allert){
     };
 }
 
-function idToContext(idContext){
+function stringToMode(mode){
     context = "";
     color = "";
 
-    switch (Number(idContext)) {
-        case 0:
+    switch (mode) {
+        case "AUTOMATIC":
             context = "AUTOMATIC";
             color = "success";
             break;
-        case 1:
+        case "MANUAL":
             context = "MANUAL";
             color = "warning";
             break;
@@ -104,8 +125,8 @@ function findLvl(className) {
 
 $(function(){
 
-    function updateStatus(allert){
-        const status = allertToStatus(allert);
+    function updateStatus(alert){
+        const status = alertToStatus(alert);
 
         // set values
         $("div#state > p.value").html('<span class="text-'+status.color+'">' + status.status+'</span>');
@@ -119,8 +140,8 @@ $(function(){
         $("div#d-lvl > p.value").html(damLevel +" %");
     }
 
-    function updateContext(idContext) {
-        const cont = idToContext(idContext);
+    function updateControlMode(mode) {
+        const cont = stringToMode(mode);
 
         $("div#context > p.value").html('<span class="text-'+cont.color+'">' + cont.context+'</span>');
     }
@@ -129,11 +150,11 @@ $(function(){
         chart.data.labels.push(time); // adds X
         chart.data.datasets[0].data.push(waterLevel); // adds Y
 
-        if(chart.data.labels.length > nMeasurements){
+        if(chart.data.labels.length > N_MEASURMENTS){
             chart.data.labels.shift(); // removes first X if over nRil
         }  
         
-        if(chart.data.datasets[0].data.length > nMeasurements){
+        if(chart.data.datasets[0].data.length > N_MEASURMENTS){
             chart.data.datasets[0].data.shift(); // removes first Y if over nRil
         }
 
@@ -151,21 +172,20 @@ $(function(){
         options: options
     });
 
-    // unidirectional event listner for server
-    const eventSource = new EventSource(server);
+    function processJSON(message){
 
-    eventSource.onmessage = function(e) {
-        let message = JSON.parse(e.data);
+        // alert level from message
+        alert = getAlertLevel(message.damState);
 
         //* NORMAL
-        updateStatus(message.allertLevel);
+        updateStatus(alert);
         
         //filter what to show
         $("div.data").each(function() {
-            //get the level of allert at which to show the div using the classes lvl-n
+            //get the level of alert at which to show the div using the classes lvl-n
             showLvl = $(this).attr("class").split(/\s+/).find(findLvl).split("-")[1];
 
-            if (showLvl > message.allertLevel) {
+            if (showLvl > alert) {
                 $(this).hide();
             } else {
                 $(this).show();
@@ -173,30 +193,64 @@ $(function(){
         });
 
         //adjust text center
-        if (message.allertLevel == 0) {
+        if (alert == 0) {
             $("div#data-section").removeClass("col-md-5");
         } else {
             $("div#data-section").addClass("col-md-5");
         }
 
         //? PRE-ALLARM
-        if(message.allertLevel > 0){
+        if(alert > 0){
+            
             //update water level
             updateWaterLevel(message.waterLevel);
+        
+            //update chart
+            addData(message.Timestamp, message.waterLevel);
             
-            //update chart   
-            addData(message.time, message.waterLevel);
+
+            // update request interval on alert level basis
+            requestTimeInterval = PRE_ALARM_REQUEST_TIME;
 
             //! ALLARM
-            if(message.allertLevel > 1){
+            if(alert > 1){
                 //update dam level
                 updateDamLevel(message.damLevel);
 
                 //update context
-                updateContext(message.context);
+                updateControlMode(message.mode);
+            
+                // update request interval on alert level basis
+                requestTimeInterval = ALARM_REQUEST_TIME;
+
             }
         }
-
     }
+
+    setInterval(function(){
+        // request last timestamp and
+        var messageToServer = { Timestamp : lastMesurmentReceived };
+
+        $.ajax({
+            type: "GET",
+            async: true,
+            url: SERVER,
+            dataType: "json",
+            data: messageToServer,
+            success: function(json) {
+                let message = json;
+                
+                // for all measurments in the json we process
+                for(let i = 0; i < message.data.length; i++){
+                    processJSON(message.data[i]);
+                }
+
+                lastMesurmentReceived = message.Timestamp;
+            },
+            error: function(error) {
+                console.log("ERROR: " + error);
+            }
+          });
+    }, requestTimeInterval);
 });
 

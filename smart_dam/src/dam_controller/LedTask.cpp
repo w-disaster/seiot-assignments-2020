@@ -1,7 +1,7 @@
 #include "LedTask.h"
 #include "Arduino.h"
 
-LedTask::LedTask(RiverData *riverData, Led *led)
+LedTask::LedTask(RiverData *riverData, Light *led)
 {
   this->riverData = riverData;
   this->led = led;
