@@ -227,7 +227,7 @@ $(function(){
         }
     }
 
-    var interval = setInterval(function(){
+    setInterval(function(){
         // request last timestamp and
         var messageToServer = { Timestamp : lastMesurmentReceived };
 
@@ -238,8 +238,8 @@ $(function(){
             dataType: "json",
             data: messageToServer,
             success: function(json) {
-                let message = JSON.parse(json.data);
-
+                let message = json;
+                
                 // for all measurments in the json we process
                 for(let i = 0; i < message.data.length; i++){
                     processJSON(message.data[i]);
