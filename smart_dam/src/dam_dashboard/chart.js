@@ -2,6 +2,8 @@
 const chartColor = '0, 149, 255';
 const nMeasurements = 20;
 const server = 'http://localhost:8080';
+const requestTimeInterval = 1000;
+const lastMesurmentReceived  = 0; 
 
 //data sets ( labels -> x | data -> y )
 var data = {
@@ -153,10 +155,19 @@ $(function(){
 
     // SockJS websocket to connect to server on localhost:8080
     const sock = new SockJS(server);
+
+    //! TESTING
+    sock.onopen = function(){
+        console.log("connected");
+    }
+    //!-------
     
     sock.onmessage = function(e) {
         let message = JSON.parse(e.data);
+        processJSON(message);
+    }
 
+    function processJSON(message){
         //* NORMAL
         updateStatus(message.allertLevel);
         
@@ -196,7 +207,23 @@ $(function(){
                 updateContext(message.context);
             }
         }
-
     }
+
+    var interval = setInterval(function(){
+        //TODO: send the request to server
+        var messageToServer = { request : Date.now()};
+
+        $.ajax({
+            url: server,
+            data: messageToServer,
+            success: function(data) {
+                let message = JSON.parse(data);
+                processJSON(message);
+            }
+          });
+
+        //sock.send("request" + Date.now());
+        console.log("sent request" + Date.now());
+    }, requestTimeInterval);
 });
 
