@@ -10,7 +10,7 @@ const DAM_INFO = $("div.data");
 let requestTimeInterval = CONNECTING_REQUEST_TIME;
 
 // set up to last X measurments before now
-let lastMesurmentReceived  = Date.now() - N_MEASURMENTS * CONNECTING_REQUEST_TIME; 
+let lastMesurmentReceived  = Date.now() - N_MEASURMENTS * REQUEST_TIME; 
 
 // timer for ajax requests
 let timer;
@@ -34,7 +34,7 @@ var options = {
     scales: {
         yAxes: [{
             ticks: {
-                max:100,
+                max:5,
                 min:0,
                 beginAtZero: true
             },
@@ -54,20 +54,6 @@ var options = {
         }]
     }
 };
-
-function getAlertLevel(statusName){
-
-    switch (statusName) {
-        case "NORMAL":
-            return 0;
-        case "PRE-ALLARM":
-            return 1;
-        case "Allarme":
-            return 2;
-        default:
-            break;
-    }
-}
 
 // sets from number to string
 function alertToStatus(alert){
@@ -103,16 +89,16 @@ function alertToStatus(alert){
     };
 }
 
-function stringToMode(mode){
+function getMode(mode){
     context = "";
     color = "";
 
-    switch (mode) {
-        case "Automatic":
+    switch (Number(mode)) {
+        case 0:
             context = "AUTOMATIC";
             color = "success";
             break;
-        case "Manual":
+        case 1:
             context = "MANUAL";
             color = "warning";
             break;
@@ -160,7 +146,7 @@ $(function(){
     }
 
     function updateWaterLevel(waterLevel){
-        $("div#w-lvl > p.value").html("<span class='text-primary'>"+waterLevel +" %</span>");
+        $("div#w-lvl > p.value").html("<span class='text-primary'>"+waterLevel +" m</span>");
     }
 
     function updateDamLevel(damLevel){
@@ -168,7 +154,7 @@ $(function(){
     }
 
     function updateControlMode(mode) {
-        const cont = stringToMode(mode);
+        const cont = getMode(mode);
 
         $("div#context > p.value").html('<span class="text-'+cont.color+'">' + cont.context+'</span>');
     }
@@ -232,9 +218,9 @@ $(function(){
 
     function processJSON(message){
 
-        if(messageIsNew(message.Timestamp)){
+        if(messageIsNew(message.t)){
             // alert level from message
-            alert = getAlertLevel(message.State);
+            alert = message.s;
             
             // tells what to show before setting data
             updateUI(alert);
@@ -246,10 +232,10 @@ $(function(){
             if(alert > 0){
                 
                 //update water level
-                updateWaterLevel(message.WaterLevel);
+                updateWaterLevel(message.l);
             
                 //update chart
-                addData(message.Timestamp, message.WaterLevel);
+                addData(message.t, message.l);
                 
                 if(requestTimeInterval != REQUEST_TIME){
                     // update request interval on alert level basis
@@ -260,10 +246,10 @@ $(function(){
                 //! ALLARM
                 if(alert > 1){
                     //update dam level
-                    updateDamLevel(message.DamOpening);
+                    updateDamLevel(message.do);
 
                     //update context
-                    updateControlMode(message.DamMode);
+                    updateControlMode(message.m);
                 }
             }
 
@@ -279,7 +265,7 @@ $(function(){
 
         timer = setInterval(function(){
             // request last timestamp and
-            var messageToServer = { Timestamp : lastMesurmentReceived };
+            var messageToServer = { t : lastMesurmentReceived };
 
             $.ajax({
                 type: "GET",
@@ -289,7 +275,7 @@ $(function(){
                 data: messageToServer,
                 success: function(json) {
                     let message = json;
-                    
+                    console.log(json);
                     // only if we have items on the list
                     if(message.length){
                         // for all measurments in the json we process
