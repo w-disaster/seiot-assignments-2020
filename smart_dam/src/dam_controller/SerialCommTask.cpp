@@ -72,36 +72,35 @@ void SerialCommTask::saveDataAndSetMsgReady(Msg* msg){
 
     if (!error) { 
         // we write river data coming from Dam Service to a shared object
-        String stateFromJson = this->receivedJson["State"];
+        String stateFromJson = this->receivedJson["S"];
         RiverData::RiverState riverState;
     
         /* Json file contains river state as a string, we must convert it to the
          *  specified enum value
          */
-        if(stateFromJson == "NORMAL"){
+        if(stateFromJson == 0){
             riverState = RiverData::RiverState::NORMAL;
-        } else if(stateFromJson == "PREALARM"){
+        } else if(stateFromJson == 1){
             riverState = RiverData::RiverState::PREALARM;
         } else{
             riverState = RiverData::RiverState::ALARM;
         }
     
         /* Same for Dam Mode */
-        String modeFromJson = this->receivedJson["Mode"];
+        String modeFromJson = this->receivedJson["M"];
         RiverData::DamMode damMode;
     
-        /*if(modeFromJson == "AUTO"){
+        if(modeFromJson == 0){
             damMode = RiverData::DamMode::AUTO;
         }else {
             damMode = RiverData::DamMode::MANUAL;
-        }*/
+        }
     
         /* Shared object value set, ready to be read by ServoMotorTask and LedTask */
         this->riverData->setRiverState(riverState);
         this->riverData->setDamMode(damMode);
-        this->riverData->setDistance(this->receivedJson["Distance"]);
-        float t = this->receivedJson["Distance"];
-        Serial.println(String("t") + t);
+        this->riverData->setDistance(this->receivedJson["D"]);
+        float t = this->receivedJson["D"];
         
         digitalWrite(4, HIGH);
         delay(200);

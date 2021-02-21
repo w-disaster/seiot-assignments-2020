@@ -51,7 +51,9 @@ extern char* ssidName;
 /* WPA2 PSK password */
 extern char* pwd;
 /* service IP address */
-extern String address;
+extern String address1;
+
+extern String address2;
 
 void sendData();
 
