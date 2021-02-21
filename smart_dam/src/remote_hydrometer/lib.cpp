@@ -24,7 +24,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", 0);
 
 char* ssidName = "Vodafonefabri";
 char* pwd = "3Com2007";
-String address = "http://192.168.1.5:8080";
+String address = "http://192.168.1.21:8080";
 
 void readDistanceAndSetState(){
   /* Distance read from HC-SR04 and measurement fields fill*/
