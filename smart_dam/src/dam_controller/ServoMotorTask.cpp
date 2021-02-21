@@ -22,7 +22,6 @@ bool ServoMotorTask::updateTimeAndCheckEvent(int basePeriod){
          *  then we change State to SM1 to move the servo motor
          */
         if(this->lastDistance != distance){
-            Serial.println(distance);
             this->lastDistance = distance;
             this->state = S1;
             return true;
@@ -37,12 +36,19 @@ bool ServoMotorTask::updateTimeAndCheckEvent(int basePeriod){
 
 void ServoMotorTask::tick(){
     switch(this->state){
-        case SM0:
+        case S0:
+            Serial.println("setting to 0");
+            this->servoMotor->setPosition(0);
             break;
-        case SM1:
+        case S1:
             /* We calculate the value in grades in order to write it */ 
-            int angle = map(this->lastDistance, 0, MAX_DISTANCE_IN_M, 0, 180);
+            int angle = mapfloat(this->lastDistance, 0, MAX_DISTANCE_IN_M, 0, 180);
+            Serial.println(String("setting to: ") + angle);
             this->servoMotor->setPosition(angle);
             break;
     }
+}
+
+float ServoMotorTask::mapfloat(float x, float inMin, float inMax, float outMin, float outMax) {
+ return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }

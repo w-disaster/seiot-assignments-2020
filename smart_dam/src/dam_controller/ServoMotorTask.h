@@ -5,8 +5,8 @@
 #include "RiverData.h"
 #include "ServoMotor.h"
 
-#define SERVO_MOTOR_PIN 7
-#define MAX_DISTANCE_IN_M 5.0
+#define SERVO_MOTOR_PIN 12
+#define MAX_DISTANCE_IN_M 1.0
 
 class ServoMotorTask : public Task{
 
@@ -26,6 +26,8 @@ class ServoMotorTask : public Task{
         void init(int period);
         bool updateTimeAndCheckEvent(int basePeriod);
         void tick();
+    private:
+        float mapfloat(float x, float in_min, float in_max, float outMin, float out_max);
 };
 
 

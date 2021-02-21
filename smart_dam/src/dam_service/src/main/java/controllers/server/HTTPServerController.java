@@ -1,6 +1,8 @@
 package controllers.server;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +87,7 @@ public class HTTPServerController extends AbstractVerticle {
 			sendError(400, response);
 		} else {
 			/* We read the json */
-			State state = State.valueOf(res.getString("State"));
+			State state = State.values()[res.getInteger("S") - 1];
 			
 			/* Dam Mode checking : if new State isn't ALARM it can't be MANUAL */
 			if(this.model.getMode().equals(Mode.MANUAL) && !state.equals(State.ALARM)) {
@@ -99,9 +101,9 @@ public class HTTPServerController extends AbstractVerticle {
 			
 			//NEED TO CHECK STATE
 			if(!state.equals(State.NORMAL)) {
-				long timestamp = res.getLong("Timestamp") * 1000;
-				float distance = res.getFloat("Distance");
-				
+				long timestamp = res.getLong("T") * 1000;
+				float distance = res.getFloat("D");
+								
 				/* We obtain the Water Level from detected distance */
 				float waterLevel = this.getWaterLevelFromDistance(distance);
 			
@@ -119,7 +121,10 @@ public class HTTPServerController extends AbstractVerticle {
 			response.setStatusCode(200).end();
 			
 			/* Forward message to Dam Controller (Arduino) */
+			List<Mode> l = Arrays.asList(Mode.values());
+			res.put("M", l.indexOf(this.model.getMode()));
 			System.out.println("Msg: " + res.encode());
+
 			this.channel.sendMsg(res.encode());
 		}
 		

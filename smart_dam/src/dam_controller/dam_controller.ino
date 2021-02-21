@@ -19,13 +19,13 @@ void setup() {
    
 
     /* initialize scheduler */
-    scheduler->init(10);
+    scheduler->init(BASE_PERIOD);
 
     Msg* serialMsg;
     Msg* btMsg;
     
     Task* serialCommTask = new SerialCommTask(btMsg, serialMsg, riverData);
-    serialCommTask->init(10);
+    serialCommTask->init(BASE_PERIOD);
     scheduler->addTask(serialCommTask);
 
     /*Task* btCommTask = new BTCommTask(serialMsg, btMsg);
@@ -33,17 +33,14 @@ void setup() {
     scheduler->addTask(btCommTask);*/
 
     Task* servoMotorTask = new ServoMotorTask(riverData);
-    servoMotorTask->init(10);
+    servoMotorTask->init(200);
     scheduler->addTask(servoMotorTask);
     
     /* initialize tasks */
-    Task *ledTask = new LedTask(riverData, led);
+    //Task *blinkingTask = new BlinkingTask(led);
     
     /* add tasks to the scheduler */
-    scheduler->addTask(ledTask);
-
-    /*//!------------TESTING-----------------
-    *///!------------------------------------ 
+    //schedule.addTask(blinkingTask);
 }
 
 void loop() {

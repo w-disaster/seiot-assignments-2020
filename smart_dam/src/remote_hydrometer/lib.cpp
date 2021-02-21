@@ -24,7 +24,8 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", 0);
 
 char* ssidName = "Vodafonefabri";
 char* pwd = "3Com2007";
-String address = "http://192.168.1.5:8080";
+String address1 = "http://192.168.1.5:8080";
+String address2 = "http://192.168.1.21:8080";
 
 void readDistanceAndSetState(){
   /* Distance read from HC-SR04 and measurement fields fill*/
@@ -60,30 +61,25 @@ void readDistanceAndSetState(){
 void sendData(){
   DynamicJsonDocument data(200);
   HTTPClient http;
-  http.begin(address + "/api/data");      
+  http.begin(address1 + "/api/data");      
   http.addHeader("Content-Type", "application/json"); 
+
+  HTTPClient http2;
+  http2.begin(address2 + "/api/data");      
+  http2.addHeader("Content-Type", "application/json"); 
+
 
   timeClient.update();
   timestamp = timeClient.getEpochTime();
 
   noInterrupts();
   /* We determine the strint to send */
-  switch(state){
-    case State::NORMAL:
-        data["State"] = "NORMAL";
-        break;
-      case State::PREALARM:
-        data["State"] = "PREALARM";
-        break;
-      case State::ALARM:
-        data["State"] = "ALARM";
-        break;
-  }
-
+  data["S"] = state;
+        
   /* At NORMAL state we mustn't send river data */
   if(state != State::NORMAL){
-    data["Distance"] = distance;
-    data["Timestamp"] = timestamp;
+    data["D"] = distance;
+    data["T"] = timestamp;
   }
   interrupts();
   
@@ -92,10 +88,13 @@ void sendData(){
   //Serial.println(json);
   
   int responce = http.POST(json);  
+
+  http2.POST(json);
   
-  Serial.println(String("responce") + responce);
+  //Serial.println(String("responce") + responce);
   
   http.end();
+  http2.end();
   msgReady = false;
 }
 
