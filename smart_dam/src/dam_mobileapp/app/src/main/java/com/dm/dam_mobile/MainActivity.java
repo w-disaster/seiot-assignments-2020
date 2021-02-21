@@ -41,8 +41,21 @@ public class MainActivity extends AppCompatActivity {
     private static final String BTN_DISABLED = "#5c5c5c";
     private static final String BTN_ENABLED = "#009688";
 
-    /* jSON accepted keys */
-    private static final List<String> JSON_KEYS = new ArrayList<>(Arrays.asList("mode", "level", "water", "state"));
+    /**
+     *  jSON accepted keys
+     *
+     *  do -> dam opening
+     *  l -> water level
+     *  s -> state
+     *  m -> control mode
+     *
+     */
+    private static final List<String> JSON_KEYS = new ArrayList<>(Arrays.asList("DO", "L", "S", "M"));
+
+    private static final int DAM_OPENING = 0;
+    private static final int WATER_LEVEL = 1;
+    private static final int DAM_STATE = 2;
+    private static final int CONTROL_MODE = 3;
 
     private int damLevel;
     private int waterLevel;
@@ -117,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
         //context set up
         this.contextSwitch = findViewById(R.id.contextSwitch);
         this.contextSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            //TODO: send request to DS to context witch
 
             if(isChecked){
                 //update control mode
@@ -141,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
 
             // pair the values in a map
             Map<String, Object> message = new HashMap<>();
-            message.put("level", DEFAULT_MANUAL);
-            message.put("context", this.context);
+            message.put(JSON_KEYS.get(DAM_OPENING), DEFAULT_MANUAL);
+            message.put(JSON_KEYS.get(CONTROL_MODE), this.context);
 
             // send message to DC
             this.btChannel.sendMessage(setMessage(message));
@@ -250,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
 
             // pair the values in a map
             Map<String, Object> message = new HashMap<>();
-            message.put("level", this.damLevel);
+            message.put(JSON_KEYS.get(DAM_OPENING), this.damLevel);
 
             // send message to DC
             this.btChannel.sendMessage(setMessage(message));
@@ -359,7 +371,7 @@ public class MainActivity extends AppCompatActivity {
                             // check all accepted keys and update the global fields
                             for (final String key : JSON_KEYS){
                                 if(jsonMessage.has(key)) {
-                                    updateValueFromKey(key, String.valueOf(jsonMessage.get(key)));
+                                    updateValueFromKey(key, Integer.parseInt(String.valueOf(jsonMessage.get(key))));
                                 }
                             }
 
@@ -387,28 +399,28 @@ public class MainActivity extends AppCompatActivity {
      * @param key
      * The parameter to update.
      */
-    private void updateValueFromKey(final String key, final String value){
+    private void updateValueFromKey(final String key, final int value){
         switch (key){
-            case "mode":
+            case "M":
                 switch (value) {
-                    case "automatica":
+                    case 0:
                         this.context = ControlMode.AUTOMATIC;
                         break;
-                    case "manuale":
+                    case 1:
                         this.context = ControlMode.MANUAL;
                         break;
                     default:break;
                 }
                 break;
-            case "state":
+            case "S":
                 switch (value) {
-                    case "normale":
+                    case 0:
                         this.damState = DamState.NORMAL;
                         break;
-                    case "pre-allarme":
+                    case 1:
                         this.damState = DamState.PRE_ALARM;
                         break;
-                    case "allarme":
+                    case 2:
                         this.damState = DamState.ALARM;
                         break;
                     default:
@@ -416,11 +428,11 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 break;
-            case "water":
-                this.waterLevel = Integer.parseInt(value);
+            case "L":
+                this.waterLevel = value;
                 break;
-            case "level":
-                this.damLevel = Integer.parseInt(value);
+            case "DO":
+                this.damLevel = value;
                 break;
             default:break;
         }

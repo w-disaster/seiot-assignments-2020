@@ -97,25 +97,32 @@ public class HTTPServerController extends AbstractVerticle {
 			this.model.setState(state);
 			
 			//log("new msg " + routingContext.getBodyAsString());
-
+			
+			// timestamp of message
+			long timestamp = res.getLong("T") * 1000;
+			
+			// default values for river data
+			float distance = 0;
+			float waterLevel = 0;
 			
 			//NEED TO CHECK STATE
 			if(!state.equals(State.NORMAL)) {
-				long timestamp = res.getLong("T") * 1000;
-				float distance = res.getFloat("D");
+
+				// get distance
+				distance = res.getFloat("D");
 								
 				/* We obtain the Water Level from detected distance */
-				float waterLevel = this.getWaterLevelFromDistance(distance);
+				waterLevel = this.getWaterLevelFromDistance(distance);
 			
 				/* If AUTO we determine the Dam open percentage */
 				if(this.model.getMode().equals(Mode.AUTO)) {
 					this.model.setDamOpening(this.getDamOpeningFromDistance(distance));
-				}
-				
-				/* DBMS insert */
-				this.dbmsController.insertData(timestamp, waterLevel, this.model.getMode().toString(), 
-						state.toString(), this.model.getDamOpening());
+				}	
 			}
+			
+			/* DBMS insert */
+			this.dbmsController.insertData(timestamp, waterLevel, this.model.getMode().toString(), 
+					state.toString(), this.model.getDamOpening());
 			
 			/* Msg back if success */
 			response.setStatusCode(200).end();

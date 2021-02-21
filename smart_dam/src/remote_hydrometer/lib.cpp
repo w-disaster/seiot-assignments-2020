@@ -24,6 +24,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", 0);
 
 char* ssidName = "Vodafonefabri";
 char* pwd = "3Com2007";
+
 String address1 = "http://192.168.1.5:8080";
 String address2 = "http://192.168.1.21:8080";
 
