@@ -4,7 +4,7 @@
 
 ServoMotorTask::ServoMotorTask(RiverData* riverData){
     this->riverData = riverData;
-    this->lastDistance = riverData->getDistance();
+    this->lastDamOpening = riverData->getDamOpening();
     this->servoMotor = new ServoMotorImpl(SERVO_MOTOR_PIN);
 }
 
@@ -16,13 +16,13 @@ void ServoMotorTask::init(int period){
 
 bool ServoMotorTask::updateTimeAndCheckEvent(int basePeriod){
     if(Task::updateAndCheckTime(basePeriod)){
-        float distance = this->riverData->getDistance();
+        int damOpening = this->riverData->getDamOpening();
         
         /* If the distance is different from the previous, new one has been sampled
          *  then we change State to SM1 to move the servo motor
          */
-        if(this->lastDistance != distance){
-            this->lastDistance = distance;
+        if(this->lastDamOpening != damOpening){
+            this->lastDamOpening = damOpening;
             this->state = S1;
             return true;
         }
@@ -42,7 +42,7 @@ void ServoMotorTask::tick(){
             break;
         case S1:
             /* We calculate the value in grades in order to write it */ 
-            int angle = mapfloat(this->lastDistance, 0, MAX_DISTANCE_IN_M, 0, 180);
+            int angle = mapfloat(this->lastDamOpening, 0, 100, 0, 180);
             Serial.println(String("setting to: ") + angle);
             this->servoMotor->setPosition(angle);
             break;

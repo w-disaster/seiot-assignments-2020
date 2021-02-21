@@ -99,8 +99,7 @@ void SerialCommTask::saveDataAndSetMsgReady(Msg* msg){
         /* Shared object value set, ready to be read by ServoMotorTask and LedTask */
         this->riverData->setRiverState(riverState);
         this->riverData->setDamMode(damMode);
-        this->riverData->setDistance(this->receivedJson["D"]);
-        float t = this->receivedJson["D"];
+        this->riverData->setDamOpening(this->receivedJson["DO"]);
         
         digitalWrite(4, HIGH);
         delay(200);

@@ -123,6 +123,7 @@ public class HTTPServerController extends AbstractVerticle {
 			/* Forward message to Dam Controller (Arduino) */
 			List<Mode> l = Arrays.asList(Mode.values());
 			res.put("M", l.indexOf(this.model.getMode()));
+			res.put("DO", this.model.getDamOpening());
 			System.out.println("Msg: " + res.encode());
 
 			this.channel.sendMsg(res.encode());

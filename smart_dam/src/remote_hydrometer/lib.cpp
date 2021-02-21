@@ -75,11 +75,10 @@ void sendData(){
   noInterrupts();
   /* We determine the strint to send */
   data["S"] = state;
-        
+  data["T"] = timestamp;      
   /* At NORMAL state we mustn't send river data */
   if(state != State::NORMAL){
     data["D"] = distance;
-    data["T"] = timestamp;
   }
   interrupts();
   

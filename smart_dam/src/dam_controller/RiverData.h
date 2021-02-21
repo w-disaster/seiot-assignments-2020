@@ -24,14 +24,14 @@ public:
 
     DamMode getDamMode();
 
-    void setDistance(float distance);
+    void setDamOpening(int damOpening);
 
-    float getDistance();
+    int getDamOpening();
 
 private:
     RiverState riverState;
     DamMode damMode;
-    float distance;
+    int damOpening;
 
 };
 

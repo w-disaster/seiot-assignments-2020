@@ -19,7 +19,7 @@ class ServoMotorTask : public Task{
     };
     State state;
     
-    float lastDistance;
+    int lastDamOpening;
 
     public:
         ServoMotorTask(RiverData* riverData);

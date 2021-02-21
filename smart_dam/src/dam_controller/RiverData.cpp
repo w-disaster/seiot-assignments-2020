@@ -4,7 +4,7 @@
 RiverData::RiverData(){
     this->riverState = NORMAL;
     this->damMode = AUTO;
-    this->distance = 5.0;
+    this->damOpening = 0;
 }
 
 void RiverData::setRiverState(RiverData::RiverState riverState){
@@ -23,10 +23,10 @@ RiverData::DamMode RiverData::getDamMode(){
     return this->damMode;
 }
 
-void RiverData::setDistance(float distance){
-    this->distance = distance;
+void RiverData::setDamOpening(int damOpening){
+    this->damOpening = damOpening;
 }
 
-float RiverData::getDistance(){
-    return this->distance;
+int RiverData::getDamOpening(){
+    return this->damOpening;
 }
