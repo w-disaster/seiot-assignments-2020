@@ -218,9 +218,9 @@ $(function(){
 
     function processJSON(message){
 
-        if(messageIsNew(message.t)){
+        if(messageIsNew(message.T)){
             // alert level from message
-            alert = message.s;
+            alert = message.S;
             
             // tells what to show before setting data
             updateUI(alert);
@@ -232,10 +232,10 @@ $(function(){
             if(alert > 0){
                 
                 //update water level
-                updateWaterLevel(message.l);
+                updateWaterLevel(message.L);
             
                 //update chart
-                addData(message.t, message.l);
+                addData(message.T, message.L);
                 
                 if(requestTimeInterval != REQUEST_TIME){
                     // update request interval on alert level basis
@@ -246,14 +246,14 @@ $(function(){
                 //! ALLARM
                 if(alert > 1){
                     //update dam level
-                    updateDamLevel(message.do);
+                    updateDamLevel(message.DO);
 
                     //update context
-                    updateControlMode(message.m);
+                    updateControlMode(message.M);
                 }
             }
 
-            lastMesurmentReceived = checkAndGetTimestamp(message.Timestamp);
+            lastMesurmentReceived = checkAndGetTimestamp(message.T);
         }
     } 
     
@@ -265,7 +265,7 @@ $(function(){
 
         timer = setInterval(function(){
             // request last timestamp and
-            var messageToServer = { t : lastMesurmentReceived };
+            var messageToServer = { T : lastMesurmentReceived };
 
             $.ajax({
                 type: "GET",
@@ -275,7 +275,7 @@ $(function(){
                 data: messageToServer,
                 success: function(json) {
                     let message = json;
-                    console.log(json);
+                    
                     // only if we have items on the list
                     if(message.length){
                         // for all measurments in the json we process

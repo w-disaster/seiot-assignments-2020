@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
      *  m -> control mode
      *
      */
-    private static final List<String> JSON_KEYS = new ArrayList<>(Arrays.asList("do", "l", "s", "m"));
+    private static final List<String> JSON_KEYS = new ArrayList<>(Arrays.asList("DO", "L", "S", "M"));
 
     private static final int DAM_OPENING = 0;
     private static final int WATER_LEVEL = 1;
@@ -401,7 +401,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateValueFromKey(final String key, final int value){
         switch (key){
-            case "m":
+            case "M":
                 switch (value) {
                     case 0:
                         this.context = ControlMode.AUTOMATIC;
@@ -412,7 +412,7 @@ public class MainActivity extends AppCompatActivity {
                     default:break;
                 }
                 break;
-            case "s":
+            case "S":
                 switch (value) {
                     case 0:
                         this.damState = DamState.NORMAL;
@@ -428,10 +428,10 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 break;
-            case "l":
+            case "L":
                 this.waterLevel = value;
                 break;
-            case "do":
+            case "DO":
                 this.damLevel = value;
                 break;
             default:break;
