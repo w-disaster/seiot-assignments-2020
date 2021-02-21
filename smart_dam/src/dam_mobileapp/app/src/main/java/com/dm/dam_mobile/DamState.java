@@ -1,8 +1,8 @@
 package com.dm.dam_mobile;
 
 public enum DamState {
-    CONNECTING("Connessione in corso...", "#5c5c5c", 0),
-    NORMAL("Normale","#00c400", 0),
+    CONNECTING("Connessione in corso...", "#5c5c5c", -1),
+    NORMAL("Normale","#0080ff", 0),
     PRE_ALARM("Pre-Allarme", "#dbac00", 1),
     ALARM("Allarme","#e60000", 2);
 
