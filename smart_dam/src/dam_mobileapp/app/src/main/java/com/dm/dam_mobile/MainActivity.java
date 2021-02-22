@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
@@ -58,9 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int CONTROL_MODE = 3;
 
     private int damLevel;
-    private int waterLevel;
-    private DamState damState;
-    private ControlMode context;
+    private float waterLevel;
+    private RiverState riverState;
+    private DamMode damMode;
 
     private TextView damLevelLabel;
     private TextView waterLevelLabel;
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // default
-        this.damState = DamState.CONNECTING;
+        this.riverState = RiverState.CONNECTING;
 
         // connect to DC via bluetooth
         try {
@@ -112,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void openDam(View view) {
-        moveDam(-1);
+        moveDam(1);
     }
 
     /**
@@ -120,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void closeDam(View view){
-        moveDam(1);
+        moveDam(-1);
     }
 
     /**
@@ -133,35 +132,34 @@ public class MainActivity extends AppCompatActivity {
 
             if(isChecked){
                 //update control mode
-                context = ControlMode.MANUAL;
+                damMode = DamMode.MANUAL;
 
                 //enable usable buttons
-                if(!operationOutOfBounds(1)){
+                if(!operationOutOfBounds(-1)){
                     enableButton(btnClose);
                 }
-                if(!operationOutOfBounds(-1)) {
+                if(!operationOutOfBounds(1)) {
                     enableButton(btnOpen);
                 }
             }else{
                 //update control mode
-                context = ControlMode.AUTOMATIC;
+                damMode = DamMode.AUTOMATIC;
 
                 //disable buttons
                 disableButton(btnClose);
                 disableButton(btnOpen);
             }
 
-            // pair the values in a map
-            Map<String, Object> message = new HashMap<>();
-            message.put(JSON_KEYS.get(DAM_OPENING), DEFAULT_MANUAL);
-            message.put(JSON_KEYS.get(CONTROL_MODE), this.context);
+            // Pair the values in a map and send to DC
+            Map<String, Object> damOpeningMessage = Map.of(JSON_KEYS.get(DAM_OPENING), DEFAULT_MANUAL);
+            this.btChannel.sendMessage(setMessage(damOpeningMessage));
 
-            // send message to DC
-            this.btChannel.sendMessage(setMessage(message));
+            Map<String, Object> mode = Map.of(JSON_KEYS.get(CONTROL_MODE), this.damMode.getCode());
+            this.btChannel.sendMessage(setMessage(mode));
 
             //update text
-            contextSwitch.setText(context.toString());
-            contextSwitch.setTextColor(Color.parseColor(context.getColor()));
+            contextSwitch.setText(damMode.toString());
+            contextSwitch.setTextColor(Color.parseColor(damMode.getColor()));
         });
 
         //buttons SetUp
@@ -191,18 +189,18 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateUI(){
         //Normal State and over
-        this.stateView.setText(this.damState.toString());
-        this.stateView.setTextColor(Color.parseColor(this.damState.getColor()));
+        this.stateView.setText(this.riverState.toString());
+        this.stateView.setTextColor(Color.parseColor(this.riverState.getColor()));
 
         // Pre Alarm and over
-        if(this.damState.getAlertLevel() > DamState.NORMAL.getAlertLevel()){
+        if(this.riverState.getAlertLevel() > RiverState.NORMAL.getAlertLevel()){
 
             this.waterLevelLabel.setVisibility(View.VISIBLE);
             this.waterLevelView.setVisibility(View.VISIBLE);
             this.waterLevelView.setText(String.valueOf(this.waterLevel));
 
             // Alarm and over
-            if(this.damState.getAlertLevel() > DamState.PRE_ALARM.getAlertLevel()){
+            if(this.riverState.getAlertLevel() > RiverState.PRE_ALARM.getAlertLevel()){
 
                 this.damLevelLabel.setVisibility(View.VISIBLE);
                 this.damLevelView.setVisibility(View.VISIBLE);
@@ -211,10 +209,10 @@ public class MainActivity extends AppCompatActivity {
                 this.btnOpen.setVisibility(View.VISIBLE);
 
                 this.damLevelView.setText(String.valueOf(this.damLevel));
-                this.contextSwitch.setText(this.context.toString());
-                this.contextSwitch.setTextColor(Color.parseColor(this.context.getColor()));
+                this.contextSwitch.setText(this.damMode.toString());
+                this.contextSwitch.setTextColor(Color.parseColor(this.damMode.getColor()));
 
-                if(context.getCode() > 0){
+                if(damMode.getCode() > 0){
                     if(this.damLevel == DAM_LEVEL_MIN){
                         disableButton(this.btnOpen);
                     }
@@ -247,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
             this.btnOpen.setVisibility(View.GONE);
             this.contextSwitch.setVisibility(View.GONE);
         }
-
     }
 
     /**
@@ -371,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
                             // check all accepted keys and update the global fields
                             for (final String key : JSON_KEYS){
                                 if(jsonMessage.has(key)) {
-                                    updateValueFromKey(key, Integer.parseInt(String.valueOf(jsonMessage.get(key))));
+                                    updateValueFromKey(key, String.valueOf(jsonMessage.get(key)));
                                 }
                             }
 
@@ -388,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onConnectionCanceled() {
-               damState = DamState.CONNECTING;
+               riverState = RiverState.CONNECTING;
                updateUI();
             }
         }).execute();
@@ -399,40 +396,40 @@ public class MainActivity extends AppCompatActivity {
      * @param key
      * The parameter to update.
      */
-    private void updateValueFromKey(final String key, final int value){
+    private void updateValueFromKey(final String key, final String value){
         switch (key){
             case "M":
-                switch (value) {
+                switch (Integer.parseInt(value)) {
                     case 0:
-                        this.context = ControlMode.AUTOMATIC;
+                        this.damMode = DamMode.AUTOMATIC;
                         break;
                     case 1:
-                        this.context = ControlMode.MANUAL;
+                        this.damMode = DamMode.MANUAL;
                         break;
                     default:break;
                 }
                 break;
             case "S":
-                switch (value) {
+                switch (Integer.parseInt(value)) {
                     case 0:
-                        this.damState = DamState.NORMAL;
+                        this.riverState = RiverState.NORMAL;
                         break;
                     case 1:
-                        this.damState = DamState.PRE_ALARM;
+                        this.riverState = RiverState.PRE_ALARM;
                         break;
                     case 2:
-                        this.damState = DamState.ALARM;
+                        this.riverState = RiverState.ALARM;
                         break;
                     default:
-                        this.damState = DamState.CONNECTING;
+                        this.riverState = RiverState.CONNECTING;
                         break;
                 }
                 break;
             case "L":
-                this.waterLevel = value;
+                this.waterLevel = Float.parseFloat(value);
                 break;
             case "DO":
-                this.damLevel = value;
+                this.damLevel = Integer.parseInt(value);
                 break;
             default:break;
         }

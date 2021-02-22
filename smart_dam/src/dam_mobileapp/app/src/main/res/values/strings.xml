@@ -2,9 +2,9 @@
     <string name="app_name" translatable="true">DAM APP</string>
     <string name="buttonOpen" translatable="true">Open the Dam</string>
     <string name="buttonClose" translatable="true">Close the Dam</string>
-    <string name="stateLabel" translatable="true">Stato della diga:</string>
-    <string name="levelLabel" translatable="true">Livello della diga:</string>
-    <string name="waterLabel" translatable="true">Livello acqua:</string>
+    <string name="stateLabel" translatable="true">River state</string>
+    <string name="waterLabel" translatable="true">Water level:</string>
+    <string name = "damOpeningLabel" translatable="true">Dam opening:</string>
     <string name="placeholder">placeholder</string>
-    <string name="mode">Modalità Automatica</string>
+    <string name="mode">Auto mode</string>
 </resources>

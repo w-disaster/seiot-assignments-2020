@@ -21,16 +21,18 @@ void setup() {
     /* initialize scheduler */
     scheduler->init(BASE_PERIOD);
 
-    Msg* serialMsg;
-    Msg* btMsg;
+    Msg* serialMsg = new Msg("");
+    serialMsg->setMsgReady(false);
+    Msg* btMsg = new Msg("");
+    btMsg->setMsgReady(false);
     
     Task* serialCommTask = new SerialCommTask(btMsg, serialMsg, riverData);
     serialCommTask->init(BASE_PERIOD);
     scheduler->addTask(serialCommTask);
 
-    /*Task* btCommTask = new BTCommTask(serialMsg, btMsg);
+    Task* btCommTask = new BTCommTask(serialMsg, btMsg);
     btCommTask->init(BASE_PERIOD);
-    scheduler->addTask(btCommTask);*/
+    scheduler->addTask(btCommTask);
 
     Task* servoMotorTask = new ServoMotorTask(riverData);
     servoMotorTask->init(200);

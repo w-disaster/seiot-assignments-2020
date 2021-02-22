@@ -34,9 +34,10 @@ void setup() {
   /* If state sampled is NORMAL then we cannot detach the Timer that 
    *  sends data to the server
    */
-  mustDetach = false;
   if(state != State::NORMAL){
     mustDetach = true;
+  }else {
+    mustDetach = false;
   }
 
   mustDetachLedISR = false;
@@ -45,9 +46,8 @@ void setup() {
   timeClient.begin();
 }
 
-void setLedBehaviour(State state){
-  noInterrupts();
-  switch(state){
+void setLedBehaviour(State currentState){
+  switch(currentState){
     case State::NORMAL:
         /* BlinkLed interrupt detach if senderController tells us */
         if(mustDetachLedISR){
@@ -70,7 +70,6 @@ void setLedBehaviour(State state){
         digitalWrite(LED_PIN, HIGH);
         break;
   }
-  interrupts();
 }
 
 void loop() { 
@@ -80,16 +79,21 @@ void loop() {
       case State::NORMAL:
         /* At state change we always send the data, even in the other cases */
         if(isStateChanged){
+            isStateChanged = false;
           /* As said before, we detach the interrupt if we're coming from
            *  PRE_ALARM or ALARM state
            */
+          Serial.println("siamo in NORMAL");
           if(mustDetach){
+            Serial.println(" faccio il detach della send");
             senderController.detach();
           }
 
           /* If state is changed, we must edit the Led behaviour */
           setLedBehaviour(state);
           sendData();
+        } else {
+            mustDetachLedISR = false;
         }
         break;
       case State::PREALARM:
@@ -98,16 +102,26 @@ void loop() {
          *  every T seconds, depending on the state
          */
         if(isStateChanged){
+          Serial.println("state changed");
+          Serial.println("siamo in PRE-ALARM");
           senderController.attach(10, setMsgReady);
           mustDetach = true;
           /* If state is changed, we must edit the Led behaviour */
           setLedBehaviour(state);
+        } else {
+            mustDetachLedISR = false;
         }
         /* We send data at state change and when senderController tells us */
         if(msgReady || isStateChanged){
           Serial.println(String("Sending ") + (char)state);
           sendData();
         }
+
+        if(isStateChanged){
+            isStateChanged = false;
+        }
+
+        break;
         break;
       case State::ALARM:
         /* If the state is different from the previous sampled by dataReader ISR,
@@ -115,16 +129,25 @@ void loop() {
          *  every T seconds, depending on the state
          */
         if(isStateChanged){
+          Serial.println("state changed");
+          Serial.println("siamo in ALARM");
           senderController.attach(5, setMsgReady);
           mustDetach = true;
           /* If state is changed, we must edit the Led behaviour */
           setLedBehaviour(state);
+        } else {
+            mustDetachLedISR = false;
         }
         /* We send data at state change and when senderController tells us */
         if(msgReady || isStateChanged){
           Serial.println(String("Sending ") + (char)state);
           sendData();
         }
+
+        if(isStateChanged){
+            isStateChanged = false;
+        }
+
         break;
     }
     interrupts();
@@ -132,6 +155,4 @@ void loop() {
  } else { 
    Serial.println("Error in WiFi connection");   
  }
- 
- delay(1000);  
 }

@@ -37,13 +37,11 @@ bool ServoMotorTask::updateTimeAndCheckEvent(int basePeriod){
 void ServoMotorTask::tick(){
     switch(this->state){
         case S0:
-            Serial.println("setting to 0");
             this->servoMotor->setPosition(0);
             break;
         case S1:
             /* We calculate the value in grades in order to write it */ 
             int angle = mapfloat(this->lastDamOpening, 0, 100, 0, 180);
-            Serial.println(String("setting to: ") + angle);
             this->servoMotor->setPosition(angle);
             break;
     }

@@ -65,10 +65,13 @@ void SerialCommTask::tick(){
  *  to be sent from BTCommTask
  */
 void SerialCommTask::saveDataAndSetMsgReady(Msg* msg){
-    delete(this->serialMsg);
-    this->serialMsg = msg;
+    //delete(this->serialMsg);
+    this->serialMsg->setContent(msg->getContent());
+    this->serialMsg->setMsgReady(true);
+
+    delete(msg);
+    
     DeserializationError error = deserializeJson(this->receivedJson, this->serialMsg->getContent());
-    Serial.println(this->serialMsg->getContent());
 
     if (!error) { 
         // we write river data coming from Dam Service to a shared object

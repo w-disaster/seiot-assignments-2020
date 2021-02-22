@@ -1,6 +1,6 @@
 package com.dm.dam_mobile;
 
-public enum ControlMode {
+public enum DamMode {
     MANUAL("Modalità Manuale", "#dbac00", 1),
     AUTOMATIC("Modalità Automatica","#009688", 0);
 
@@ -8,7 +8,7 @@ public enum ControlMode {
     private final String color;
     private final int code;
 
-    ControlMode(final String text, final String color, final int code){
+    DamMode(final String text, final String color, final int code){
         this.text = text;
         this.color = color;
         this.code = code;

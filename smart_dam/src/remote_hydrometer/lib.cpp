@@ -24,39 +24,38 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", 0);
 
 char* ssidName = "Vodafonefabri";
 char* pwd = "3Com2007";
-
 String address1 = "http://192.168.1.5:8080";
-String address2 = "http://192.168.1.21:8080";
 
 void readDistanceAndSetState(){
-  /* Distance read from HC-SR04 and measurement fields fill*/
-  distance = getDistance();
-  Serial.println(String("distance: ") + distance);
-  /* We determine the State by the distance sampled */
-  if(distance > d1_in_m){
-    state = State::NORMAL;
-  } else if(distance >= d2_in_m && distance <= d1_in_m){
-    state = State::PREALARM;
-  } else {
-    state = State::ALARM;
-  }
-    
-  if(precState != state){
-    /* If the state is changed and the previous was PRE_ALARM then
-     *  we must detach the interrupt
-     */
-    if(precState == State::PREALARM){
-      mustDetachLedISR = true;
+    /* Distance read from HC-SR04 and measurement fields fill*/
+    distance = getDistance();
+    Serial.println(String("distance: ") + distance);
+    /* We determine the State by the distance sampled */
+    if(distance > d1_in_m){
+        Serial.println("normal");
+        state = State::NORMAL;
+    } else if(distance >= d2_in_m && distance <= d1_in_m){
+        Serial.println("pre-alarm");
+        state = State::PREALARM;
     } else {
-      mustDetachLedISR = false;
+        Serial.println("alarm");
+        state = State::ALARM;
     }
-    isStateChanged = true;
-  } else {
-    mustDetachLedISR = false;
-    isStateChanged = false;
-  }
-
-  precState = state;
+    
+    if(precState != state){
+        /* If the state is changed and the previous was PRE_ALARM then
+         *  we must detach the interrupt
+         */
+        if(precState == State::PREALARM){
+            mustDetachLedISR = true;
+        } else {
+            mustDetachLedISR = false;
+        }
+        Serial.println("state changed");
+        isStateChanged = true;
+    }
+    
+    precState = state;
 }
 
 void sendData(){
@@ -65,17 +64,12 @@ void sendData(){
   http.begin(address1 + "/api/data");      
   http.addHeader("Content-Type", "application/json"); 
 
-  HTTPClient http2;
-  http2.begin(address2 + "/api/data");      
-  http2.addHeader("Content-Type", "application/json"); 
-
-
   timeClient.update();
   timestamp = timeClient.getEpochTime();
 
   noInterrupts();
   /* We determine the strint to send */
-  data["S"] = state;
+  data["S"] = state - 1;
   data["T"] = timestamp;      
   /* At NORMAL state we mustn't send river data */
   if(state != State::NORMAL){
@@ -88,13 +82,10 @@ void sendData(){
   //Serial.println(json);
   
   int responce = http.POST(json);  
-
-  http2.POST(json);
   
   //Serial.println(String("responce") + responce);
   
   http.end();
-  http2.end();
   msgReady = false;
 }
 

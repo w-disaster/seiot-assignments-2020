@@ -1,6 +1,8 @@
 package controllers.serial;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
 
@@ -28,6 +30,9 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 				
 				System.out.println(msg);
 				
+				
+				this.setModel(msg);
+				
 				/* We deserialize it as a Json */
 				//Mode mode = this.getModeFromJson(msg);
 				/* We set the mode of the model, if possible */
@@ -53,13 +58,27 @@ public class SerialCommChannelControllerRunnable implements Runnable {
         return gson.toJson(map, Map.class);
 	}
 	
-	private Mode getModeFromJson(String json) {
+	private void setModel(String json) {
 		/* We read the Json file with the mode requested by Dam Controller */
 		Gson gson = new Gson();
-        Map<String, String> jsonMap = gson.fromJson(json, Map.class);
+        Map<String, Double> jsonMap = gson.fromJson(json, Map.class);
+        
+        jsonMap.entrySet().forEach(e -> System.out.println(e.getKey() + ", " + e.getValue().intValue()));
         
         /* We get the Mode and we set it if it's possible */
-        return Mode.valueOf(jsonMap.get("Mode"));
+        if(jsonMap.containsKey("M")) {
+			List<Mode> modes = Arrays.asList(Mode.values());
+			Mode mode = modes.get(jsonMap.get("M").intValue());
+            setEnvironmentMode(this.model, mode);
+        }
+        if(jsonMap.containsKey("DO")) {
+    		System.out.println(jsonMap.get("DO").intValue());
+
+        	if(this.model.getMode().equals(Mode.MANUAL)) {
+        		this.model.setDamOpening(jsonMap.get("DO").intValue());
+
+        	}
+        }
 	}
 	
 	

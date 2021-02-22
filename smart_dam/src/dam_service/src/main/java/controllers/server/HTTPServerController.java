@@ -130,6 +130,7 @@ public class HTTPServerController extends AbstractVerticle {
 			/* Forward message to Dam Controller (Arduino) */
 			List<Mode> l = Arrays.asList(Mode.values());
 			res.remove("D");
+			res.remove("T");
 			res.put("L", waterLevel);
 			res.put("M", l.indexOf(this.model.getMode()));
 			res.put("DO", this.model.getDamOpening());
@@ -164,7 +165,7 @@ public class HTTPServerController extends AbstractVerticle {
 		HttpServerRequest request = routingContext.request();
 		
 		/* DB query : we'll get all data onwards a given t (timestamp) */
-		Long timestamp = Long.parseLong(request.getParam("Timestamp"));
+		Long timestamp = Long.parseLong(request.getParam("t"));
 
 		if(timestamp > 0) {
 			Map<Integer, List<Pair<String, String>>> data = this.dbmsController.getDataFromTimestampOnwards(timestamp);

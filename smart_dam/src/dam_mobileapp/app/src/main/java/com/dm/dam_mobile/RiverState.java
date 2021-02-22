@@ -1,6 +1,6 @@
 package com.dm.dam_mobile;
 
-public enum DamState {
+public enum RiverState {
     CONNECTING("Connessione in corso...", "#5c5c5c", -1),
     NORMAL("Normale","#0080ff", 0),
     PRE_ALARM("Pre-Allarme", "#dbac00", 1),
@@ -10,7 +10,7 @@ public enum DamState {
     private final String color;
     private final int alertLevel;
 
-    DamState(final String text, final String color, final int alertLevel){
+    RiverState(final String text, final String color, final int alertLevel){
         this.text = text;
         this.color = color;
         this.alertLevel = alertLevel;
