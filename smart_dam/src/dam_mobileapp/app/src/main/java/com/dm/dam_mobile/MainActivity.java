@@ -151,11 +151,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Pair the values in a map and send to DC
-            Map<String, Object> damOpeningMessage = Map.of(JSON_KEYS.get(DAM_OPENING), DEFAULT_MANUAL);
-            this.btChannel.sendMessage(setMessage(damOpeningMessage));
-
             Map<String, Object> mode = Map.of(JSON_KEYS.get(CONTROL_MODE), this.damMode.getCode());
             this.btChannel.sendMessage(setMessage(mode));
+            
+            Map<String, Object> damOpeningMessage = Map.of(JSON_KEYS.get(DAM_OPENING), DEFAULT_MANUAL);
+            this.btChannel.sendMessage(setMessage(damOpeningMessage));
 
             //update text
             contextSwitch.setText(damMode.toString());

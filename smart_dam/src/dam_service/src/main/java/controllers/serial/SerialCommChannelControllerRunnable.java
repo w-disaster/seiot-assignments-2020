@@ -28,8 +28,7 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 				/* Incoming message */
 				String msg = this.channel.receiveMsg();
 				
-				System.out.println(msg);
-				
+				//System.out.println(msg);
 				
 				this.setModel(msg);
 				
@@ -62,9 +61,7 @@ public class SerialCommChannelControllerRunnable implements Runnable {
 		/* We read the Json file with the mode requested by Dam Controller */
 		Gson gson = new Gson();
         Map<String, Double> jsonMap = gson.fromJson(json, Map.class);
-        
-        jsonMap.entrySet().forEach(e -> System.out.println(e.getKey() + ", " + e.getValue().intValue()));
-        
+                
         /* We get the Mode and we set it if it's possible */
         if(jsonMap.containsKey("M")) {
 			List<Mode> modes = Arrays.asList(Mode.values());
@@ -72,15 +69,11 @@ public class SerialCommChannelControllerRunnable implements Runnable {
             setEnvironmentMode(this.model, mode);
         }
         if(jsonMap.containsKey("DO")) {
-    		System.out.println(jsonMap.get("DO").intValue());
-
         	if(this.model.getMode().equals(Mode.MANUAL)) {
         		this.model.setDamOpening(jsonMap.get("DO").intValue());
-
         	}
         }
 	}
-	
 	
 	public static void setEnvironmentMode(Model model, Mode mode) {
         /* Always possible switch to AUTO mode, only when state == ALARM to MANUAL mode */

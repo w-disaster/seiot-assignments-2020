@@ -87,7 +87,7 @@ public class HTTPServerController extends AbstractVerticle {
 			sendError(400, response);
 		} else {
 			/* We read the json */
-			State state = State.values()[res.getInteger("S") - 1];
+			State state = State.values()[res.getInteger("S")];
 			
 			/* Dam Mode checking : if new State isn't ALARM it can't be MANUAL */
 			if(this.model.getMode().equals(Mode.MANUAL) && !state.equals(State.ALARM)) {
