@@ -1,10 +1,10 @@
 package com.dm.dam_mobile;
 
 public enum RiverState {
-    CONNECTING("Connessione in corso...", "#5c5c5c", -1),
-    NORMAL("Normale","#0080ff", 0),
-    PRE_ALARM("Pre-Allarme", "#dbac00", 1),
-    ALARM("Allarme","#e60000", 2);
+    CONNECTING("Connecting...", "#5c5c5c", -1),
+    NORMAL("Normal","#0080ff", 0),
+    PRE_ALARM("Pre-Alarm", "#dbac00", 1),
+    ALARM("Alarm","#e60000", 2);
 
     private final String text;
     private final String color;

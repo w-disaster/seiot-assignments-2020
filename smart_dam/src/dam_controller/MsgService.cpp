@@ -43,7 +43,9 @@ void serialEvent() {
   while (Serial.available()) {
     char ch = (char) Serial.read();
     if (ch == '\n'){
-      MsgService.currentMsg = new Msg(content);
+      MsgService.currentMsg = new Msg();
+      MsgService.currentMsg->setContent(content);
+      MsgService.currentMsg->setMsgReady(true);
       MsgService.msgAvailable = true;      
     } else {
       content += ch;      

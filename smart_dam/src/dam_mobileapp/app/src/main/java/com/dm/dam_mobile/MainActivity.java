@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
             // Pair the values in a map and send to DC
             Map<String, Object> mode = Map.of(JSON_KEYS.get(CONTROL_MODE), this.damMode.getCode());
             this.btChannel.sendMessage(setMessage(mode));
-            
+
             Map<String, Object> damOpeningMessage = Map.of(JSON_KEYS.get(DAM_OPENING), DEFAULT_MANUAL);
             this.btChannel.sendMessage(setMessage(damOpeningMessage));
 
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
             this.waterLevelLabel.setVisibility(View.VISIBLE);
             this.waterLevelView.setVisibility(View.VISIBLE);
-            this.waterLevelView.setText(String.valueOf(this.waterLevel));
+            this.waterLevelView.setText(String.valueOf(this.waterLevel) + " m");
 
             // Alarm and over
             if(this.riverState.getAlertLevel() > RiverState.PRE_ALARM.getAlertLevel()){
@@ -215,9 +215,13 @@ public class MainActivity extends AppCompatActivity {
                 if(damMode.getCode() > 0){
                     if(this.damLevel == DAM_LEVEL_MIN){
                         disableButton(this.btnOpen);
+                    } else if(!this.btnOpen.isEnabled()){
+                        enableButton(this.btnOpen);
                     }
                     if(this.damLevel == DAM_LEVEL_MAX){
                         disableButton(this.btnClose);
+                    } else if(!this.btnClose.isEnabled()){
+                        enableButton(this.btnClose);
                     }
                 }else{
                     this.contextSwitch.setChecked(false);
@@ -250,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Moves the dam level in the direction of the verse by DAM_STEP
      * @param verse
-     * The verse of the opration (1: close, -1:open).
+     * The verse of the opration (-1 close, 1:open).
      */
     private void moveDam(final int verse) {
         if(!operationOutOfBounds(verse)) {

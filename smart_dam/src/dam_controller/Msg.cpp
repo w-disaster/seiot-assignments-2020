@@ -1,10 +1,5 @@
 #include "Arduino.h"
 #include "Msg.h"
-
-Msg::Msg(String content){
-    this->content = content;
-    setMsgReady(true);
-}
   
 String Msg::getContent(){
     return this->content;

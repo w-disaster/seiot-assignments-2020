@@ -83,9 +83,11 @@ public class HTTPServerController extends AbstractVerticle {
 		HttpServerResponse response = routingContext.response();
 		JsonObject res = routingContext.getBodyAsJson();
 		
+
 		if (res == null) {
 			sendError(400, response);
 		} else {
+			System.out.println("Msg: " + res.encode());
 			/* We read the json */
 			State state = State.values()[res.getInteger("S")];
 			
@@ -135,7 +137,6 @@ public class HTTPServerController extends AbstractVerticle {
 			res.put("M", l.indexOf(this.model.getMode()));
 			res.put("DO", this.model.getDamOpening());
 			
-			System.out.println("Msg: " + res.encode());
 
 			this.channel.sendMsg(res.encode());
 		}

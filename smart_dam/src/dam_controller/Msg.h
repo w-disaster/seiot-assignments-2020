@@ -8,7 +8,6 @@ class Msg{
   bool isReady;
   
   public:
-    Msg(String content);
     String getContent();
     void setContent(String content);
     void setMsgReady(bool flag);

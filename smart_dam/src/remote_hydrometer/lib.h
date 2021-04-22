@@ -27,10 +27,10 @@ extern volatile uint32_t lastMillis;
 extern float distance;
 extern unsigned long timestamp;
 extern boolean msgReady;
-extern boolean isStateChanged; 
+extern boolean isStateChanged;
 extern boolean mustDetachLedISR;
 
-enum State{
+enum State {
   IDLE,
   NORMAL,
   PREALARM,
@@ -51,9 +51,8 @@ extern char* ssidName;
 /* WPA2 PSK password */
 extern char* pwd;
 /* service IP address */
-extern String address1;
+extern String address;
 
-extern String address2;
 
 void sendData();
 

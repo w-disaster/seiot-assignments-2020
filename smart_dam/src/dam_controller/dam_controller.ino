@@ -21,9 +21,9 @@ void setup() {
     /* initialize scheduler */
     scheduler->init(BASE_PERIOD);
 
-    Msg* serialMsg = new Msg("");
+    Msg* serialMsg = new Msg();
     serialMsg->setMsgReady(false);
-    Msg* btMsg = new Msg("");
+    Msg* btMsg = new Msg();
     btMsg->setMsgReady(false);
     
     Task* serialCommTask = new SerialCommTask(btMsg, serialMsg, riverData);

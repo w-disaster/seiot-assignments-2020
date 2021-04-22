@@ -19,7 +19,9 @@ bool MsgServiceBT::isMsgAvailable(){
   while (channel->available()) {
     char ch = (char) channel->read();
     if (ch == '\n'){
-      availableMsg = new Msg(content); 
+      availableMsg = new Msg();
+      availableMsg->setContent(content);
+      availableMsg->setMsgReady(true); 
       content = "";
       return true;    
     } else {

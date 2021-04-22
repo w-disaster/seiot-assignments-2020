@@ -7,8 +7,62 @@
 Ticker blinker;
 Ticker dataReader;
 Ticker senderController;
+Ticker controller;
 
 boolean mustDetach;
+
+void control(){
+    if (WiFi.status() == WL_CONNECTED){ 
+    switch(state){
+      case State::NORMAL:
+        /* At state change we always send the data, even in the other cases */
+        if(isStateChanged){
+          /* As said before, we detach the interrupt if we're coming from
+           *  PRE_ALARM or ALARM state
+           */
+          if(mustDetach){
+            senderController.detach();
+          }
+
+          /* If state is changed, we must edit the Led behaviour */
+          setLedBehaviour(state);
+          
+        }
+        break;
+      case State::PREALARM:
+        /* If the state is different from the previous sampled by dataReader ISR,
+         *  we attach the one to senderController, that sets the msg ready to be sent
+         *  every T seconds, depending on the state
+         */
+        if(isStateChanged){
+          senderController.attach(10, setMsgReady);
+          mustDetach = true;
+          /* If state is changed, we must edit the Led behaviour */
+          setLedBehaviour(state);
+        }
+        
+        break;
+      case State::ALARM:
+        /* If the state is different from the previous sampled by dataReader ISR,
+         *  we attach the one to senderController, that sets the msg ready to be sent
+         *  every T seconds, depending on the state
+         */
+        if(isStateChanged){
+          senderController.attach(5, setMsgReady);
+          mustDetach = true;
+          /* If state is changed, we must edit the Led behaviour */
+          setLedBehaviour(state);
+        }
+        
+        break;
+    }
+    
+ } else { 
+   Serial.println("Error in WiFi connection");   
+ }
+}
+
+
 
 void setup() { 
   Serial.begin(115200);    
@@ -30,14 +84,16 @@ void setup() {
   readDistanceAndSetState();
   /* We attach an interrupt that reads distance and sets state every second */
   dataReader.attach(1, readDistanceAndSetState);
+
+  control();
+  controller.attach(1, control);
   
   /* If state sampled is NORMAL then we cannot detach the Timer that 
    *  sends data to the server
    */
+  mustDetach = false;
   if(state != State::NORMAL){
     mustDetach = true;
-  }else {
-    mustDetach = false;
   }
 
   mustDetachLedISR = false;
@@ -46,8 +102,8 @@ void setup() {
   timeClient.begin();
 }
 
-void setLedBehaviour(State currentState){
-  switch(currentState){
+void setLedBehaviour(State state){
+  switch(state){
     case State::NORMAL:
         /* BlinkLed interrupt detach if senderController tells us */
         if(mustDetachLedISR){
@@ -73,86 +129,11 @@ void setLedBehaviour(State currentState){
 }
 
 void loop() { 
-  if (WiFi.status() == WL_CONNECTED){ 
     noInterrupts();
-    switch(state){
-      case State::NORMAL:
-        /* At state change we always send the data, even in the other cases */
-        if(isStateChanged){
-            isStateChanged = false;
-          /* As said before, we detach the interrupt if we're coming from
-           *  PRE_ALARM or ALARM state
-           */
-          Serial.println("siamo in NORMAL");
-          if(mustDetach){
-            Serial.println(" faccio il detach della send");
-            senderController.detach();
-          }
-
-          /* If state is changed, we must edit the Led behaviour */
-          setLedBehaviour(state);
-          sendData();
-        } else {
-            mustDetachLedISR = false;
-        }
-        break;
-      case State::PREALARM:
-        /* If the state is different from the previous sampled by dataReader ISR,
-         *  we attach the one to senderController, that sets the msg ready to be sent
-         *  every T seconds, depending on the state
-         */
-        if(isStateChanged){
-          Serial.println("state changed");
-          Serial.println("siamo in PRE-ALARM");
-          senderController.attach(10, setMsgReady);
-          mustDetach = true;
-          /* If state is changed, we must edit the Led behaviour */
-          setLedBehaviour(state);
-        } else {
-            mustDetachLedISR = false;
-        }
-        /* We send data at state change and when senderController tells us */
-        if(msgReady || isStateChanged){
-          Serial.println(String("Sending ") + (char)state);
-          sendData();
-        }
-
-        if(isStateChanged){
-            isStateChanged = false;
-        }
-
-        break;
-        break;
-      case State::ALARM:
-        /* If the state is different from the previous sampled by dataReader ISR,
-         *  we attach the one to senderController, that sets the msg ready to be sent
-         *  every T seconds, depending on the state
-         */
-        if(isStateChanged){
-          Serial.println("state changed");
-          Serial.println("siamo in ALARM");
-          senderController.attach(5, setMsgReady);
-          mustDetach = true;
-          /* If state is changed, we must edit the Led behaviour */
-          setLedBehaviour(state);
-        } else {
-            mustDetachLedISR = false;
-        }
-        /* We send data at state change and when senderController tells us */
-        if(msgReady || isStateChanged){
-          Serial.println(String("Sending ") + (char)state);
-          sendData();
-        }
-
-        if(isStateChanged){
-            isStateChanged = false;
-        }
-
-        break;
-    }
+    /* We send data at state change and when senderController tells us */
+    if(msgReady){
+      Serial.println(String("Sending ") + (char)state);
+      sendData();
+    }    
     interrupts();
-    
- } else { 
-   Serial.println("Error in WiFi connection");   
- }
 }
