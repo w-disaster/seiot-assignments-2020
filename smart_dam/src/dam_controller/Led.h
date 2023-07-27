@@ -2,14 +2,22 @@
 #define __LED__
 
 #include "Light.h"
+#define LED_PIN 4
 
-class Led: public Light { 
-public:
-  Led(int pin);
-  void switchOn();
-  void switchOff();    
-protected:
-  int pin;  
+/* Led class */
+class LedClass: public Light { 
+  public:
+    LedClass(int pin);
+    void switchOn();
+    void switchOff();
+    bool isLedOn();
+    static void blink();
+
+    int pin;
+    enum { ON, OFF } state;  
+    bool isOn;
 };
+
+extern LedClass Led;
 
 #endif

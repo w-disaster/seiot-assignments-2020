@@ -10,4 +10,10 @@
     <color name="enabled">#5c5c5c</color>
     <color name="disabled">#FF03DAC5</color>
     <color name="water">#0080ff</color>
+    <color name="light_blue">#add8e6</color>
+    <color name="grey">#808080</color>
+    <color name="green">#2dc937</color>
+    <color name="orange">#db7b2b</color>
+    <color name="red">#cc3232</color>
+
 </resources>

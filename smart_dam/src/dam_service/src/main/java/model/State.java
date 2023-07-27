@@ -2,6 +2,6 @@ package model;
 
 public enum State {
 	NORMAL,
-	PREALARM,
-	ALARM;
+	PRE_ALARM,
+	ALARM,
 }

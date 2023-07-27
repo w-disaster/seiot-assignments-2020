@@ -12,8 +12,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
-	<classpathentry kind="lib" path="/home/luca/Arduino/seiot-assignments-2020/smart_dam/src/dam_service/mysql-connector-java-8.0.21.jar"/>
-	<classpathentry kind="lib" path="/home/luca/Arduino/seiot-assignments-2020/smart_dam/src/dam_service/jssc.jar"/>
-	<classpathentry kind="lib" path="/home/luca/Arduino/seiot-assignments-2020/smart_dam/src/dam_service/gson-2.8.6.jar"/>
+	<classpathentry kind="lib" path="/home/luca/Desktop/Progetto-03/src/dam_service/sqljdbc4.jar"/>
+	<classpathentry kind="lib" path="/home/luca/Desktop/Progetto-03/src/dam_service/mysql-connector-java-8.0.21.jar"/>
+	<classpathentry kind="lib" path="/home/luca/Desktop/Progetto-03/src/dam_service/jssc.jar"/>
 	<classpathentry kind="output" path="bin/default"/>
 </classpath>

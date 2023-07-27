@@ -2,6 +2,8 @@ package btlib;
 
 import android.os.AsyncTask;
 
+import org.json.JSONException;
+
 public abstract class ConnectionTask extends AsyncTask<Void, Void, Integer> {
 
     static final int CONNECTION_DONE = 1;
@@ -15,7 +17,11 @@ public abstract class ConnectionTask extends AsyncTask<Void, Void, Integer> {
         switch (result){
             case CONNECTION_DONE:
                 if(eventListener != null){
-                    eventListener.onConnectionActive(connectedChannel);
+                    try {
+                        eventListener.onConnectionActive(connectedChannel);
+                    } catch (JSONException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
 
@@ -28,7 +34,7 @@ public abstract class ConnectionTask extends AsyncTask<Void, Void, Integer> {
     }
 
     public interface EventListener{
-        void onConnectionActive(final BluetoothChannel channel);
+        void onConnectionActive(final BluetoothChannel channel) throws JSONException, InterruptedException;
         void onConnectionCanceled();
     }
 }

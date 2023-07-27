@@ -1,24 +1,35 @@
-#ifndef __MSGSERVICEBT__
-#define __MSGSERVICEBT__
+#ifndef __MSG_SERVICE_BT__
+#define __MSG_SERVICE_BT__
+#define BT_MSG_RECV 2
 
-#include "Arduino.h"
+#include "MsgService.h"
 #include "SoftwareSerial.h"
-#include "Msg.h"
 
-class MsgServiceBT {
-    
-public: 
-  MsgServiceBT(int rxPin, int txPin);  
-  void init();  
-  bool isMsgAvailable();
-  Msg* receiveMsg();
-  bool sendMsg(Msg msg);
+/* Bluetooth event source */
+class MsgServiceBT : public MsgEventSource {
+    public: 
+        MsgServiceBT(int rxPin, int txPin);
+        void btEvent();
+        void init();
+        void sendMsg(String msg); 
+    private:
+        SoftwareSerial* channel;
+        String content;
+};
 
-private:
-  String content;
-  Msg* availableMsg;
-  SoftwareSerial* channel;
-  
+/* Bluetooth event */
+class BTMsgRecv : public Event {
+    public:
+        BTMsgRecv(MsgServiceBT* msgServiceBT, String msg) : Event(BT_MSG_RECV, msg){
+            this->source = source;  
+        }
+
+        MsgServiceBT* getSource(){
+            return source;
+        }
+
+    private:
+        MsgServiceBT* source;
 };
 
 #endif

@@ -1,32 +1,38 @@
 #include "RiverData.h"
 #include "Arduino.h"
 
-RiverData::RiverData(){
-    this->riverState = NORMAL;
-    this->damMode = AUTO;
-    this->damOpening = 0;
+StaticJsonDocument<D_JSON_DIM> riverDataJson;
+
+RiverData::RiverData(String msg){
+    this->error = deserializeJson(riverDataJson, msg);
 }
 
-void RiverData::setRiverState(RiverData::RiverState riverState){
-    this->riverState = riverState;
+State RiverData::getRiverState(){
+    State res;
+    if(!error){
+        String stateAsString = riverDataJson["S"];
+        int stateCode = stateAsString.toInt();
+        switch(stateCode){
+            case 0:
+                res = NORMAL;
+                break;
+            case 1:
+                res = PRE_ALARM;
+                break;
+            case 2:
+                res = ALARM;
+                break;
+       }
+   }
+   return res;
 }
 
-RiverData::RiverState RiverData::getRiverState(){
-   return this->riverState;
+boolean RiverData::containsDamOpening(){
+    JsonVariant error = riverDataJson["DO"];
+    return !error.isNull();
 }
 
-void RiverData::setDamMode(RiverData::DamMode damMode){
-    this->damMode = damMode;
-}
-
-RiverData::DamMode RiverData::getDamMode(){
-    return this->damMode;
-}
-
-void RiverData::setDamOpening(int damOpening){
-    this->damOpening = damOpening;
-}
 
 int RiverData::getDamOpening(){
-    return this->damOpening;
+    return riverDataJson["DO"];
 }

@@ -1,42 +1,33 @@
-#include "Arduino.h"
 #include "MsgServiceBT.h"
+#include "Arduino.h"
 
 MsgServiceBT::MsgServiceBT(int rxPin, int txPin){
-  channel = new SoftwareSerial(rxPin, txPin);
+    pinMode(rxPin, INPUT);
+    pinMode(txPin, OUTPUT);
+    this->channel = new SoftwareSerial(rxPin, txPin);
 }
 
 void MsgServiceBT::init(){
-  content.reserve(256);
-  channel->begin(9600);
-  availableMsg = NULL;
+    this->channel->begin(BAUD_RATE);
+    this->content = "";
 }
 
-bool MsgServiceBT::sendMsg(Msg msg){
-  channel->println(msg.getContent());  
+void MsgServiceBT::sendMsg(String msg){
+   this->channel->println(msg);
 }
 
-bool MsgServiceBT::isMsgAvailable(){
-  while (channel->available()) {
-    char ch = (char) channel->read();
-    if (ch == '\n'){
-      availableMsg = new Msg();
-      availableMsg->setContent(content);
-      availableMsg->setMsgReady(true); 
-      content = "";
-      return true;    
-    } else {
-      content += ch;      
-    }
-  }
-  return false;  
-}
-
-Msg* MsgServiceBT::receiveMsg(){
-  if (availableMsg != NULL){
-    Msg* msg = availableMsg;
-    availableMsg = NULL;
-    return msg;  
-  } else {
-    return NULL;
-  }
+void MsgServiceBT::btEvent(){
+    char ch;
+    while (this->channel->available()) {
+        ch = (char) this->channel->read();
+        if (ch == '\n'){
+            /* Create the event */
+            Event* ev = new BTMsgRecv(this, content);
+            this->content = "";
+            /* Generate it */
+            this->generateEvent(ev);
+        } else {
+            this->content += ch;      
+        }
+    } 
 }

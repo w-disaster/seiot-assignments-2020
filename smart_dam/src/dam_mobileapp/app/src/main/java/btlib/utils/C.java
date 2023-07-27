@@ -23,5 +23,4 @@ public class C {
         public static final String BT_DEVICE_ACTING_AS_SERVER_NAME = "isi00"; //MODIFICARE QUESTA COSTANTE CON IL NOME DEL DEVICE CHE FUNGE DA SERVER
         public static final String BT_SERVER_UUID = "7ba55836-01eb-11e9-8eb2-f2801f1b9fd1";
     }
-
 }

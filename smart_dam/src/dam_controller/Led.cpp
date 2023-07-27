@@ -1,15 +1,27 @@
 #include "Led.h"
 #include "Arduino.h"
 
-Led::Led(int pin){
+LedClass Led(LED_PIN);
+
+LedClass::LedClass(int pin){
   this->pin = pin;
-  pinMode(pin,OUTPUT);
+  pinMode(pin, OUTPUT);
 }
 
-void Led::switchOn(){
-  digitalWrite(pin,HIGH);
+void LedClass::switchOn(){
+  digitalWrite(pin, HIGH);
+  isOn = true;
 }
 
-void Led::switchOff(){
-  digitalWrite(pin,LOW);
-};
+void LedClass::switchOff(){
+  digitalWrite(pin, LOW);
+  isOn = false;
+}
+
+bool LedClass::isLedOn(){
+  return isOn;
+}
+
+void LedClass::blink(){
+  Led.isLedOn() ? Led.switchOff() : Led.switchOn();
+}

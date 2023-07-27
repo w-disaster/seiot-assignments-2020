@@ -1,37 +1,20 @@
 #ifndef __RIVER_DATA__
 #define __RIVER_DATA__
 
+#include "ArduinoJson.h"
+#include "State.h"
+#define D_JSON_DIM 100
+
+/* This class is useful to fetch data of a json sent from DS */
 class RiverData {
+    public:
+        RiverData(String msg);
+        State getRiverState();
+        bool containsDamOpening();
+        int getDamOpening();
 
-public:
-    enum RiverState{
-        NORMAL,
-        PREALARM,
-        ALARM
-    };
-
-    enum DamMode{
-        AUTO,
-        MANUAL
-    };
-
-    RiverData();
-    void setRiverState(RiverState riverState);
-
-    RiverState getRiverState();
-
-    void setDamMode(DamMode damMode);
-
-    DamMode getDamMode();
-
-    void setDamOpening(int damOpening);
-
-    int getDamOpening();
-
-private:
-    RiverState riverState;
-    DamMode damMode;
-    int damOpening;
+    private:
+        DeserializationError error;
 
 };
 

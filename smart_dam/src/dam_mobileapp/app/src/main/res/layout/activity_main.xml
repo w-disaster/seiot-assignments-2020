@@ -1,137 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:fillViewport="true">
 
-    <Button
-        android:id="@+id/buttonOpen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/buttonOpen"
-        android:onClick="openDam"
+    <androidx.constraintlayout.widget.ConstraintLayout
 
-        app:backgroundTint="#009688"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contextSwitch"
-        app:layout_constraintVertical_bias="0.1"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/buttonClose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="closeDam"
-        android:text="@string/buttonClose"
+            <TextView
+                android:id="@+id/stateCircle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:drawableEnd="@drawable/grey_circle"
+                android:drawableRight="@drawable/grey_circle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/waterLevelLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-        app:backgroundTint="#009688"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contextSwitch"
-        app:layout_constraintVertical_bias="0.3" />
+            <TextView
+                android:id="@+id/state"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textColor="@color/black"
+                android:textSize="21dp"
+                android:textStyle="bold|italic"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="@+id/stateCircle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/stateCircle"/>
 
-    <TextView
-        android:id="@+id/stateLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/stateLabel"
+            <TextView
+                android:id="@+id/waterLevelLabel"
+                android:background="@drawable/back"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="290dp"
+                app:layout_constraintTop_toBottomOf="@id/stateCircle"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="center|left"
+                android:text="@string/waterLabel"
+                android:textColor="@color/black"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="parent"/>
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.1" />
+            <TextView
+                android:id="@+id/waterLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:gravity="center|right"
+                android:layout_marginRight="20dp"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="italic"
+                app:layout_constraintHorizontal_bias="1.0"
 
-    <TextView
-        android:id="@+id/state"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/waterLevelLabel"
+                app:layout_constraintEnd_toEndOf="@+id/waterLevelLabel"
+                app:layout_constraintStart_toEndOf="@+id/state"/>
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+            <TextView
+                android:id="@+id/damOpeningLabel"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginBottom="290dp"
+                app:layout_constraintTop_toBottomOf="@id/waterLevelLabel"
+                app:layout_constraintBottom_toTopOf="@+id/mode"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@string/damOpeningLabel"
+                android:gravity="center|left"
+                android:textColor="@color/black"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="parent"/>
 
-        app:layout_constraintTop_toBottomOf="@+id/stateLabel"
+            <TextView
+                android:id="@+id/damOpening"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:gravity="center|right"
+                android:layout_marginRight="20dp"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="italic"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintBottom_toBottomOf="@+id/damOpeningLabel"
+                app:layout_constraintEnd_toEndOf="@+id/waterLevelLabel"
+                app:layout_constraintStart_toEndOf="@+id/state"/>
 
-        app:layout_constraintVertical_bias="0.02"
-        android:textSize="35sp"
-        android:text="@string/placeholder"/>
+            <TextView
+                android:id="@+id/modeLabel"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/back"
+                android:gravity="center|left"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/mode"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toTopOf="@+id/manualOpeningView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/damOpeningLabel"/>
 
-    <TextView
-        android:id="@+id/levelLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/damOpeningLabel"
+            <Switch
+                android:id="@+id/mode"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:checked="false"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/water"
-        app:layout_constraintVertical_bias="0.02" />
+                android:text="AUTO"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:textStyle="italic"
 
-    <TextView
-        android:id="@+id/level"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/modeLabel"
+                app:layout_constraintTop_toBottomOf="@id/damOpeningLabel"
+                tools:ignore="UseSwitchCompatOrMaterialXml"/>
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+            <TextView
+                android:id="@+id/manualOpeningView"
+                android:layout_width="match_parent"
+                android:layout_height="170dp"
+                app:layout_constraintVertical_bias="1.0"
+                android:gravity="top|left"
+                android:paddingLeft="10dp"
+                android:paddingTop="10dp"
+                android:text="@string/manualOpening"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/modeLabel"/>
 
-        app:layout_constraintTop_toBottomOf="@+id/levelLabel"
+            <SeekBar
+                android:id="@+id/manualSeekBar"
+                android:layout_width="300dp"
+                android:layout_height="45dp"
+                app:layout_constraintBottom_toBottomOf="@+id/manualOpeningView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/modeLabel"/>
 
-        app:layout_constraintVertical_bias="0.02"
-        android:textSize="35sp"
-        android:text="@string/placeholder"/>
+            <TextView
+                android:id="@+id/manualOpeningValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="bottom|center"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="@+id/manualOpeningView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/manualSeekBar"
+                app:layout_constraintVertical_bias="0" />
 
-    <TextView
-        android:id="@+id/waterLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/waterLabel"
+            <Button
+                android:id="@+id/connectBtn"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_default="spread"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0"
+                app:layout_constraintTop_toBottomOf="@+id/manualOpeningView"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="Connect to Dam Controller"/>
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/state"
-        app:layout_constraintVertical_bias="0.02" />
-
-    <TextView
-        android:id="@+id/water"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-
-        app:layout_constraintTop_toBottomOf="@+id/waterLabel"
-        android:textColor="@color/water"
-
-        app:layout_constraintVertical_bias="0.02"
-        android:textSize="35sp"
-        android:text="@string/placeholder"/>
-
-    <Switch
-        android:id="@+id/contextSwitch"
-        android:layout_width="200dp"
-        android:layout_height="53dp"
-
-        android:checked="false"
-        android:text="@string/mode"
-
-        android:textSize="25sp"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

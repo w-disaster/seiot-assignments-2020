@@ -1,32 +1,15 @@
-#ifndef __MSGSERVICE__
-#define __MSGSERVICE__
+#ifndef __MSG_SERVICE__
+#define __MSG_SERVICE__
 
-#include "Arduino.h"
-#include "Msg.h"
+#include "MsgEventSource.h"
+#define BAUD_RATE 9600
 
-class Pattern {
-public:
-  virtual boolean match(const Msg& m) = 0;  
-};
-
-class MsgServiceClass {
-    
-public: 
-  
-  Msg* currentMsg;
-  bool msgAvailable;
-
-  void init();  
-
-  bool isMsgAvailable();
-  Msg* receiveMsg();
-
-  bool isMsgAvailable(Pattern& pattern);
-  Msg* receiveMsg(Pattern& pattern);
-  
-  void sendMsg(const Msg& msg);
-  void sendMsg(const String& msg);
-};
+/* Serial message service */
+class MsgServiceClass : public MsgEventSource {
+    public: 
+        void init();
+        void sendMsg(String msg); 
+}; 
 
 extern MsgServiceClass MsgService;
 

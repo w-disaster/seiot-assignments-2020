@@ -1,0 +1,11 @@
+.subtle-pattern {
+    background-color: #f1f2f3;
+    background-image:
+    url("/upload/swirl_pattern.jpeg"),
+    url("/upload/swirl_pattern.jpeg");
+    background-position: -1px -1px, -1px -1px;
+}
+
+.italic {
+    font-style: italic;
+}
